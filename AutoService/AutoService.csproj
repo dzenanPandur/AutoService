@@ -29,10 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoService.Data\AutoService.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\AutoService.Services\AutoService.Services.csproj" />
   </ItemGroup>
 
 </Project>

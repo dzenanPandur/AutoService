@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-//using AutoService.Services.Services;
 using AutoService.Data.Entities.UserData;
 using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.VehicleData;
 using AutoService.Data.Entities.ClientData;
-using AutoService.Data.Database;
-using System.Reflection.Emit;
 
-namespace AutoService.Services
+namespace AutoService.Data.Database
 {
     public partial class AutoServiceContext : IdentityDbContext<User, Role, Guid>
 

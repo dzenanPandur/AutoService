@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoService.Data.Migrations
 {
     [DbContext(typeof(AutoServiceContext))]
-    [Migration("20231228122526_Initial")]
-    partial class Initial
+    [Migration("20231228222817_UserIdFix")]
+    partial class UserIdFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -271,19 +271,16 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"),
-                            ConcurrencyStamp = "58bc855b-fe41-4389-8d39-af07db2700d6",
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"),
-                            ConcurrencyStamp = "bc3aefbf-2ad3-4da6-9a38-7aa7e4a40ed6",
                             Name = "Employee"
                         },
                         new
                         {
                             Id = new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"),
-                            ConcurrencyStamp = "fcb99488-4264-4a4e-a3c4-f15f60c0aaad",
                             Name = "Client"
                         });
                 });
@@ -322,6 +319,7 @@ namespace AutoService.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -349,10 +347,12 @@ namespace AutoService.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NormalizedEmail")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -378,6 +378,7 @@ namespace AutoService.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -388,8 +389,7 @@ namespace AutoService.Data.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.HasIndex("RoleId");
 
