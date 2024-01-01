@@ -45,7 +45,7 @@ public class Vehicle
         if (dto.RecordIdList.Any())
         {
             Records = new List<VehicleServiceRecord>(dto.RecordIdList.Count);
-            foreach (VehicleServiceRecordDto recordDto in dto.Records)
+            foreach (RecordDto recordDto in dto.Records)
             {
                 VehicleServiceRecord record = new VehicleServiceRecord(recordDto);
 

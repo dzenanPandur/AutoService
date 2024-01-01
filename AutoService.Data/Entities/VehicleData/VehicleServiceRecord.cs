@@ -11,7 +11,7 @@ public class VehicleServiceRecord
 
     }
 
-    public VehicleServiceRecord(VehicleServiceRecordDto dto)
+    public VehicleServiceRecord(RecordDto dto)
     {
         Id = dto.Id;
         Date = dto.Date;

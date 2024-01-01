@@ -1,11 +1,12 @@
 ﻿using AutoService.Data.DTO.ServiceData;
+using AutoService.Data.DTO.UserData;
 using AutoService.Data.DTO.VehicleData;
 using AutoService.Data.Entities.ClientData;
 using AutoService.Data.Entities.ServiceData;
 
 namespace AutoService.Data.DTO.ClientData
 {
-    public class ClientDto
+    public class ClientDto : UserDto
     {
         public ClientDto()
         {

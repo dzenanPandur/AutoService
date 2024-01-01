@@ -2,6 +2,7 @@
 using AutoService.Data.DTO.VehicleData;
 using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Enums;
+using System.Text.Json.Serialization;
 
 namespace AutoService.Data.DTO.ServiceData
 {
@@ -40,17 +41,25 @@ namespace AutoService.Data.DTO.ServiceData
                 Vehicle = new VehicleDto(request.Vehicle);
             }
         }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
         public Status Status { get; set; }
         public DateTime? DateRequested { get; set; }
         public DateTime? DateCompleted { get; set; }
         public string? CustomRequest { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public AppointmentDto? Appointment { get; set; }
+        [JsonIgnore]
         public int? AppointmentId { get; set; }
-        public ClientDto Client { get; set; }
+        [JsonIgnore]
+        public ClientDto? Client { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Guid ClientId { get; set; }
+        [JsonIgnore]
         public VehicleDto? Vehicle { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? VehicleId { get; set; }
+        [JsonIgnore]
         public ICollection<ServiceDto> Services { get; set; } = new List<ServiceDto>();
         public ICollection<int> ServiceIdList { get; set; } = new List<int>();
     }

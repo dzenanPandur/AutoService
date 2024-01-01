@@ -1,5 +1,6 @@
 ﻿using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.VehicleData;
+using System.Text.Json.Serialization;
 
 namespace AutoService.Data.DTO.ServiceData
 {
@@ -24,14 +25,21 @@ namespace AutoService.Data.DTO.ServiceData
             }
         }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string Name { get; set; }
         public bool? IsActive { get; set; }
         public decimal Price { get; set; }
+        [JsonIgnore]
         public CategoryDto? Category { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? CategoryId { get; set; }
+        [JsonIgnore]
         public ICollection<int> RequestIdList { get; set; } = new List<int>();
+
+        [JsonIgnore]
         public ICollection<RequestDto> Requests { get; set; } = new List<RequestDto>();
+        [JsonIgnore]
         public ICollection<VehicleServiceRecord> Records { get; set; } = new List<VehicleServiceRecord>();
     }
 }

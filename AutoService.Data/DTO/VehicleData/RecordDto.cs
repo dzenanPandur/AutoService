@@ -1,16 +1,17 @@
 ﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.Entities.VehicleData;
+using System.Text.Json.Serialization;
 
 namespace AutoService.Data.DTO.VehicleData
 {
-    public class VehicleServiceRecordDto
+    public class RecordDto
     {
-        public VehicleServiceRecordDto()
+        public RecordDto()
         {
 
         }
 
-        public VehicleServiceRecordDto(VehicleServiceRecord vehicleServiceRecord)
+        public RecordDto(VehicleServiceRecord vehicleServiceRecord)
         {
             Id = vehicleServiceRecord.Id;
             Date = vehicleServiceRecord.Date;
@@ -31,13 +32,17 @@ namespace AutoService.Data.DTO.VehicleData
                     .ToList();
             }
         }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
         public DateTime? Date { get; set; }
         public int? MileageAtTimeOfService { get; set; }
         public decimal? Cost { get; set; }
         public string? Notes { get; set; }
+        [JsonIgnore]
         public Vehicle? Vehicle { get; set; }
+        //[JsonIgnore(Condition =JsonIgnoreCondition.WhenWritingNull)]
         public int? VehicleId { get; set; }
+        [JsonIgnore]
         public ICollection<ServiceDto> Services { get; set; } = new List<ServiceDto>();
         public ICollection<int> ServiceIdList { get; set; } = new List<int>();
     }

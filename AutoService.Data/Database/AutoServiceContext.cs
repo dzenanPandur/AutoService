@@ -49,6 +49,18 @@ namespace AutoService.Data.Database
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaim", "dbo");
             builder.Entity<IdentityUserToken<Guid>>().ToTable("UserToken", "dbo");
             builder.Entity<Role>().HasData(DefaultRoleData.Roles);
+            builder.Entity<VehicleFuelType>().HasData(DefaultVehicleData.VehicleFuelTypes);
+            builder.Entity<VehicleType>().HasData(DefaultVehicleData.VehicleTypes);
+            builder.Entity<TransmissionType>().HasData(DefaultVehicleData.TransmissionTypes);
+            builder.Entity<Vehicle>().HasData(DefaultVehicleData.Vehicles);
+            builder.Entity<VehicleServiceRecord>().HasData(DefaultVehicleData.VehicleServiceRecords);
+            builder.Entity<ServicesPerformed>().HasData(DefaultVehicleData.ServicesPerformeds);
+            builder.Entity<Category>().HasData(DefaultServiceData.Categories);
+            builder.Entity<Service>().HasData(DefaultServiceData.Services);
+            builder.Entity<Request>().HasData(DefaultServiceData.Requests);
+            builder.Entity<Appointment>().HasData(DefaultServiceData.Appointments);
+            builder.Entity<ServiceRequest>().HasData(DefaultServiceData.ServiceRequests);
+
 
             //VehicleServiceRecord N : 1 Vehicle
 

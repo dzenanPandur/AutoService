@@ -1,4 +1,5 @@
 ﻿using AutoService.Data.Entities.VehicleData;
+using System.Text.Json.Serialization;
 
 namespace AutoService.Data.DTO.VehicleData
 {
@@ -15,6 +16,7 @@ namespace AutoService.Data.DTO.VehicleData
             Name = vehicleType.Name;
         }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
         public string Name { get; set; }
     }

@@ -103,6 +103,7 @@ namespace AutoService.Services.Managers
         public async Task<int> CreateUser(UserDto dto)
         {
             var user = new User(dto);
+            _context.ChangeTracker.Clear();
 
             user.Id = Guid.NewGuid();
             user.SecurityStamp = Guid.NewGuid().ToString();

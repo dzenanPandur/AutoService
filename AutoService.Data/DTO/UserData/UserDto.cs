@@ -37,7 +37,7 @@ namespace AutoService.Data.DTO.UserData
             }
         }
 
-        [JsonIgnore]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

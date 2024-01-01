@@ -59,6 +59,16 @@ builder.Services.AddSingleton(typeof(IPasswordHasher<>), typeof(PasswordHasher<>
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IUserManager, UserManager>();
 builder.Services.AddScoped<IRoleManager, RoleManager>();
+builder.Services.AddScoped<IAppointmentManager, AppointmentManager>();
+builder.Services.AddScoped<ICategoryManager, CategoryManager>();
+builder.Services.AddScoped<IClientManager, ClientManager>();
+builder.Services.AddScoped<IRequestManager, RequestManager>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
+builder.Services.AddScoped<ITransmissionTypeManager, TransmissionTypeManager>();
+builder.Services.AddScoped<IVehicleFuelTypeManager, VehicleFuelTypeManager>();
+builder.Services.AddScoped<IVehicleManager, VehicleManager>();
+builder.Services.AddScoped<IVehicleServiceRecordManager, VehicleServiceRecordManager>();
+builder.Services.AddScoped<IVehicleTypeManager, VehicleTypeManager>();
 
 builder.Services.AddAuthentication(opt =>
 {
