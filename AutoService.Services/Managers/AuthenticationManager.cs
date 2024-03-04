@@ -1,14 +1,15 @@
-﻿using AutoService.Data.Entities.UserData;
+﻿using AutoService.Data.Database;
+using AutoService.Data.DTO.UserData;
+using AutoService.Data.Entities.UserData;
 using AutoService.Services.Interfaces;
+using AutoService.ViewModels.AuthData;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using AutoService.Data.Database;
-using AutoService.Data.Entities.ClientData;
-using AutoService.Data.DTO.UserData;
+using System.Security.Authentication;
+using System.Security.Claims;
+using System.Text;
 
 namespace AutoService.Services.Managers
 {
@@ -26,7 +27,7 @@ namespace AutoService.Services.Managers
             IConfiguration configuration,
             AutoServiceContext context)
         {
-            _userManager= userManager;
+            _userManager = userManager;
             this.passwordHasher = passwordHasher;
             this.configuration = configuration;
             this.context = context;
@@ -34,17 +35,19 @@ namespace AutoService.Services.Managers
 
         public async Task<AuthenticationResponse?> Authenticate(AuthenticationRequest request)
         {
-            UserDto userDto = await _userManager.GetByUsername(request.Username);
-            User user = new User(userDto);
 
-            if (user == null)
+            UserDto userDto = await _userManager.GetByUsername(request.Username);
+
+            if (userDto == null)
             {
-                return null;
+                throw new AuthenticationException("Username or password is wrong.");
             }
 
-            if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, request.Password) != PasswordVerificationResult.Success)
+            User user = new User(userDto);
+
+            if (passwordHasher.VerifyHashedPassword(user, userDto.Password, request.Password) != PasswordVerificationResult.Success)
             {
-                return null;
+                throw new AuthenticationException("Username or password is wrong.");
             }
 
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
@@ -58,9 +61,8 @@ namespace AutoService.Services.Managers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"])), SecurityAlgorithms.HmacSha512Signature)
             };
 
-            
 
-            // Add claims without using 'Action' type
+
             tokenDescriptor.Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -72,8 +74,17 @@ namespace AutoService.Services.Managers
 
             return new AuthenticationResponse
             {
-                Token = jwtSecurityTokenHandler.WriteToken(token)
+                Token = jwtSecurityTokenHandler.WriteToken(token),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role.Name,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                Username = user.UserName,
+                UserId = user.Id,
+                Gender = user.Gender,
+
             };
         }
     }
-    }
+}

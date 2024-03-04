@@ -1,17 +1,13 @@
 ﻿using AutoService.Data.Entities.UserData;
 using AutoService.Data.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace AutoService.Data.DTO.UserData
 {
     public class UserDto
     {
-        public UserDto() { 
+        public UserDto()
+        {
 
         }
 
@@ -30,6 +26,7 @@ namespace AutoService.Data.DTO.UserData
             UserName = user.UserName;
             PhoneNumber = user.PhoneNumber;
             RoleId = user.RoleId;
+            Password = user.PasswordHash;
 
             if (user.Role is not null)
             {
@@ -54,9 +51,9 @@ namespace AutoService.Data.DTO.UserData
         public RoleDto? Role { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string PasswordConfirm { get; set; }
+        public string? PasswordConfirm { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Guid RoleId { get; set; }
     }

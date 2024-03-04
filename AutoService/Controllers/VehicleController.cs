@@ -1,5 +1,4 @@
-﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.DTO.VehicleData;
+﻿using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.VehicleData;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +17,7 @@ namespace AutoService.Controllers
             _vehicleManager = vehicleManager;
         }
 
-        [HttpGet("GetAllVehicles")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllVehicles()
         {
 
@@ -35,16 +34,16 @@ namespace AutoService.Controllers
 
             foreach (VehicleDto vehicleDto in vehicles)
             {
-                
+
                 VehicleViewModel vehicleViewModel = new VehicleViewModel(vehicleDto);
                 vehicleViewModels.Add(vehicleViewModel);
-                
+
             }
 
             return Ok(vehicleViewModels);
         }
 
-        [HttpGet("GetVehicleById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetVehicle(int id)
         {
@@ -63,7 +62,7 @@ namespace AutoService.Controllers
             return Ok(vehicle);
         }
 
-        [HttpPost("CreateVehicle")]
+        [HttpPost("Create")]
         [Authorize]
         public async Task<IActionResult> CreateVehicle(VehicleDto dto)
         {
@@ -74,7 +73,7 @@ namespace AutoService.Controllers
 
                 return Ok("Vehicle created successfully.");
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 return Problem(e.InnerException.ToString());
             }
@@ -89,7 +88,7 @@ namespace AutoService.Controllers
             //}
         }
 
-        [HttpPut("UpdateVehicle")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateVehicle(VehicleDto dto)
         {
@@ -103,7 +102,7 @@ namespace AutoService.Controllers
             return Ok(vehicle);
         }
 
-        [HttpDelete("DeleteVehicle")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteVehicle(int id)
         {

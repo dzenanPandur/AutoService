@@ -107,15 +107,15 @@ namespace AutoService.Data.Database
                     Make= "Peugeot",
                     Model = "308",
                     Vin = "1231AKHJKHJ1213JH",
-                    ClientId = Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId = Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     FuelTypeId = 2,
                     VehicleTypeId = 2,
                     TransmissionTypeId = 1,
                     Mileage = 195123,
                     Status = (Enums.Status)2,
                     ManufactureYear=2016
-                    
-                    
+
+
 
                 },
 
@@ -125,7 +125,7 @@ namespace AutoService.Data.Database
                     Make= "Toyota",
                     Model = "Yaris",
                     Vin = "12151AKGHEQRH15121JH",
-                    ClientId = Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId = Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     FuelTypeId = 1,
                     VehicleTypeId = 2,
                     TransmissionTypeId = 1,

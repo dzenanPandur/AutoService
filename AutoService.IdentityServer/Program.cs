@@ -1,5 +1,4 @@
 using AutoService.Data.Database;
-using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.UserData;
 using AutoService.IdentityServer;
 using AutoService.IdentityServer.Config;
@@ -28,6 +27,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
 
     options.User.RequireUniqueEmail = true;
     options.SignIn.RequireConfirmedEmail = false;
@@ -41,7 +41,7 @@ builder.Services.AddIdentity<User, Role>(options =>
 var settings = builder.Configuration.GetSection("Identity").Get<Settings>();
 
 builder.Services.AddIdentityServer()
-    .AddAspNetIdentity <User> ()
+    .AddAspNetIdentity<User>()
     .AddInMemoryIdentityResources(Config.GetIdentityResources())
     .AddInMemoryApiResources(Config.GetApis())
     .AddInMemoryClients(Config.GetClients())

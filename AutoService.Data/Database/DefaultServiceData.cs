@@ -12,7 +12,7 @@ namespace AutoService.Data.Database
                     Id = 1,
                     Date = DateTime.Now,
                     IsOccupied = true,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     RequestId = 1
                 },
 
@@ -21,7 +21,7 @@ namespace AutoService.Data.Database
                     Id = 2,
                     Date = DateTime.UtcNow,
                     IsOccupied = false,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     RequestId = 2
                 },
                 new Appointment
@@ -29,7 +29,7 @@ namespace AutoService.Data.Database
                     Id = 3,
                     Date = DateTime.Now,
                     IsOccupied = true,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     RequestId = 3
                 },
                 new Appointment
@@ -37,7 +37,7 @@ namespace AutoService.Data.Database
                     Id = 4,
                     Date = DateTime.Now,
                     IsOccupied = false,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     RequestId = 4
                 },
             };
@@ -112,7 +112,7 @@ namespace AutoService.Data.Database
                 {
                     Id = 1,
                     AppointmentId = 1,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change tires",
                     DateCompleted=DateTime.UtcNow,
                     DateRequested=DateTime.UtcNow,
@@ -126,7 +126,7 @@ namespace AutoService.Data.Database
                 {
                     Id = 2,
                     AppointmentId = 2,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change window",
                     DateCompleted=DateTime.UtcNow,
                     DateRequested=DateTime.UtcNow,
@@ -139,7 +139,7 @@ namespace AutoService.Data.Database
                 {
                     Id = 3,
                     AppointmentId = 3,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change bumper",
                     DateCompleted=DateTime.UtcNow,
                     DateRequested=DateTime.UtcNow,
@@ -152,7 +152,7 @@ namespace AutoService.Data.Database
                 {
                     Id = 4,
                     AppointmentId = 4,
-                    ClientId =Guid.Parse("45EDB75B-2876-4709-AAB9-3382D5E8184B"),
+                    ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change rims",
                     DateCompleted=DateTime.UtcNow,
                     DateRequested=DateTime.UtcNow,

@@ -15,7 +15,7 @@ namespace AutoService.Controllers
             _transmissionTypeManager = transmissionTypeManager;
         }
 
-        [HttpGet("GetAllTransmissionTypes")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllTransmissionTypes()
         {
 
@@ -38,7 +38,7 @@ namespace AutoService.Controllers
             //return Ok(userViewModels);
         }
 
-        [HttpGet("GetTransmissionTypeById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetTransmissionType(int id)
         {
@@ -57,7 +57,7 @@ namespace AutoService.Controllers
             return Ok(transmissionType);
         }
 
-        [HttpPost("CreateTransmissionType")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateTransmissionType(TransmissionTypeDto dto)
         {
@@ -72,7 +72,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateTransmissionType")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateTransmissionType(TransmissionTypeDto dto)
         {
@@ -86,7 +86,7 @@ namespace AutoService.Controllers
             return Ok(transmissionType);
         }
 
-        [HttpDelete("DeleteTransmissionType")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteTransmissionType(int id)
         {

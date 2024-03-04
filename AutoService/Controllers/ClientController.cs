@@ -1,14 +1,10 @@
-﻿using AutoService.Data.Database;
-using AutoService.Data.DTO.ClientData;
-using AutoService.Data.DTO.ServiceData;
+﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.DTO.UserData;
 using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
-using AutoService.Services.Managers;
 using AutoService.ViewModels.ServiceData;
 using AutoService.ViewModels.VehicleData;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AutoService.Controllers
 {
@@ -17,13 +13,14 @@ namespace AutoService.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientManager _clientManager;
-        public ClientController(IClientManager clientManager) 
+        public ClientController(IClientManager clientManager)
         {
             _clientManager = clientManager;
         }
 
-        [HttpGet("GetClient")]
-        public async Task<IActionResult> GetClient(Guid id) {
+        [HttpGet("GetById")]
+        public async Task<IActionResult> GetClient(Guid id)
+        {
 
             if (string.IsNullOrEmpty(id.ToString()))
             {
@@ -41,7 +38,7 @@ namespace AutoService.Controllers
 
         }
 
-        [HttpGet("GetAllClients")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllClients()
         {
             IEnumerable<UserDto> clients = await _clientManager.GetAllClients();
@@ -85,7 +82,7 @@ namespace AutoService.Controllers
 
             return Ok(requestViewModels);
         }
-        
+
         [HttpGet("GetAllAppointmentsByClient")]
         public async Task<IActionResult> GetAllAppointmentsByClient(Guid id)
         {
@@ -99,7 +96,7 @@ namespace AutoService.Controllers
 
             return Ok(appointments);
         }
-        
+
         [HttpGet("GetAllVehiclesByClient")]
         public async Task<IActionResult> GetAllVehiclesByClient(Guid id)
         {

@@ -1,7 +1,5 @@
 ﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.DTO.UserData;
 using AutoService.Services.Interfaces;
-using AutoService.ViewModels.UserData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -11,13 +9,13 @@ namespace AutoService.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentManager _appointmentManager;
-        public AppointmentController(IAppointmentManager appointmentManager) 
+        public AppointmentController(IAppointmentManager appointmentManager)
         {
             _appointmentManager = appointmentManager;
         }
 
-        [HttpGet("GetAllAppointments")]
-        public async Task<IActionResult> GetAllAppointments() 
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAllAppointments()
         {
 
             IEnumerable<AppointmentDto> appointments = await _appointmentManager.GetAllAppointments();
@@ -39,7 +37,7 @@ namespace AutoService.Controllers
             //return Ok(userViewModels);
         }
 
-        [HttpGet("GetAppointmentById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetAppointment(int id)
         {
@@ -58,7 +56,7 @@ namespace AutoService.Controllers
             return Ok(appointment);
         }
 
-        [HttpPost("CreateAppointment")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateAppointment(AppointmentDto dto)
         {
@@ -73,7 +71,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateAppointment")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateAppointment(AppointmentDto dto)
         {
@@ -87,7 +85,7 @@ namespace AutoService.Controllers
             return Ok(appointment);
         }
 
-        [HttpDelete("DeleteAppointment")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteAppointment(int id)
         {

@@ -1,4 +1,5 @@
 ﻿using AutoService.Services.Interfaces;
+using AutoService.ViewModels.AuthData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -19,7 +20,7 @@ namespace AutoService.Controllers
         {
             var result = await _authenticationManager.Authenticate(authenticationRequest);
 
-            if(result == null)
+            if (result == null)
             {
                 return BadRequest("Invalid");
             }

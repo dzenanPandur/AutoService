@@ -1,5 +1,4 @@
 ﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +15,7 @@ namespace AutoService.Controllers
             _categoryManager = categoryManager;
         }
 
-        [HttpGet("GetAllCategories")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllCategories()
         {
 
@@ -39,7 +38,7 @@ namespace AutoService.Controllers
             //return Ok(userViewModels);
         }
 
-        [HttpGet("GetCategoryById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetCategoryById(int id)
         {
@@ -58,7 +57,7 @@ namespace AutoService.Controllers
             return Ok(category);
         }
 
-        [HttpPost("CreateCategory")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateCategory(CategoryDto dto)
         {
@@ -73,7 +72,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateCategory")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateCategory(CategoryDto dto)
         {
@@ -87,7 +86,7 @@ namespace AutoService.Controllers
             return Ok(category);
         }
 
-        [HttpDelete("DeleteCategory")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteCategory(int id)
         {

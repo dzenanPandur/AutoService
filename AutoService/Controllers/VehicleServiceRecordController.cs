@@ -1,13 +1,7 @@
-﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Entities.ServiceData;
+﻿using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
-using AutoService.Services.Managers;
-using AutoService.ViewModels.ServiceData;
 using AutoService.ViewModels.VehicleData;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace AutoService.Controllers
 {
@@ -21,7 +15,7 @@ namespace AutoService.Controllers
             _recordManager = recordManager;
         }
 
-        [HttpGet("GetAllRecords")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllRecords()
         {
 
@@ -71,7 +65,7 @@ namespace AutoService.Controllers
             return Ok(recordViewModels);
         }
 
-        [HttpGet("GetRecordById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetRecord(int id)
         {
@@ -90,7 +84,7 @@ namespace AutoService.Controllers
             return Ok(Record);
         }
 
-        [HttpPost("CreateRecord")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateRecord(RecordDto dto)
         {
@@ -113,7 +107,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateRecord")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateRecord(RecordDto dto)
         {
@@ -127,7 +121,7 @@ namespace AutoService.Controllers
             return Ok(record);
         }
 
-        [HttpDelete("DeleteRecord")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteRecord(int id)
         {

@@ -1,6 +1,4 @@
-﻿using AutoService.Data.DTO.UserData;
-using AutoService.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using AutoService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -16,7 +14,7 @@ namespace AutoService.Controllers
             _manager = manager;
         }
 
-        [HttpGet("GetRoleById")]
+        [HttpGet("GetById")]
         //[AllowAnonymous]
         //[Authorize]
         public async Task<IActionResult> GetRoleById(Guid id)

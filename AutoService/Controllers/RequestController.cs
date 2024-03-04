@@ -1,9 +1,6 @@
 ﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.Entities.ServiceData;
 using AutoService.Services.Interfaces;
-using AutoService.Services.Managers;
 using AutoService.ViewModels.ServiceData;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -21,7 +18,7 @@ namespace AutoService.Controllers
             _appointmentManager = appointmentManager;
         }
 
-        [HttpGet("GetAllRequests")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllRequests()
         {
 
@@ -44,7 +41,7 @@ namespace AutoService.Controllers
             return Ok(requestViewModels);
         }
 
-        [HttpGet("GetRequestById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetRequest(int id)
         {
@@ -63,7 +60,7 @@ namespace AutoService.Controllers
             return Ok(Request);
         }
 
-        [HttpPost("CreateRequest")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateRequest(RequestDto dto)
         {
@@ -86,7 +83,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateRequest")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateRequest(RequestDto dto)
         {
@@ -100,7 +97,7 @@ namespace AutoService.Controllers
             return Ok(request);
         }
 
-        [HttpDelete("DeleteRequest")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteRequest(int id)
         {

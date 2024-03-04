@@ -15,7 +15,7 @@ namespace AutoService.Controllers
             _vehicleFuelTypeManager = vehicleFuelTypeManager;
         }
 
-        [HttpGet("GetAllVehicleFuelTypes")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllVehicleFuelTypes()
         {
 
@@ -38,7 +38,7 @@ namespace AutoService.Controllers
             //return Ok(userViewModels);
         }
 
-        [HttpGet("GetVehicleFuelTypeById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetVehicleFuelType(int id)
         {
@@ -57,7 +57,7 @@ namespace AutoService.Controllers
             return Ok(vehicleFuelType);
         }
 
-        [HttpPost("CreateVehicleFuelType")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateVehicleFuelType(VehicleFuelTypeDto dto)
         {
@@ -72,7 +72,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateVehicleFuelType")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateVehicleFuelType(VehicleFuelTypeDto dto)
         {
@@ -86,7 +86,7 @@ namespace AutoService.Controllers
             return Ok(vehicleFuelType);
         }
 
-        [HttpDelete("DeleteVehicleFuelType")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteVehicleFuelType(int id)
         {

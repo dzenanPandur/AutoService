@@ -1,5 +1,4 @@
 ﻿using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Entities.VehicleData;
 using AutoService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +15,7 @@ namespace AutoService.Controllers
             _vehicleTypeManager = vehicleTypeManager;
         }
 
-        [HttpGet("GetAllVehicleTypes")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllVehicleTypes()
         {
 
@@ -39,7 +38,7 @@ namespace AutoService.Controllers
             //return Ok(userViewModels);
         }
 
-        [HttpGet("GetVehicleTypeById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetVehicleType(int id)
         {
@@ -58,7 +57,7 @@ namespace AutoService.Controllers
             return Ok(VehicleType);
         }
 
-        [HttpPost("CreateVehicleType")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateVehicleType(VehicleTypeDto dto)
         {
@@ -73,7 +72,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateVehicleType")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateVehicleType(VehicleTypeDto dto)
         {
@@ -87,7 +86,7 @@ namespace AutoService.Controllers
             return Ok(vehicleType);
         }
 
-        [HttpDelete("DeleteVehicleType")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteVehicleType(int id)
         {

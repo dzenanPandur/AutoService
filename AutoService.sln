@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoService.Data", "AutoSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoService.Services", "AutoService.Services\AutoService.Services.csproj", "{7BF1DD8F-C72A-4869-B01F-3286EA0F0B56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoService.IdentityServer", "AutoService.IdentityServer\AutoService.IdentityServer.csproj", "{703761F7-1ED6-47BD-88E2-96481B67A2E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoService.IdentityServer", "AutoService.IdentityServer\AutoService.IdentityServer.csproj", "{703761F7-1ED6-47BD-88E2-96481B67A2E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

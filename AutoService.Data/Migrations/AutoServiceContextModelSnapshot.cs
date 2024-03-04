@@ -107,32 +107,32 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
-                            Date = new DateTime(2023, 12, 31, 21, 20, 9, 627, DateTimeKind.Local).AddTicks(8028),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            Date = new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6942),
                             IsOccupied = true,
                             RequestId = 1
                         },
                         new
                         {
                             Id = 2,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
-                            Date = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8034),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            Date = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6945),
                             IsOccupied = false,
                             RequestId = 2
                         },
                         new
                         {
                             Id = 3,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
-                            Date = new DateTime(2023, 12, 31, 21, 20, 9, 627, DateTimeKind.Local).AddTicks(8036),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            Date = new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6946),
                             IsOccupied = true,
                             RequestId = 3
                         },
                         new
                         {
                             Id = 4,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
-                            Date = new DateTime(2023, 12, 31, 21, 20, 9, 627, DateTimeKind.Local).AddTicks(8038),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            Date = new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6948),
                             IsOccupied = false,
                             RequestId = 4
                         });
@@ -218,10 +218,10 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             AppointmentId = 1,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change tires",
-                            DateCompleted = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8007),
-                            DateRequested = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8008),
+                            DateCompleted = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6927),
+                            DateRequested = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6928),
                             Status = 2,
                             VehicleId = 1
                         },
@@ -229,10 +229,10 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             AppointmentId = 2,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change window",
-                            DateCompleted = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8011),
-                            DateRequested = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8011),
+                            DateCompleted = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6930),
+                            DateRequested = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6930),
                             Status = 5,
                             VehicleId = 1
                         },
@@ -240,10 +240,10 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 3,
                             AppointmentId = 3,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change bumper",
-                            DateCompleted = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8013),
-                            DateRequested = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8013),
+                            DateCompleted = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6931),
+                            DateRequested = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6932),
                             Status = 3,
                             VehicleId = 1
                         },
@@ -251,10 +251,10 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 4,
                             AppointmentId = 4,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change rims",
-                            DateCompleted = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8015),
-                            DateRequested = new DateTime(2023, 12, 31, 20, 20, 9, 627, DateTimeKind.Utc).AddTicks(8015),
+                            DateCompleted = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6933),
+                            DateRequested = new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6933),
                             Status = 4,
                             VehicleId = 1
                         });
@@ -613,6 +613,92 @@ namespace AutoService.Data.Migrations
                     b.ToTable("User", "dbo");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b8396f1d-a29a-4856-a4c1-1312dc97a4a1"),
+                            AccessFailedCount = 0,
+                            Active = true,
+                            Address = "Ulica 2",
+                            BirthDate = new DateTime(2000, 1, 11, 16, 22, 29, 961, DateTimeKind.Unspecified),
+                            City = "Mostar",
+                            ConcurrencyStamp = "97e229af-2604-4b7c-b579-d44e43b88576",
+                            CreatedDate = new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9869),
+                            Email = "employee@employee.com",
+                            EmailConfirmed = false,
+                            FirstName = "Employee",
+                            Gender = 1,
+                            LastName = "User",
+                            LockoutEnabled = false,
+                            ModifiedDate = new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9930),
+                            NormalizedEmail = "EMPLOYEE@EMPLOYEE.COM",
+                            NormalizedUserName = "EMPLOYEE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEIHvjeCGSTaZfqUVK9IC/ONuj5fJj5vKIhHnJkXRWgMCEspYS9/+gr3DBICkveXKg==",
+                            PhoneNumber = "123456789",
+                            PhoneNumberConfirmed = false,
+                            PostalCode = 88104,
+                            RoleId = new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"),
+                            SecurityStamp = "2bb56497-5c49-4c01-8bc7-e2df21ef5d53",
+                            TwoFactorEnabled = false,
+                            UserName = "EMPLOYEE"
+                        },
+                        new
+                        {
+                            Id = new Guid("f760ee5c-435b-4875-91a5-21a6a554513b"),
+                            AccessFailedCount = 0,
+                            Active = true,
+                            Address = "Ulica 1",
+                            BirthDate = new DateTime(2000, 1, 1, 16, 22, 29, 961, DateTimeKind.Unspecified),
+                            City = "Mostar",
+                            ConcurrencyStamp = "2ee39f74-519d-400f-bb89-c937f284b676",
+                            CreatedDate = new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1253),
+                            Email = "admin@admin.com",
+                            EmailConfirmed = false,
+                            FirstName = "Admin",
+                            Gender = 1,
+                            LastName = "User",
+                            LockoutEnabled = false,
+                            ModifiedDate = new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1765),
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI9PHasKoFp5DwWoGI8pTvKMeEUkZzfCkdtjIVgv1IWGNUMP9gHa01RFqELzQq5isw==",
+                            PhoneNumber = "123456789",
+                            PhoneNumberConfirmed = false,
+                            PostalCode = 88000,
+                            RoleId = new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"),
+                            SecurityStamp = "76cbb512-37af-4f7a-aef4-4b52eb2c7618",
+                            TwoFactorEnabled = false,
+                            UserName = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            AccessFailedCount = 0,
+                            Active = true,
+                            Address = "Ulica 3",
+                            BirthDate = new DateTime(1998, 1, 4, 16, 22, 29, 961, DateTimeKind.Unspecified),
+                            City = "Sarajevo",
+                            ConcurrencyStamp = "650492b3-5975-4a30-b796-b27c56a065a3",
+                            CreatedDate = new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(607),
+                            Email = "client@client.com",
+                            EmailConfirmed = false,
+                            FirstName = "Client",
+                            Gender = 2,
+                            LastName = "User",
+                            LockoutEnabled = false,
+                            ModifiedDate = new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(637),
+                            NormalizedEmail = "CLIENT@CLIENT.COM",
+                            NormalizedUserName = "CLIENT",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIPOmlsV57rPJlEsDCfu4rsP2GBDN7KXIcFymvHL2ZLzlyCbzIn+LGx6DSCe6BV2og==",
+                            PhoneNumber = "123456789",
+                            PhoneNumberConfirmed = false,
+                            PostalCode = 88104,
+                            RoleId = new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"),
+                            SecurityStamp = "f5f9fa28-8f00-45a5-b3d9-e0921a1a104d",
+                            TwoFactorEnabled = false,
+                            UserName = "Client"
+                        });
                 });
 
             modelBuilder.Entity("AutoService.Data.Entities.VehicleData.TransmissionType", b =>
@@ -701,7 +787,7 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             FuelTypeId = 2,
                             Make = "Peugeot",
                             ManufactureYear = 2016,
@@ -715,7 +801,7 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 2,
-                            ClientId = new Guid("45edb75b-2876-4709-aab9-3382d5e8184b"),
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             FuelTypeId = 1,
                             Make = "Toyota",
                             ManufactureYear = 2008,
@@ -801,7 +887,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             Cost = 1500m,
-                            Date = new DateTime(2023, 12, 31, 21, 20, 9, 627, DateTimeKind.Local).AddTicks(7864),
+                            Date = new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6851),
                             MileageAtTimeOfService = 185100,
                             Notes = "Found broken light",
                             VehicleId = 1
@@ -810,7 +896,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             Cost = 500m,
-                            Date = new DateTime(2023, 12, 31, 21, 20, 9, 627, DateTimeKind.Local).AddTicks(7929),
+                            Date = new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6875),
                             MileageAtTimeOfService = 17800,
                             Notes = "",
                             VehicleId = 2
@@ -962,7 +1048,7 @@ namespace AutoService.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", "dbo");
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>

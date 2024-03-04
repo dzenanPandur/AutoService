@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoService.Data.Entities.ClientData;
+using AutoService.Data.Entities.ServiceData;
+using AutoService.Data.Entities.UserData;
+using AutoService.Data.Entities.VehicleData;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using AutoService.Data.Entities.UserData;
-using AutoService.Data.Entities.ServiceData;
-using AutoService.Data.Entities.VehicleData;
-using AutoService.Data.Entities.ClientData;
 
 namespace AutoService.Data.Database
 {
@@ -21,8 +21,8 @@ namespace AutoService.Data.Database
         }
 
         //public virtual DbSet<ApplicationUserProfilePhoto> ApplicationUserProfilePhotos { get; set; }
-        public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<ProfilePhoto> ProfilePhotos { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
@@ -39,15 +39,20 @@ namespace AutoService.Data.Database
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
             base.OnModelCreating(builder);
 
             builder.Entity<User>().ToTable("User", "dbo");
             builder.Entity<Role>().ToTable("Role", "dbo");
-            builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRole", "dbo");
+
+            //builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRole", "dbo");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaim", "dbo");
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogin", "dbo");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaim", "dbo");
             builder.Entity<IdentityUserToken<Guid>>().ToTable("UserToken", "dbo");
+
+            #region SEED 
+            builder.Entity<User>().HasData(DefaultUserData.Users);
             builder.Entity<Role>().HasData(DefaultRoleData.Roles);
             builder.Entity<VehicleFuelType>().HasData(DefaultVehicleData.VehicleFuelTypes);
             builder.Entity<VehicleType>().HasData(DefaultVehicleData.VehicleTypes);
@@ -60,7 +65,8 @@ namespace AutoService.Data.Database
             builder.Entity<Request>().HasData(DefaultServiceData.Requests);
             builder.Entity<Appointment>().HasData(DefaultServiceData.Appointments);
             builder.Entity<ServiceRequest>().HasData(DefaultServiceData.ServiceRequests);
-
+            //builder.Entity<IdentityUserRole<Guid>>().HasData(DefaultRoleData.UserRoles);
+            #endregion
 
             //VehicleServiceRecord N : 1 Vehicle
 
@@ -188,7 +194,7 @@ namespace AutoService.Data.Database
                             .WithMany(r => r.ServicesPerformeds)
                             .HasForeignKey(sr => sr.RecordId)
                             .OnDelete(DeleteBehavior.Cascade)
-                       
+
                 );
             });
 

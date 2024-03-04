@@ -16,7 +16,7 @@ namespace AutoService.Controllers
             _serviceManager = serviceManager;
         }
 
-        [HttpGet("GetAllServices")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllServices()
         {
 
@@ -39,7 +39,7 @@ namespace AutoService.Controllers
             return Ok(serviceViewModels);
         }
 
-        [HttpGet("GetServiceById")]
+        [HttpGet("GetById")]
 
         public async Task<IActionResult> GetServiceById(int id)
         {
@@ -58,7 +58,7 @@ namespace AutoService.Controllers
             return Ok(service);
         }
 
-        [HttpPost("CreateService")]
+        [HttpPost("Create")]
 
         public async Task<IActionResult> CreateService(ServiceDto dto)
         {
@@ -73,7 +73,7 @@ namespace AutoService.Controllers
             }
         }
 
-        [HttpPut("UpdateService")]
+        [HttpPut("Update")]
 
         public async Task<IActionResult> UpdateService(ServiceDto dto)
         {
@@ -87,7 +87,7 @@ namespace AutoService.Controllers
             return Ok(service);
         }
 
-        [HttpDelete("DeleteService")]
+        [HttpDelete("Delete")]
 
         public async Task<IActionResult> DeleteService(int id)
         {

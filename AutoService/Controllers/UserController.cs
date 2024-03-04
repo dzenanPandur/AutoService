@@ -1,4 +1,5 @@
 ﻿using AutoService.Data.DTO.UserData;
+using AutoService.Data.Entities.UserData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.UserData;
 using Microsoft.AspNetCore.Authorization;
@@ -58,7 +59,26 @@ namespace AutoService.Controllers
             return Ok(userViewModel);
         }
 
-        [HttpGet("GetAllUsers")]
+        [HttpGet("GetById")]
+
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            if (string.IsNullOrEmpty(id.ToString()))
+            {
+                return BadRequest("Id must be provided.");
+            }
+
+            var user = await _manager.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(user);
+        }
+
+        [HttpGet("GetAll")]
         //[Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -71,7 +91,7 @@ namespace AutoService.Controllers
 
             List<UserViewModel> userViewModels = new List<UserViewModel>();
 
-            foreach(UserDto userDto in users)
+            foreach (UserDto userDto in users)
             {
                 UserViewModel userViewModel = new UserViewModel(userDto);
                 userViewModels.Add(userViewModel);
@@ -80,8 +100,37 @@ namespace AutoService.Controllers
             return Ok(userViewModels);
         }
 
+        [HttpGet("GetAllEmployees")]
+        //[Authorize]
+        public async Task<IActionResult> GetEmployees()
+        {
+            List<UserDto> users = await _manager.GetAllUsers();
 
-        [HttpPost("CreateUser")]
+            if (users == null || users.Count == 0)
+            {
+                return NotFound("No employees found.");
+            }
+
+            List<UserDto> employeeUsers = users.Where(user => user.Role.Name == "Employee").ToList();
+
+            if (employeeUsers.Count == 0)
+            {
+                return NotFound("No employees found.");
+            }
+
+            List<UserViewModel> employeeViewModels = new List<UserViewModel>();
+
+            foreach (UserDto userDto in employeeUsers)
+            {
+                UserViewModel userViewModel = new UserViewModel(userDto);
+                employeeViewModels.Add(userViewModel);
+            }
+
+            return Ok(employeeViewModels);
+        }
+
+
+        [HttpPost("Create")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
         {
@@ -95,6 +144,40 @@ namespace AutoService.Controllers
                 return BadRequest("Failed to create user.");
             }
         }
+        [HttpPut("Update")]
+        //[Authorize]
+        public async Task<IActionResult> UpdateUser(UserDto userDto)
+        {
+            User user = await _manager.UpdateUser(userDto);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(user);
+        }
+
+        [HttpDelete("Delete")]
+
+        public async Task<IActionResult> DeleteService(Guid id)
+        {
+            if (string.IsNullOrEmpty(id.ToString()))
+            {
+                return BadRequest("Id must be provided.");
+            }
+
+            var user = await _manager.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            await _manager.DeleteUser(id);
+
+            return Ok("Successfully deleted user.");
+        }
     }
-    
+
 }
