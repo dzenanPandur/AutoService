@@ -96,13 +96,13 @@ Widget buildCheckboxRow(
     child: Row(
       children: [
         Text(labelText),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
         Expanded(
           child: TextFormField(
             controller: controller,
             readOnly: isReadOnly,
             keyboardType: TextInputType.text,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
             ),
           ),

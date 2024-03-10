@@ -1,4 +1,3 @@
-// main.dart
 import 'package:autoservice_desktop/globals.dart';
 import 'package:autoservice_desktop/models/storageService.dart';
 import 'package:autoservice_desktop/providers/AuthProvider.dart';
@@ -29,15 +28,15 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(authProvider: authProvider),
-        '/home': (context) => MyHomePage(title: 'AutoService'),
-        '/home2': (context) => MyHomePageEmp(title: 'AutoService')
+        '/home': (context) => const MyHomePage(title: 'AutoService'),
+        '/home2': (context) => const MyHomePageEmp(title: 'AutoService')
       },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title, this.storageService})
+  const MyHomePage({Key? key, required this.title, this.storageService})
       : super(key: key);
 
   final String title;
@@ -51,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPage = 0;
 
   void _logout(BuildContext context) async {
-    await _storage.delete(key: 'token');
+    await _storage.deleteAll();
     Navigator.pushReplacementNamed(context, '/');
   }
 
@@ -93,11 +92,11 @@ class _MyHomePageState extends State<MyHomePage> {
               "Employees",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            body: EmployeeScreen(),
+            body: const EmployeeScreen(),
           ),
           PaneItem(
             icon: const Icon(
-              FluentIcons.profile_search,
+              FluentIcons.settings,
               size: 30,
             ),
             title: const Text(

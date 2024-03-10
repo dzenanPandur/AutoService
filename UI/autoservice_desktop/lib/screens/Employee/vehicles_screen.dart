@@ -1,20 +1,17 @@
-import 'package:autoservice_desktop/providers/RequestProvider.dart';
-import 'package:autoservice_desktop/screens/Employee/request_details_screen.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:autoservice_desktop/models/Employee/vehicleModel.dart';
+import 'package:autoservice_desktop/providers/VehicleProvider.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../models/Employee/requestModel.dart';
 
-class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({super.key});
+class VehiclesScreen extends StatefulWidget {
+  const VehiclesScreen({super.key});
 
   @override
-  _RequestsScreenState createState() => _RequestsScreenState();
+  _VehiclesScreenState createState() => _VehiclesScreenState();
 }
 
-class _RequestsScreenState extends State<RequestsScreen> {
-  final RequestProvider requestProvider = RequestProvider();
-  List<RequestModel>? requests;
+class _VehiclesScreenState extends State<VehiclesScreen> {
+  final VehicleProvider vehicleProvider = VehicleProvider();
+  List<VehicleModel>? vehicles;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -27,7 +24,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Request Management'),
+        title: const Text('Vehicle Management'),
       ),
       body: Column(
         children: [
@@ -37,15 +34,15 @@ class _RequestsScreenState extends State<RequestsScreen> {
               onRefresh: () async {
                 setState(() {});
               },
-              child: FutureBuilder<List<RequestModel>>(
-                future: requestProvider.getAll(),
+              child: FutureBuilder<List<VehicleModel>>(
+                future: vehicleProvider.getAll(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
-                    requests = snapshot.data;
+                    vehicles = snapshot.data;
 
                     return Column(
                       children: [
@@ -55,19 +52,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
                             columns: const [
                               DataColumn(label: Text('ID')),
                               DataColumn(label: Text('Status')),
-                              DataColumn(label: Text('Request Date')),
-                              DataColumn(label: Text('Client Name')),
+                              DataColumn(label: Text('Owner')),
                               DataColumn(label: Text('Car')),
                               DataColumn(label: Text('Details')),
                             ],
                             header: const Center(
-                              child: Text('Requests'),
+                              child: Text('Vehicles'),
                             ),
                             rowsPerPage: 5,
-                            source: RequestDataTableSource(
-                              requests!,
-                              requestProvider: requestProvider,
+                            source: VehicleDataTableSource(
+                              vehicles!,
+                              vehicleProvider: vehicleProvider,
                               context: context,
+                              //showDetailsDialog: _showDetailsDialog,
                               refreshData: _refreshData,
                             ),
                           ),
@@ -89,42 +86,37 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 }
 
-class RequestDataTableSource extends DataTableSource {
-  final List<RequestModel> _requests;
-  final RequestProvider requestProvider;
+class VehicleDataTableSource extends DataTableSource {
+  final List<VehicleModel> _vehicles;
+  final VehicleProvider vehicleProvider;
   final BuildContext context;
+  //final Function(ServiceModel) showDetailsDialog;
   final Function refreshData;
 
-  RequestDataTableSource(this._requests,
-      {required this.refreshData,
-      required this.requestProvider,
+  VehicleDataTableSource(this._vehicles,
+      {
+      //required this.showDetailsDialog
+      required this.refreshData,
+      required this.vehicleProvider,
       required this.context});
 
   @override
   DataRow getRow(int index) {
-    final RequestModel request = _requests[index];
+    final VehicleModel vehicle = _vehicles[index];
 
     return DataRow(
       cells: [
-        DataCell(Text(request.id.toString())),
-        DataCell(Text(request.status)),
-        DataCell(Text(DateFormat('yyyy-MM-dd').format(request.dateRequested))),
-        DataCell(Text(request.clientName)),
-        DataCell(Text(request.vehicleName)),
+        DataCell(Text(vehicle.id.toString())),
+        DataCell(Text(vehicle.status)),
+        DataCell(Text(vehicle.clientName)),
+        DataCell(Text("${vehicle.make} ${vehicle.model}")),
         DataCell(ElevatedButton(
-          onPressed: () => _openDetailsScreen(context, request),
+          onPressed: () {
+            //showDeleteConfirmationDialog(service);
+          },
           child: const Text('Details'),
         )),
       ],
-    );
-  }
-
-  void _openDetailsScreen(BuildContext context, RequestModel request) {
-    Navigator.push(
-      context,
-      FluentPageRoute(
-        builder: (context) => RequestDetailsScreen(request: request),
-      ),
     );
   }
 
@@ -132,7 +124,7 @@ class RequestDataTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => _requests.length;
+  int get rowCount => _vehicles.length;
 
   @override
   int get selectedRowCount => 0;

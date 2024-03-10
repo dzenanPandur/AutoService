@@ -1,5 +1,4 @@
-﻿using AutoService.Data.DTO.ClientData;
-using AutoService.Data.DTO.ServiceData;
+﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.DTO.UserData;
 using AutoService.Data.DTO.VehicleData;
 

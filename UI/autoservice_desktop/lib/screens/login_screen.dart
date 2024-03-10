@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_errorText.isNotEmpty)
                     Text(
                       _errorText,
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                     ),
                   const SizedBox(height: 50),
                   ElevatedButton(

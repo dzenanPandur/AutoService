@@ -7,6 +7,8 @@ import '../../models/createUserModel.dart';
 import '../../models/updateUserModel.dart';
 
 class EmployeeScreen extends StatefulWidget {
+  const EmployeeScreen({super.key});
+
   @override
   _EmployeeScreenState createState() => _EmployeeScreenState();
 }
@@ -39,7 +41,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Employee Management'),
+          title: const Text('Employee Management'),
         ),
         body: Column(children: [
           Padding(
@@ -49,7 +51,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                 Expanded(
                   child: TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Search by Name',
                     ),
                   ),

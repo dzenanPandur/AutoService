@@ -1,10 +1,7 @@
 ﻿using AutoService.Data.Database;
-using AutoService.Data.DTO.ClientData;
 using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.DTO.UserData;
 using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Entities.ClientData;
-using AutoService.Data.Entities.ServiceData;
 using AutoService.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -64,7 +61,7 @@ namespace AutoService.Services.Managers
                 .Where(r => r.ClientId == clientId)
                 .Select(r => new RequestDto(r))
                 .ToListAsync();
-            
+
             return requests;
         }
 

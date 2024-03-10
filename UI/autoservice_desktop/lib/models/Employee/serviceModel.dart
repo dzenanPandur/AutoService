@@ -5,6 +5,7 @@ class ServiceModel {
   final bool isActive;
   final double price;
   final int categoryId;
+
   ServiceModel({
     required this.id,
     required this.name,

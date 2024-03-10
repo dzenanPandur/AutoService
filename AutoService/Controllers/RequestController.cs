@@ -12,10 +12,14 @@ namespace AutoService.Controllers
     {
         private readonly IRequestManager _requestManager;
         private readonly IAppointmentManager _appointmentManager;
-        public RequestController(IRequestManager requestManager, IAppointmentManager appointmentManager)
+        private readonly IVehicleManager _vehicleManager;
+        private readonly IClientManager _clientManager;
+        public RequestController(IRequestManager requestManager, IAppointmentManager appointmentManager, IVehicleManager vehicleManager, IClientManager clientManager)
         {
             _requestManager = requestManager;
             _appointmentManager = appointmentManager;
+            _vehicleManager = vehicleManager;
+            _clientManager = clientManager;
         }
 
         [HttpGet("GetAll")]
@@ -34,7 +38,11 @@ namespace AutoService.Controllers
 
             foreach (RequestDto requestDto in requests)
             {
+                var vehicle = await _vehicleManager.GetVehicle((int)requestDto.VehicleId);
+                var client = await _clientManager.GetClient(requestDto.ClientId);
                 RequestViewModel requestViewModel = new RequestViewModel(requestDto);
+                requestViewModel.VehicleName = vehicle.Make + " " + vehicle.Model;
+                requestViewModel.ClientName = client.FirstName + " " + client.LastName;
                 requestViewModels.Add(requestViewModel);
             }
 
@@ -57,7 +65,7 @@ namespace AutoService.Controllers
                 return NotFound("Request not found.");
             }
 
-            return Ok(Request);
+            return Ok(request);
         }
 
         [HttpPost("Create")]

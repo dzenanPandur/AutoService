@@ -1,6 +1,4 @@
 ﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Enums;
 
 namespace AutoService.ViewModels.ServiceData
 {
@@ -19,8 +17,11 @@ namespace AutoService.ViewModels.ServiceData
             DateCompleted = dto.DateCompleted;
             CustomRequest = dto.CustomRequest;
             ServiceIdList = dto.ServiceIdList;
+
         }
 
         public string Status { get; set; }
+        public string VehicleName { get; set; }
+        public string ClientName { get; set; }
     }
 }

@@ -12,9 +12,11 @@ namespace AutoService.Controllers
     public class VehicleController : ControllerBase
     {
         private readonly IVehicleManager _vehicleManager;
-        public VehicleController(IVehicleManager vehicleManager)
+        private readonly IClientManager _clientManager;
+        public VehicleController(IVehicleManager vehicleManager, IClientManager clientManager)
         {
             _vehicleManager = vehicleManager;
+            _clientManager = clientManager;
         }
 
         [HttpGet("GetAll")]
@@ -34,8 +36,9 @@ namespace AutoService.Controllers
 
             foreach (VehicleDto vehicleDto in vehicles)
             {
-
+                var client = await _clientManager.GetClient(vehicleDto.ClientId);
                 VehicleViewModel vehicleViewModel = new VehicleViewModel(vehicleDto);
+                vehicleViewModel.ClientName = client.FirstName + " " + client.LastName;
                 vehicleViewModels.Add(vehicleViewModel);
 
             }

@@ -6,6 +6,8 @@ import '../../models/Employee/categoryModel.dart';
 import '../../globals.dart';
 
 class ServiceScreen extends StatefulWidget {
+  const ServiceScreen({super.key});
+
   @override
   _ServiceScreenState createState() => _ServiceScreenState();
 }
@@ -38,7 +40,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Service Management'),
+        title: const Text('Service Management'),
       ),
       body: Column(
         children: [
@@ -52,7 +54,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 future: serviceProvider.getAll(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
@@ -130,7 +132,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                               }
                                             });
                                           },
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             labelText: 'Service Category',
                                           ),
                                         ),

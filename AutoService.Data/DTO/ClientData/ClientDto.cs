@@ -2,7 +2,6 @@
 using AutoService.Data.DTO.UserData;
 using AutoService.Data.DTO.VehicleData;
 using AutoService.Data.Entities.ClientData;
-using AutoService.Data.Entities.ServiceData;
 
 namespace AutoService.Data.DTO.ClientData
 {

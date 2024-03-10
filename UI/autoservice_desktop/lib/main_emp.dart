@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import './screens/profile_screen.dart';
 import './screens/login_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import './screens/Employee/cars_screen.dart';
+import 'screens/Employee/vehicles_screen.dart';
 import './screens/Employee/requests_screen.dart';
 import './screens/Employee/customers_screen.dart';
 import './screens/Employee/services_screen.dart';
@@ -31,14 +31,14 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(authProvider: authProvider),
-        '/home2': (context) => MyHomePageEmp(title: 'AutoService'),
+        '/home2': (context) => const MyHomePageEmp(title: 'AutoService'),
       },
     );
   }
 }
 
 class MyHomePageEmp extends StatefulWidget {
-  MyHomePageEmp({Key? key, required this.title, this.storageService})
+  const MyHomePageEmp({Key? key, required this.title, this.storageService})
       : super(key: key);
 
   final String title;
@@ -52,7 +52,7 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
   int _currentPage = 0;
 
   void _logout(BuildContext context) async {
-    await _storage.delete(key: 'token');
+    await _storage.deleteAll();
     Navigator.pushReplacementNamed(context, '/');
   }
 
@@ -95,7 +95,7 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
               "Requests",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            body: RequestsScreen(),
+            body: const RequestsScreen(),
           ),
           PaneItem(
             icon: const Icon(
@@ -106,7 +106,7 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
               "Services",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            body: ServiceScreen(),
+            body: const ServiceScreen(),
           ),
           PaneItem(
             icon: const Icon(
@@ -117,7 +117,7 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
               "Cars",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            body: CarsScreen(),
+            body: const VehiclesScreen(),
           ),
           PaneItem(
             icon: const Icon(
@@ -128,11 +128,11 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
               "Customers",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            body: CustomersScreen(),
+            body: const CustomersScreen(),
           ),
           PaneItem(
             icon: const Icon(
-              FluentIcons.profile_search,
+              FluentIcons.settings,
               size: 30,
             ),
             title: const Text(
@@ -141,6 +141,13 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
             ),
             body: const ProfileScreen(),
           ),
+          PaneItem(
+            icon: const Icon(
+              FluentIcons.settings,
+              size: 0,
+            ),
+            body: const ProfileScreen(),
+          )
         ],
         selected: _currentPage,
         onChanged: (index) {

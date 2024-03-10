@@ -43,7 +43,7 @@ class userModel {
       email: json['email'],
       phoneNumber: json['phoneNumber'],
       username: json['userName'],
-      role: json['roleName'],
+      role: json['roleName'] ?? '',
     );
   }
 }

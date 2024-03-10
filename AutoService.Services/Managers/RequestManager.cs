@@ -20,6 +20,7 @@ namespace AutoService.Services.Managers
         {
             RequestDto request = await _context.Request
                 .Where(a => a.Id == id)
+                .Include(a => a.Services)
                 .Select(a => new RequestDto(a))
                 .FirstOrDefaultAsync();
             return request;
@@ -27,6 +28,7 @@ namespace AutoService.Services.Managers
 
         public async Task<IEnumerable<RequestDto>> GetAllRequests()
         {
+
             IEnumerable<RequestDto> Requests = await _context.Request
                 .Include(a => a.Services)
                 .Select(a => new RequestDto(a))

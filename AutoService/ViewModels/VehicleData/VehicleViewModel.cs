@@ -1,7 +1,4 @@
-﻿using AutoService.Data.DTO.UserData;
-using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Enums;
-using Microsoft.Data.SqlClient;
+﻿using AutoService.Data.DTO.VehicleData;
 
 namespace AutoService.ViewModels.VehicleData
 {
@@ -30,5 +27,6 @@ namespace AutoService.ViewModels.VehicleData
         public string VehicleTypeName { get; set; }
         public string TransmissionTypeName { get; set; }
         public string VehicleFuelTypeName { get; set; }
+        public string ClientName { get; set; }
     }
 }

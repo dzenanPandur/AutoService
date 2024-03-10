@@ -24,6 +24,7 @@ namespace AutoService.Data.DTO.ServiceData
             ClientId = request.ClientId;
             VehicleId = request.VehicleId;
 
+
             if (request.Services is not null)
             {
                 Services = new List<ServiceDto>(
