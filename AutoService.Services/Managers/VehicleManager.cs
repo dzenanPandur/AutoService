@@ -17,7 +17,11 @@ namespace AutoService.Services.Managers
 
         public async Task<VehicleDto> GetVehicle(int id)
         {
-            VehicleDto vehicle = await _context.Vehicles.Where(a => a.Id == id).Select(a => new VehicleDto(a)).FirstOrDefaultAsync();
+            VehicleDto vehicle = await _context.Vehicles.Where(a => a.Id == id)
+                .Include(v => v.VehicleType)
+                .Include(t => t.TransmissionType)
+                .Include(f => f.FuelType)
+                .Select(a => new VehicleDto(a)).FirstOrDefaultAsync();
             return vehicle;
         }
 
@@ -52,6 +56,10 @@ namespace AutoService.Services.Managers
             vehicleDto.ManufactureYear = dto.ManufactureYear;
             vehicleDto.Mileage = dto.Mileage;
             vehicleDto.Model = dto.Model;
+            //vehicleDto.FuelType.Id = (int)dto.FuelTypeId;
+            //vehicleDto.TransmissionType.Id = (int)dto.TransmissionTypeId;
+            //vehicleDto.VehicleType.Id = (int)dto.VehicleTypeId;
+            //vehicleDto.FuelType.Name = dto.VehicleType.Name;
 
             Vehicle vehicle = new Vehicle(vehicleDto);
 

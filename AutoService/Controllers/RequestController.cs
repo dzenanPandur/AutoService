@@ -43,6 +43,7 @@ namespace AutoService.Controllers
                 RequestViewModel requestViewModel = new RequestViewModel(requestDto);
                 requestViewModel.VehicleName = vehicle.Make + " " + vehicle.Model;
                 requestViewModel.ClientName = client.FirstName + " " + client.LastName;
+                requestViewModel.VehicleId = requestDto.VehicleId;
                 requestViewModels.Add(requestViewModel);
             }
 

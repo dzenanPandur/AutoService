@@ -58,7 +58,7 @@ namespace AutoService.Data.DTO.ServiceData
         public Guid ClientId { get; set; }
         [JsonIgnore]
         public VehicleDto? Vehicle { get; set; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? VehicleId { get; set; }
         [JsonIgnore]
         public ICollection<ServiceDto> Services { get; set; } = new List<ServiceDto>();

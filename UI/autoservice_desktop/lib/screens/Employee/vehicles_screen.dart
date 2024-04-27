@@ -1,5 +1,7 @@
 import 'package:autoservice_desktop/models/Employee/vehicleModel.dart';
 import 'package:autoservice_desktop/providers/VehicleProvider.dart';
+import 'package:autoservice_desktop/screens/Employee/vehicle_details_screen.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 
 class VehiclesScreen extends StatefulWidget {
@@ -112,11 +114,20 @@ class VehicleDataTableSource extends DataTableSource {
         DataCell(Text("${vehicle.make} ${vehicle.model}")),
         DataCell(ElevatedButton(
           onPressed: () {
-            //showDeleteConfirmationDialog(service);
+            _openDetailsScreen(context, vehicle);
           },
           child: const Text('Details'),
         )),
       ],
+    );
+  }
+
+  void _openDetailsScreen(BuildContext context, VehicleModel vehicle) {
+    Navigator.push(
+      context,
+      FluentPageRoute(
+        builder: (context) => VehicleDetailsScreen(vehicle: vehicle),
+      ),
     );
   }
 

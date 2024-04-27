@@ -26,7 +26,7 @@ namespace AutoService.Services.Managers
         public async Task<IEnumerable<RecordDto>> GetAllVehicleServiceRecordsByVehicle(int id)
         {
             IEnumerable<RecordDto> vehicleServiceRecords = await _context.VehicleServiceRecords
-                .Where(a=>a.VehicleId == id)
+                .Where(a => a.VehicleId == id)
                 .Include(a => a.Services)
                 .Select(a => new RecordDto(a))
                 .ToListAsync();
@@ -38,7 +38,7 @@ namespace AutoService.Services.Managers
         {
             IEnumerable<RecordDto> vehicleServiceRecords = await _context.VehicleServiceRecords
                 .Include(a => a.Vehicle)
-                .Include(a=> a.Services)
+                .Include(a => a.Services)
                 .Select(a => new RecordDto(a))
                 .ToListAsync();
 
@@ -63,6 +63,7 @@ namespace AutoService.Services.Managers
             vehicleServiceRecordDto.Date = dto.Date;
             vehicleServiceRecordDto.MileageAtTimeOfService = dto.MileageAtTimeOfService;
             vehicleServiceRecordDto.Notes = dto.Notes;
+            vehicleServiceRecordDto.ServiceIdList = dto.ServiceIdList;
 
             VehicleServiceRecord vehicleServiceRecord = new VehicleServiceRecord(vehicleServiceRecordDto);
 

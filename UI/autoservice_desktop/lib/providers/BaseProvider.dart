@@ -37,7 +37,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   Future<T?> getById(int id) async {
-    var url = "$baseUrl$_endpoint/GetById/$id";
+    var url = "$baseUrl$_endpoint/GetById?id=$id";
     var uri = Uri.parse(url);
 
     Map<String, String> headers = createHeaders();

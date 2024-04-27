@@ -7,6 +7,7 @@ class RequestModel {
   DateTime dateCompleted;
   String? customRequest;
   List<int> serviceIdList;
+  int? vehicleId;
 
   RequestModel({
     required this.status,
@@ -17,6 +18,7 @@ class RequestModel {
     required this.dateCompleted,
     this.customRequest,
     required this.serviceIdList,
+    required this.vehicleId,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class RequestModel {
           DateTime.parse(json['dateCompleted'] ?? DateTime.now().toString()),
       customRequest: json['customRequest'] ?? '',
       serviceIdList: List<int>.from(json['serviceIdList'] ?? []),
+      vehicleId: json['vehicleId'],
     );
   }
 
@@ -44,6 +47,7 @@ class RequestModel {
       'dateCompleted': dateCompleted.toIso8601String(),
       'customRequest': customRequest,
       'serviceIdList': serviceIdList,
+      'vehicleId': vehicleId,
     };
   }
 }

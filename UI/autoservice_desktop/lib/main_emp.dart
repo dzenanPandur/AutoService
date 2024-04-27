@@ -141,13 +141,6 @@ class _MyHomePageEmpState extends State<MyHomePageEmp> {
             ),
             body: const ProfileScreen(),
           ),
-          PaneItem(
-            icon: const Icon(
-              FluentIcons.settings,
-              size: 0,
-            ),
-            body: const ProfileScreen(),
-          )
         ],
         selected: _currentPage,
         onChanged: (index) {

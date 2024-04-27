@@ -1,4 +1,7 @@
 import 'package:autoservice_desktop/globals.dart';
+import 'package:autoservice_desktop/models/Employee/vehicleModel.dart';
+import 'package:autoservice_desktop/providers/VehicleProvider.dart';
+import 'package:autoservice_desktop/screens/Employee/vehicle_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/Employee/categoryModel.dart';
@@ -20,6 +23,7 @@ class RequestDetailsScreen extends StatefulWidget {
 class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   final ServiceProvider serviceProvider = ServiceProvider();
   final CategoryProvider categoryProvider = CategoryProvider();
+  final VehicleProvider vehicleProvider = VehicleProvider();
   List<CategoryModel> categories = [];
   List<ServiceModel> services = [];
 
@@ -99,7 +103,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
-                          print('Vehicle Details button pressed');
+                          _openDetailsScreen(context);
                         },
                         child: const Text('Vehicle Details'),
                       ),
@@ -133,6 +137,29 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         ),
       ),
     );
+  }
+
+  void _openDetailsScreen(BuildContext context) async {
+    try {
+      // Replace the next line with your actual logic to get the vehicle using the ID
+      VehicleModel? vehicle =
+          await vehicleProvider.getById(widget.request.vehicleId!);
+
+      if (vehicle != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VehicleDetailsScreen(vehicle: vehicle),
+          ),
+        );
+      } else {
+        // Handle the case where the vehicle is not found
+        print('Error: Vehicle not found.');
+      }
+    } catch (error) {
+      print('Error loading vehicle details: $error');
+      // Handle the error (show a message, log it, etc.)
+    }
   }
 
   Widget _buildTextField(

@@ -47,12 +47,11 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
-
         public async Task<IActionResult> GetVehicle(int id)
         {
-            if (string.IsNullOrEmpty(id.ToString()))
+            if (id <= 0)
             {
-                return BadRequest("Id must be provided.");
+                return BadRequest("Id must be a positive integer.");
             }
 
             var vehicle = await _vehicleManager.GetVehicle(id);
@@ -62,7 +61,12 @@ namespace AutoService.Controllers
                 return NotFound("Vehicle not found.");
             }
 
-            return Ok(vehicle);
+            var client = await _clientManager.GetClient(vehicle.ClientId);
+
+            VehicleViewModel vehicleViewModel = new VehicleViewModel(vehicle);
+            vehicleViewModel.ClientName = client.FirstName + " " + client.LastName;
+
+            return Ok(vehicleViewModel);
         }
 
         [HttpPost("Create")]

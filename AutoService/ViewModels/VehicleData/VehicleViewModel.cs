@@ -18,11 +18,15 @@ namespace AutoService.ViewModels.VehicleData
             ManufactureYear = dto.ManufactureYear;
             Mileage = dto.Mileage;
             Status = dto.Status.ToString();
+            StatusId = (int)dto.Status;
             VehicleTypeName = dto.VehicleType.Name;
             TransmissionTypeName = dto.TransmissionType.Name;
             VehicleFuelTypeName = dto.FuelType.Name;
+            VehicleTypeId = dto.VehicleTypeId;
+            TransmissionTypeId = dto.TransmissionTypeId;
+            FuelTypeId = dto.FuelTypeId;
         }
-
+        public int StatusId { get; set; }
         public string Status { get; set; }
         public string VehicleTypeName { get; set; }
         public string TransmissionTypeName { get; set; }

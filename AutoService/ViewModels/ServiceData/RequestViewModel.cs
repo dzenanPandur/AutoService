@@ -23,5 +23,6 @@ namespace AutoService.ViewModels.ServiceData
         public string Status { get; set; }
         public string VehicleName { get; set; }
         public string ClientName { get; set; }
+        public int? VehicleId { get; set; }
     }
 }
