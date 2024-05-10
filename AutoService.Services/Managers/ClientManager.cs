@@ -59,6 +59,7 @@ namespace AutoService.Services.Managers
         {
             IEnumerable<RequestDto> requests = await _context.Request
                 .Where(r => r.ClientId == clientId)
+                .Include(a => a.Services)
                 .Select(r => new RequestDto(r))
                 .ToListAsync();
 

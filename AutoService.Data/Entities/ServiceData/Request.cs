@@ -23,6 +23,8 @@ public class Request
         AppointmentId = dto.AppointmentId;
         ClientId = dto.ClientId;
         VehicleId = dto.VehicleId;
+        TotalCost = dto.TotalCost;
+
 
         if (dto.ServiceIdList.Any())
         {
@@ -51,12 +53,13 @@ public class Request
     public DateTime? DateRequested { get; set; }
     public DateTime? DateCompleted { get; set; }
     public string? CustomRequest { get; set; }
+    public decimal? TotalCost { get; set; }
     public Appointment? Appointment { get; set; }
     public int? AppointmentId { get; set; }
     public Client Client { get; set; }
     public Guid ClientId { get; set; }
     public Vehicle? Vehicle { get; set; }
-    public int? VehicleId { get; set; }
+    public int VehicleId { get; set; }
     public ICollection<Service> Services { get; set; } = new List<Service>();
     public ICollection<ServiceRequest> ServiceRequests { get; set; }
 }

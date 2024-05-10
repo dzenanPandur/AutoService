@@ -76,6 +76,10 @@ namespace AutoService.Controllers
             try
             {
                 dto.ClientId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var vehicles = await _clientManager.GetAllVehiclesByClient(dto.ClientId);
+                if (vehicles.Where(x => x.isArchived == false).Count() >= 3)
+                    return BadRequest("Maximum of 3 vehicles per user!");
+
                 dto.Id = await _vehicleManager.CreateVehicle(dto);
 
                 return Ok("Vehicle created successfully.");

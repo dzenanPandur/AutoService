@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:autoservice_mobile/providers/VehicleServiceRecordProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -49,6 +51,8 @@ class _AddMaintenanceRecordScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: secondaryColor,
+          foregroundColor: fontColor,
           title: const Text('Add new record'),
         ),
         body: SingleChildScrollView(
@@ -68,17 +72,27 @@ class _AddMaintenanceRecordScreenState
                       buildDatePicker(
                           'Date of Service', context, _dateController),
                       const SizedBox(height: 20),
-                      const Text('Mileage at Time of Service (in kilometers):'),
+                      Text('Mileage at Time of Service (in kilometers):',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold)),
                       TextFormField(
+                        maxLength: 7,
                         controller: _mileageController,
                         keyboardType: TextInputType.number,
                       ),
-                      const SizedBox(height: 20),
-                      const Text('Services Done:'),
+                      Text('Services Done:',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold)),
                       _buildServiceSection(),
                       const SizedBox(height: 20),
-                      const Text('Notes:'),
+                      Text('Notes:',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold)),
                       TextFormField(
+                        maxLength: 100,
                         controller: _notesController,
                       ),
                       const SizedBox(height: 20),
@@ -114,6 +128,8 @@ class _AddMaintenanceRecordScreenState
           readOnly: true,
           decoration: InputDecoration(
             labelText: label,
+            labelStyle:
+                TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
             border: const OutlineInputBorder(),
           ),
           onTap: () async {
@@ -195,20 +211,10 @@ class _AddMaintenanceRecordScreenState
 
       await recordProvider.create(newRecord);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Record added successfully'),
-        ),
-      );
-      //Navigator.pop(context, true);
+      showSnackBar(context, 'Record added successfully.', null);
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      showSnackBar(context, 'Error: $e', secondaryColor);
     }
   }
 }

@@ -2,6 +2,7 @@
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.ServiceData;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AutoService.Controllers
 {
@@ -62,7 +63,13 @@ namespace AutoService.Controllers
 
         public async Task<IActionResult> CreateService(ServiceDto dto)
         {
+
+            if (dto.Name.IsNullOrEmpty()
+                || !dto.CategoryId.HasValue)
+                return BadRequest("All fields must be filled");
+
             int message = await _serviceManager.CreateService(dto);
+
             if (message > 0)
             {
                 return Ok("Service created successfully.");

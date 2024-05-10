@@ -25,7 +25,7 @@ class TabNavigator extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => tabItem == TabItem.home
                   ? HomeScreen(userId: userId)
-                  : const ProfileScreen(),
+                  : ProfileScreen(userId: userId),
             );
           default:
             return null;

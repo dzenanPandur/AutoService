@@ -1,5 +1,4 @@
 import "package:autoservice_desktop/models/updateUserModel.dart";
-
 import "./BaseProvider.dart";
 import "../models/userModel.dart";
 import "../globals.dart";
@@ -69,6 +68,18 @@ class UserProvider extends BaseProvider<userModel> {
 
     if (!isValidResponseCode(response)) {
       throw Exception("Failed to delete data");
+    }
+  }
+
+  Future<void> updateUserActiveStatus(String id, bool active) async {
+    var url = "$baseUrl$_endpoint/ChangeActiveStatusUser?id=$id&active=$active";
+    var uri = Uri.parse(url);
+
+    Map<String, String> headers = createHeaders();
+    var response = await http!.put(uri, headers: headers);
+
+    if (!isValidResponseCode(response)) {
+      throw Exception("Failed to update user data");
     }
   }
 }

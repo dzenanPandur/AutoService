@@ -8,7 +8,9 @@ import '../../globals.dart';
 import 'vehicle_details_screen.dart';
 
 class CustomersScreen extends StatefulWidget {
-  const CustomersScreen({super.key});
+  const CustomersScreen({
+    super.key,
+  });
 
   @override
   _CustomersScreenState createState() => _CustomersScreenState();
@@ -20,6 +22,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  TextEditingController searchByNameController = TextEditingController();
+  TextEditingController searchByLocationController = TextEditingController();
+
+  List<userModel> filteredCustomers = [];
+
   @override
   void initState() {
     super.initState();
@@ -29,10 +36,59 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customer Management'),
+        title: const Text(
+          'Customer Management',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: primaryBackgroundColor,
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: searchByNameController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Search by Name',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: searchByLocationController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Search by Location',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 50),
+                    backgroundColor: secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  onPressed: () {
+                    _searchCustomers();
+                  },
+                  child: const Text('Search'),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -49,31 +105,52 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   } else {
                     customers = snapshot.data;
 
-                    return Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: PaginatedDataTable(
-                            columns: const [
-                              DataColumn(label: Text('Name')),
-                              DataColumn(label: Text('Location')),
-                              //DataColumn(label: Text('Cars owned')),
-                              DataColumn(label: Text('Details')),
-                            ],
-                            header: const Center(
-                              child: Text('Customers'),
-                            ),
-                            rowsPerPage: 5,
-                            source: CustomerDataTableSource(
-                              customers!,
-                              clientProvider: clientProvider,
-                              context: context,
-                              //showDetailsDialog: _showDetailsDialog,
-                              refreshData: _refreshData,
+                    List<userModel> displayedCustomers =
+                        _getDisplayedCustomers();
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: PaginatedDataTable(
+                              headingRowColor:
+                                  MaterialStateProperty.all(secondaryColor),
+                              arrowHeadColor: secondaryColor,
+                              columns: [
+                                DataColumn(
+                                    label: Text(
+                                  'Name',
+                                  style: TextStyle(color: fontColor),
+                                )),
+                                DataColumn(
+                                    label: Text(
+                                  'Location',
+                                  style: TextStyle(color: fontColor),
+                                )),
+                                DataColumn(
+                                    label: Text(
+                                  'Details',
+                                  style: TextStyle(color: fontColor),
+                                )),
+                              ],
+                              header: const Center(
+                                child: Text(
+                                  'Customers',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              rowsPerPage: 5,
+                              source: CustomerDataTableSource(
+                                displayedCustomers,
+                                clientProvider: clientProvider,
+                                context: context,
+                                refreshData: _refreshData,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   }
                 },
@@ -85,12 +162,50 @@ class _CustomersScreenState extends State<CustomersScreen> {
     );
   }
 
+  void _searchCustomers() {
+    String nameSearchText = searchByNameController.text.toLowerCase();
+    String locationSearchText = searchByLocationController.text.toLowerCase();
+
+    if (customers != null) {
+      filteredCustomers = customers!
+          .where((customer) =>
+              '${customer.firstName} ${customer.lastName}'
+                  .toLowerCase()
+                  .contains(nameSearchText) &&
+              customer.city.toLowerCase().contains(locationSearchText))
+          .toList();
+
+      String message;
+      if (filteredCustomers.isNotEmpty) {
+        message =
+            '${filteredCustomers.length} customer(s) found for selected filters';
+      } else {
+        message = 'No customers found for selected filters';
+      }
+
+      showSnackBar(context, message);
+
+      _refreshData();
+    }
+  }
+
+  List<userModel> _getDisplayedCustomers() {
+    if (filteredCustomers.isNotEmpty) {
+      return filteredCustomers;
+    } else {
+      return customers ?? [];
+    }
+  }
+
   void _refreshData() {
     _refreshIndicatorKey.currentState?.show();
   }
 }
 
-void _showDetailsDialog(userModel customer, BuildContext context) {
+void _showDetailsDialog(
+  userModel customer,
+  BuildContext context,
+) {
   TextEditingController firstNameController =
       TextEditingController(text: customer.firstName);
   TextEditingController lastNameController =
@@ -113,7 +228,6 @@ void _showDetailsDialog(userModel customer, BuildContext context) {
       TextEditingController(text: customer.phoneNumber);
 
   final ClientProvider clientProvider = ClientProvider();
-
   showDialog(
     context: context,
     builder: (context) {
@@ -124,33 +238,21 @@ void _showDetailsDialog(userModel customer, BuildContext context) {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return AlertDialog(
+              scrollable: true,
               backgroundColor: primaryBackgroundColor,
               title: const Text(
                 'Loading...',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             );
-          } else if (snapshot.hasError) {
-            return AlertDialog(
-              backgroundColor: primaryBackgroundColor,
-              title: const Text(
-                'Error loading vehicles',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: Text('Error: ${snapshot.error}'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
           } else {
-            List<VehicleModel> vehicles = snapshot.data!;
+            List<VehicleModel> vehicles = [];
+            if (snapshot.hasData) {
+              vehicles = snapshot.data!;
+            }
 
             return AlertDialog(
+              elevation: 0,
               backgroundColor: primaryBackgroundColor,
               title: const Text(
                 'Customer Details',
@@ -166,12 +268,16 @@ void _showDetailsDialog(userModel customer, BuildContext context) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              buildRow("First Name", firstNameController, true),
-                              buildRow("Last Name", lastNameController, true),
-                              buildRow("Gender", genderController, true),
-                              buildRow("City", cityController, true),
+                              buildRow("First Name", firstNameController, true,
+                                  null, null),
+                              buildRow("Last Name", lastNameController, true,
+                                  null, null),
                               buildRow(
-                                  "Postal Code", postalCodeController, true),
+                                  "Gender", genderController, true, null, null),
+                              buildRow(
+                                  "City", cityController, true, null, null),
+                              buildRow("Postal Code", postalCodeController,
+                                  true, null, null),
                             ],
                           ),
                         ),
@@ -180,36 +286,66 @@ void _showDetailsDialog(userModel customer, BuildContext context) {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildRow("Address", addressController, true),
-                              buildRow("Birth Date", birthDateController, true),
-                              buildRow("Username", usernameController, true),
-                              buildRow("Email", emailController, true),
-                              buildRow("Phone Number", phoneController, true),
+                              buildRow("Address", addressController, true, null,
+                                  null),
+                              buildRow("Birth Date", birthDateController, true,
+                                  null, null),
+                              buildRow("Username", usernameController, true,
+                                  null, null),
+                              buildRow(
+                                  "Email", emailController, true, null, null),
+                              buildRow("Phone Number", phoneController, true,
+                                  null, null),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    //const SizedBox(height: 15),
-                    // Adding the new table right below "Phone Number"
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.35,
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: PaginatedDataTable(
-                        horizontalMargin: 10,
-                        columns: const [
-                          DataColumn(label: Text('ID')),
-                          DataColumn(label: Text('Vehicle')),
-                          DataColumn(label: Text('Details')),
-                        ],
-                        //header: const Center(
-                        // child: Text('Customer Vehicles'),
-                        //),
-                        rowsPerPage: 2,
-                        source: CustomerVehiclesDataTableSource(
-                          vehicles,
-                          clientProvider,
-                          context,
+                    SingleChildScrollView(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: SingleChildScrollView(
+                          child: PaginatedDataTable(
+                            horizontalMargin: 10,
+                            headingRowColor:
+                                MaterialStateProperty.all(secondaryColor),
+                            arrowHeadColor: secondaryColor,
+                            columns: [
+                              DataColumn(
+                                  label: Text(
+                                'ID',
+                                style: TextStyle(color: fontColor),
+                              )),
+                              DataColumn(
+                                  label: Text(
+                                'Vehicle',
+                                style: TextStyle(color: fontColor),
+                              )),
+                              DataColumn(
+                                  label: Text(
+                                'Details',
+                                style: TextStyle(color: fontColor),
+                              )),
+                            ],
+                            header: Container(
+                              color: primaryBackgroundColor,
+                              child: const Center(
+                                child: Text(
+                                  'Customer Vehicles',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            rowsPerPage: 2,
+                            source: CustomerVehiclesDataTableSource(
+                              vehicles,
+                              clientProvider,
+                              context,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -220,6 +356,16 @@ void _showDetailsDialog(userModel customer, BuildContext context) {
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               actions: [
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 20),
+                    backgroundColor: secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -240,7 +386,10 @@ class CustomerVehiclesDataTableSource extends DataTableSource {
   final BuildContext context;
 
   CustomerVehiclesDataTableSource(
-      this._vehicles, this.clientProvider, this.context);
+    this._vehicles,
+    this.clientProvider,
+    this.context,
+  );
 
   @override
   DataRow getRow(int index) {
@@ -251,6 +400,15 @@ class CustomerVehiclesDataTableSource extends DataTableSource {
         DataCell(Text(vehicle.id.toString())),
         DataCell(Text("${vehicle.make} ${vehicle.model}")),
         DataCell(ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            backgroundColor: secondaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.white),
+            ),
+          ),
           onPressed: () {
             _openVehicleDetailsScreen(vehicle);
           },
@@ -299,8 +457,16 @@ class CustomerDataTableSource extends DataTableSource {
       cells: [
         DataCell(Text("${customer.firstName} ${customer.lastName}")),
         DataCell(Text("${customer.city}, ${customer.address}")),
-        //DataCell(Text("2")), //temp
         DataCell(ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            backgroundColor: secondaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.white),
+            ),
+          ),
           onPressed: () {
             _showDetailsDialog(customer, context);
           },

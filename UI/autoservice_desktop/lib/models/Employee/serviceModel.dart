@@ -2,7 +2,7 @@ class ServiceModel {
   final int id;
   final String name;
   final String? categoryName;
-  final bool isActive;
+  bool isActive;
   final double price;
   final int categoryId;
 

@@ -1,14 +1,12 @@
 import 'package:autoservice_desktop/globals.dart';
 import 'package:autoservice_desktop/models/storageService.dart';
-import 'package:autoservice_desktop/providers/AuthProvider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'screens/Admin/employee_screen.dart';
-import './screens/profile_screen.dart';
-import './screens/login_screen.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'main_emp.dart';
+import 'package:autoservice_desktop/screens/Admin/home_screen.dart';
+import 'package:autoservice_desktop/screens/Employee/home_screen.dart';
+import 'package:autoservice_desktop/screens/login_screen.dart';
 
-const FlutterSecureStorage _storage = FlutterSecureStorage();
+import 'package:flutter/material.dart';
+
+import 'providers/AuthProvider.dart';
 
 void main() {
   final AuthProvider authProvider = AuthProvider();
@@ -18,113 +16,37 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final AuthProvider authProvider;
-
-  const MyApp({Key? key, required this.authProvider}) : super(key: key);
+  const MyApp({super.key, required this.authProvider});
 
   @override
   Widget build(BuildContext context) {
-    return FluentApp(
-      title: "Fluent UI",
-      initialRoute: '/',
-      routes: {
-        '/': (context) => LoginScreen(authProvider: authProvider),
-        '/home': (context) => const MyHomePage(title: 'AutoService'),
-        '/home2': (context) => const MyHomePageEmp(title: 'AutoService')
+    return MaterialApp(
+      onGenerateRoute: (settings) {
+        if (settings.name == '/home') {
+          final storageService = settings.arguments as StorageService;
+          return MaterialPageRoute(
+              builder: (context) => HomeAdminScreen(
+                  authProvider: authProvider, storageService: storageService));
+        } else if (settings.name == '/home2') {
+          final storageService = settings.arguments as StorageService;
+          return MaterialPageRoute(
+              builder: (context) => HomeEmployeeScreen(
+                  authProvider: authProvider, storageService: storageService));
+        }
+        return null;
       },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title, this.storageService})
-      : super(key: key);
-
-  final String title;
-  final StorageService? storageService;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _currentPage = 0;
-
-  void _logout(BuildContext context) async {
-    await _storage.deleteAll();
-    Navigator.pushReplacementNamed(context, '/');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var storageService =
-        ModalRoute.of(context)!.settings.arguments as StorageService?;
-
-    return NavigationView(
-      appBar: NavigationAppBar(
-        backgroundColor: accentColor,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "AutoService",
-              style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: fontColor),
-            ),
-            Text(
-              "Welcome ${storageService?.username}",
-              style: TextStyle(fontSize: 15, color: fontColor),
-            ),
-          ],
+      title: 'AutoService',
+      theme: ThemeData(
+        scaffoldBackgroundColor: primaryBackgroundColor,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8))),
+          ),
         ),
       ),
-      pane: NavigationPane(
-        size: const NavigationPaneSize(
-          openMinWidth: 250.0,
-          openMaxWidth: 320.0,
-        ),
-        items: <NavigationPaneItem>[
-          PaneItem(
-            icon: const Icon(
-              FluentIcons.employee_self_service,
-              size: 30,
-            ),
-            title: const Text(
-              "Employees",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            body: const EmployeeScreen(),
-          ),
-          PaneItem(
-            icon: const Icon(
-              FluentIcons.settings,
-              size: 30,
-            ),
-            title: const Text(
-              "Profile",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            body: const ProfileScreen(),
-          ),
-        ],
-        selected: _currentPage,
-        onChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-        },
-        footerItems: [
-          PaneItem(
-            icon: const Icon(
-              FluentIcons.sign_out,
-              size: 30,
-            ),
-            title: const Text("Log out",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            onTap: () => _logout(context),
-            body: LoginScreen(authProvider: AuthProvider()),
-          ),
-        ],
-      ),
+      home: LoginScreen(authProvider: authProvider),
     );
   }
 }

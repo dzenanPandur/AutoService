@@ -35,9 +35,4 @@ class AuthProvider {
       return null;
     }
   }
-
-  /*Future<void> logout(BuildContext context) async {
-    await _storage.delete(key: 'token');
-      }
-      */
 }

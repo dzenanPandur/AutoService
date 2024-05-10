@@ -1,11 +1,13 @@
-import 'package:autoservice_mobile/screens/add_vehicle_screen.dart';
+import 'package:autoservice_mobile/screens/payments_pending_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/providers/AuthProvider.dart';
 import 'package:autoservice_mobile/providers/ClientProvider.dart';
 import 'package:autoservice_mobile/models/vehicleModel.dart';
-
-import '../globals.dart';
+import 'create_request_screen.dart';
 import 'vehicle_details_screen.dart';
+import 'add_vehicle_screen.dart';
+import 'requests_screen.dart';
+import '../globals.dart';
 
 AuthProvider authProvider = AuthProvider();
 ClientProvider clientProvider = ClientProvider();
@@ -20,32 +22,43 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late List<VehicleModel> vehicles;
+  late Future<List<VehicleModel>> _vehicleFuture;
+  bool _loadingVehicles = false;
 
   @override
   void initState() {
     super.initState();
-    loadVehicles();
+    _vehicleFuture = _loadVehicles();
   }
 
-  Future<void> loadVehicles() async {
+  Future<List<VehicleModel>> _loadVehicles() async {
     setState(() {
-      vehicles = [];
+      _loadingVehicles = true;
     });
 
     try {
-      List<VehicleModel> fetchedVehicles =
+      final vehicles =
           await clientProvider.getAllVehiclesByClient(widget.userId);
+
+      final activeVehicles =
+          vehicles.where((vehicle) => !vehicle.isArchived!).toList();
+
       setState(() {
-        vehicles = fetchedVehicles;
+        _vehicleFuture = Future.value(activeVehicles);
       });
+
+      return activeVehicles;
     } catch (error) {
       print('Error loading vehicles: $error');
+      setState(() {
+        _vehicleFuture = Future.value([]);
+      });
+      return [];
+    } finally {
+      setState(() {
+        _loadingVehicles = false;
+      });
     }
-  }
-
-  void _handleVehiclesChange() {
-    loadVehicles();
   }
 
   @override
@@ -68,125 +81,183 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20.0),
-            height: 2.0,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildSquareButton(context, 'Major \n service', 180, 120, 35),
-              _buildSquareButton(context, 'Basic \n service', 180, 120, 35),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildSquareButton(context, 'Custom \n service', 120, 100, 15),
-              _buildSquareButton(context, 'My \n services', 120, 100, 15),
-              _buildSquareButton(context, 'Pending \n payments', 120, 100, 15),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Padding(
-            padding: EdgeInsets.only(right: 18.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
+              height: 2.0,
+              color: Colors.grey.shade300,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  'Your Vehicles',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(width: 10),
+                _buildSquareButton(context, 'Major \n service', 180, 120, 35,
+                    const CreateRequestScreen()),
+                _buildSquareButton(context, 'Basic \n service', 180, 120, 35,
+                    const CreateRequestScreen()),
               ],
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                      height: 2,
-                      color: Colors.grey.shade300,
-                    ),
-                    Positioned(
-                      right: 0,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                        width: 130,
-                        height: 2,
-                        color: secondaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: SingleChildScrollView(
-              child: vehicles != []
-                  ? DataTable(
-                      showCheckboxColumn: false,
-                      columns: const [
-                        DataColumn(label: Text('Vehicle Name')),
-                        DataColumn(label: Text('Mileage')),
-                        DataColumn(label: Text('Status')),
-                      ],
-                      rows: vehicles.map((vehicle) {
-                        return DataRow(
-                          onSelectChanged: (_) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VehicleDetailsScreen(
-                                    vehicle: vehicle,
-                                    onVehicleUpdated: _handleVehiclesChange),
-                              ),
-                            );
-                          },
-                          cells: [
-                            DataCell(Text('${vehicle.make} ${vehicle.model}')),
-                            DataCell(Text(vehicle.mileage.toString())),
-                            DataCell(Text(vehicle.status!)),
-                          ],
-                        );
-                      }).toList(),
-                    )
-                  : const Center(child: CircularProgressIndicator()),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSquareButton(context, 'Custom \n service', 120, 100, 15,
+                    const CreateRequestScreen()),
+                _buildSquareButton(context, 'My \n services', 120, 100, 15,
+                    RequestsScreen(userId: widget.userId)),
+                _buildSquareButton(context, 'Pending \n payments', 120, 100, 15,
+                    PaymentsPendingScreen(userId: widget.userId)),
+              ],
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    AddVehicleScreen(onVehicleAdded: _handleVehiclesChange),
-              ));
-        },
-        child: const Icon(Icons.add),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.only(right: 18.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Your Vehicles',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                        height: 2,
+                        color: Colors.grey.shade300,
+                      ),
+                      Positioned(
+                        right: 0,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                          width: 130,
+                          height: 2,
+                          color: secondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _loadingVehicles
+                ? const Center(child: CircularProgressIndicator())
+                : FutureBuilder<List<VehicleModel>>(
+                    future: _vehicleFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            'Error loading vehicles: ${snapshot.error}',
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 18,
+                            ),
+                          ),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'No vehicles found.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        List<VehicleModel> vehicles = snapshot.data!;
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            showCheckboxColumn: false,
+                            columns: [
+                              DataColumn(
+                                  label: Text('Vehicle Name',
+                                      style: TextStyle(color: secondaryColor))),
+                              DataColumn(
+                                  label: Text('Mileage',
+                                      style: TextStyle(color: secondaryColor))),
+                              DataColumn(
+                                  label: Text('Status',
+                                      style: TextStyle(color: secondaryColor))),
+                            ],
+                            rows: vehicles.map((vehicle) {
+                              return DataRow(
+                                onSelectChanged: (_) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          VehicleDetailsScreen(
+                                        vehicle: vehicle,
+                                        onVehicleUpdated: _loadVehicles,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                cells: [
+                                  DataCell(
+                                      Text('${vehicle.make} ${vehicle.model}')),
+                                  DataCell(Text(vehicle.mileage.toString())),
+                                  DataCell(Text(vehicle.status!)),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddVehicleScreen(onVehicleAdded: _loadVehicles),
+                  ),
+                ).then((_) => _loadVehicles());
+              },
+              child: const Text('Add New Vehicle'),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSquareButton(BuildContext context, String label, double width,
-      double height, double fontSize) {
+      double height, double fontSize, Widget screen) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
+      },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(20.0),
         backgroundColor: primaryBackgroundColor,
@@ -202,9 +273,9 @@ class _HomeScreenState extends State<HomeScreen> {
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: fontSize, color: Color.fromARGB(255, 90, 89, 87)
-              //fontWeight: FontWeight.bold,
-              ),
+            fontSize: fontSize,
+            color: const Color.fromARGB(255, 90, 89, 87),
+          ),
         ),
       ),
     );

@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:autoservice_mobile/globals.dart';
 import 'package:autoservice_mobile/screens/past_maintenance_record_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/models/vehicleModel.dart';
@@ -89,6 +92,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       fuelTypeId: widget.vehicle.fuelTypeId,
       transmissionTypeId: widget.vehicle.transmissionTypeId,
       vehicleTypeId: widget.vehicle.vehicleTypeId,
+      isArchived: false,
     );
 
     try {
@@ -96,19 +100,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
       widget.onVehicleUpdated();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vehicle updated successfully'),
-        ),
-      );
-      //Navigator.pop(context);
+      showSnackBar(context, 'Vehicle updated successfully', null);
     } catch (error) {
-      print('Error updating vehicle: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update vehicle: $error'),
-        ),
-      );
+      showSnackBar(context, 'Failed to update vehicle: $error', secondaryColor);
     }
   }
 
@@ -118,19 +112,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
       widget.onVehicleUpdated();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vehicle deleted successfully'),
-        ),
-      );
+      showSnackBar(context, 'Vehicle deleted successfully', null);
       Navigator.pop(context);
     } catch (error) {
-      print('Error deleting vehicle: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete vehicle: $error'),
-        ),
-      );
+      showSnackBar(context, 'Failed to delete vehicle: $error', secondaryColor);
     }
   }
 
@@ -138,13 +123,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: secondaryColor,
+          foregroundColor: fontColor,
           title: const Text('Vehicle details'),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
+              icon: Icon(Icons.delete, color: fontColor),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -189,33 +173,49 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Make:'),
+                        Text('Make:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 15,
                           controller: _makeController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Model:'),
+                        Text('Model:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 15,
                           controller: _modelController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('VIN (Vehicle Identification Number):'),
+                        Text('VIN (Vehicle Identification Number):',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 20,
                           controller: _vinController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Year of Manufacture:'),
+                        Text('Year of Manufacture:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 4,
                           controller: _manufactureYearController,
                           keyboardType: TextInputType.number,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Mileage (in kilometers):'),
+                        Text('Mileage (in kilometers):',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 7,
                           controller: _mileageController,
                           keyboardType: TextInputType.number,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -223,7 +223,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Fuel Type:'),
+                                  Text('Fuel Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: widget.vehicle.vehicleFuelTypeName,
                                     onChanged: (newValue) {
@@ -251,7 +254,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Transmission Type:'),
+                                  Text('Transmission Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: widget.vehicle.transmissionTypeName,
                                     onChanged: (newValue) {
@@ -287,7 +293,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Vehicle Status:'),
+                                  Text('Vehicle Status:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   TextFormField(
                                     initialValue: widget.vehicle.status,
                                     enabled: false,
@@ -300,7 +309,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Vehicle Type:'),
+                                  Text('Vehicle Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: widget.vehicle.vehicleTypeName,
                                     onChanged: (newValue) {

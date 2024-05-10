@@ -41,6 +41,8 @@ class _PastMaintenanceRecordScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: secondaryColor,
+        foregroundColor: fontColor,
         title: const Text('Past Maintenance Records'),
       ),
       body: FutureBuilder<List<VehicleServiceRecordModel>>(
@@ -83,10 +85,16 @@ class _PastMaintenanceRecordScreenState
                     Expanded(
                       child: DataTable(
                         showCheckboxColumn: false,
-                        columns: const [
-                          DataColumn(label: Text('Date')),
-                          DataColumn(label: Text('Mileage')),
-                          DataColumn(label: Text('Delete')),
+                        columns: [
+                          DataColumn(
+                              label: Text('Date',
+                                  style: TextStyle(color: secondaryColor))),
+                          DataColumn(
+                              label: Text('Mileage',
+                                  style: TextStyle(color: secondaryColor))),
+                          DataColumn(
+                              label: Text('Delete',
+                                  style: TextStyle(color: secondaryColor))),
                         ],
                         rows: snapshot.data!.map((record) {
                           return DataRow(

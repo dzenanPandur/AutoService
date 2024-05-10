@@ -1,4 +1,4 @@
-import '../../providers/baseProvider.dart'; // Import the BaseProvider
+import '../../providers/baseProvider.dart';
 import '../../models/Employee/categoryModel.dart';
 
 class CategoryProvider extends BaseProvider<CategoryModel> {

@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/models/vehicleModel.dart';
 import 'package:autoservice_mobile/providers/fuelTypeProvider.dart';
 import 'package:autoservice_mobile/providers/transmissionTypeProvider.dart';
 import 'package:autoservice_mobile/providers/vehicleTypeProvider.dart';
 
+import '../globals.dart';
 import '../models/fuelTypeModel.dart';
 import '../models/transmissionTypeModel.dart';
 import '../models/vehicleTypeModel.dart';
@@ -71,7 +74,6 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   }
 
   Future<void> _addVehicle() async {
-    // Check if all fields are filled
     if (_makeController.text.isEmpty ||
         _modelController.text.isEmpty ||
         _vinController.text.isEmpty ||
@@ -80,11 +82,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         _selectedFuelType == null ||
         _selectedTransmissionType == null ||
         _selectedCarType == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
-        ),
-      );
+      showSnackBar(context, 'Please fill in all fields', secondaryColor);
       return;
     }
 
@@ -95,31 +93,22 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       vin: _vinController.text,
       manufactureYear: int.parse(_manufactureYearController.text),
       mileage: int.parse(_mileageController.text),
-      status: 1,
+      status: 9,
       fuelTypeId: _fuelTypes.indexOf(_selectedFuelType!) + 1,
       transmissionTypeId:
           _transmissionTypes.indexOf(_selectedTransmissionType!) + 1,
       vehicleTypeId: _carTypes.indexOf(_selectedCarType!) + 1,
+      isArchived: false,
     );
 
     try {
       await VehicleProvider().create(newVehicle);
 
+      showSnackBar(context, 'Vehicle added successfully', null);
       widget.onVehicleAdded();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vehicle added successfully'),
-        ),
-      );
       Navigator.pop(context);
     } catch (error) {
-      print('Error adding vehicle: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to add vehicle: $error'),
-        ),
-      );
+      showSnackBar(context, 'Failed to add vehicle: $error', secondaryColor);
     }
   }
 
@@ -127,6 +116,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: secondaryColor,
+          foregroundColor: fontColor,
           title: const Text('Add new vehicle'),
         ),
         body: SingleChildScrollView(
@@ -143,33 +134,48 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Make:'),
+                        Text('Make:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 15,
                           controller: _makeController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Model:'),
+                        Text('Model:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 15,
                           controller: _modelController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('VIN (Vehicle Identification Number):'),
+                        Text('VIN (Vehicle Identification Number):',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 20,
                           controller: _vinController,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Year of Manufacture:'),
+                        Text('Year of Manufacture:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 4,
                           controller: _manufactureYearController,
                           keyboardType: TextInputType.number,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Mileage (in kilometers):'),
+                        Text('Mileage (in kilometers):',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
                         TextFormField(
+                          maxLength: 7,
                           controller: _mileageController,
                           keyboardType: TextInputType.number,
                         ),
-                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -177,7 +183,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Fuel Type:'),
+                                  Text('Fuel Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: _selectedFuelType,
                                     onChanged: (newValue) {
@@ -200,7 +209,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Transmission Type:'),
+                                  Text('Transmission Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: _selectedTransmissionType,
                                     onChanged: (newValue) {
@@ -229,7 +241,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Vehicle Type:'),
+                                  Text('Vehicle Type:',
+                                      style: TextStyle(
+                                          color: secondaryColor,
+                                          fontWeight: FontWeight.bold)),
                                   DropdownButton<String>(
                                     value: _selectedCarType,
                                     onChanged: (newValue) {

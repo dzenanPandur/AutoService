@@ -1,13 +1,15 @@
 import 'dart:io';
-//import 'package:autoservice_mobile/screens/create_request_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/providers/AuthProvider.dart';
 import 'package:autoservice_mobile/screens/login_screen.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'navigation/bottom_navigation.dart';
 import 'navigation/tab_item.dart';
 import 'navigation/tab_navigator.dart';
 
-void main() {
+void main() async {
+  Stripe.publishableKey =
+      "pk_test_51N7gLcAQDwep3kcFybqnBC3Zki2l1qgsJxyZaSVLnTgqZXwe6DTCa2TTin7c1Y4uW3iJEYzCHV4pylfZmkhlUT8f002b5K8Gxa";
   final AuthProvider authProvider = AuthProvider();
   const String userId = "";
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +29,7 @@ class MyHttpOverrides extends HttpOverrides {
 class MyApp extends StatelessWidget {
   final AuthProvider authProvider;
   final String userId;
-  MyApp({Key? key, required this.authProvider, required this.userId})
+  const MyApp({Key? key, required this.authProvider, required this.userId})
       : super(key: key);
 
   @override
@@ -66,7 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _selectTab(TabItem tabItem) {
     if (_currentTab == tabItem) {
-      // Pop to first route if reselecting current tab
       _navigatorKeys[tabItem]!.currentState!.popUntil((route) => route.isFirst);
     } else {
       setState(() {

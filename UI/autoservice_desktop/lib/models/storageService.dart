@@ -5,6 +5,7 @@ class StorageService {
   static String? token;
   final String username;
   final String role;
+  bool? isActive;
 
   StorageService({
     required this.userId,
@@ -12,6 +13,7 @@ class StorageService {
     required this.lastName,
     required this.username,
     required this.role,
+    this.isActive,
   });
 
   factory StorageService.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class StorageService {
         firstName: json['firstName'],
         lastName: json['lastName'],
         username: json['username'],
-        role: json['role']);
+        role: json['role'],
+        isActive: json['isActive']);
   }
 }

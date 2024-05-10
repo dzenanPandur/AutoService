@@ -9,8 +9,10 @@ import '../../providers/VehicleServiceRecordProvider.dart';
 class VehicleDetailsScreen extends StatefulWidget {
   final VehicleModel vehicle;
 
-  const VehicleDetailsScreen({Key? key, required this.vehicle})
-      : super(key: key);
+  const VehicleDetailsScreen({
+    Key? key,
+    required this.vehicle,
+  }) : super(key: key);
 
   @override
   _VehicleDetailsScreenState createState() => _VehicleDetailsScreenState();
@@ -18,56 +20,85 @@ class VehicleDetailsScreen extends StatefulWidget {
 
 class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   final VehicleServiceRecordProvider serviceRecordProvider =
-      VehicleServiceRecordProvider(); // Create an instance of the service record provider
+      VehicleServiceRecordProvider();
   ServiceProvider serviceProvider = ServiceProvider();
   List<VehicleServiceRecordModel>? serviceRecords;
 
   @override
   void initState() {
     super.initState();
-    loadServiceRecords();
+    fetchServiceRecords();
   }
 
-  Future<void> loadServiceRecords() async {
+  Future<List<VehicleServiceRecordModel>> fetchServiceRecords() async {
     try {
-      serviceRecords =
-          await serviceRecordProvider.getAllRecordsByVehicle(widget.vehicle.id);
-      setState(() {});
+      return await serviceRecordProvider
+          .getAllRecordsByVehicle(widget.vehicle.id);
     } catch (error) {
       print('Error loading service records: $error');
-      // Handle error loading service records
+      throw error;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vehicle Details'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTopDetailsRow(),
-            const SizedBox(height: 16.0),
-            _buildMiddleDetailsRow(),
-            const SizedBox(height: 16.0),
-            const Text(
-              'Past Maintenance Records',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
+        backgroundColor: primaryBackgroundColor,
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 35,
             ),
-            const SizedBox(height: 8.0),
-            _buildMaintenanceRecordsTable(),
-            const Spacer(),
-          ],
+          ),
+          title: const Text(
+            'Vehicle Details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: secondaryColor,
+          foregroundColor: fontColor,
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FutureBuilder<List<VehicleServiceRecordModel>>(
+                future: fetchServiceRecords(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final List<VehicleServiceRecordModel> serviceRecords =
+                        snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTopDetailsRow(),
+                        const SizedBox(height: 16.0),
+                        _buildMiddleDetailsRow(),
+                        const SizedBox(height: 16.0),
+                        const Text(
+                          'Past Maintenance Records',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        _buildMaintenanceRecordsTable(serviceRecords),
+                        const SizedBox(height: 16.0),
+                      ],
+                    );
+                  }
+                }),
+          ),
+        ));
   }
 
   Widget _buildTopDetailsRow() {
@@ -77,7 +108,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         _buildTextField('Make', widget.vehicle.make, true),
         _buildTextField('Model', widget.vehicle.model, true),
         _buildTextField('Fuel Type', widget.vehicle.vehicleFuelTypeName, true),
-        _buildTextField('Car Type', widget.vehicle.vehicleTypeName, true),
+        _buildTextField('Vehicle Type', widget.vehicle.vehicleTypeName, true),
         _buildTextField(
           'Transmission Type',
           widget.vehicle.transmissionTypeName,
@@ -98,7 +129,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           true,
         ),
         _buildTextField('Mileage', widget.vehicle.mileage.toString(), true),
-        _buildTextField('Car Status', widget.vehicle.status, true),
+        _buildTextField('Vehicle Status', widget.vehicle.status, true),
       ],
     );
   }
@@ -107,34 +138,56 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-        child: TextField(
-          readOnly: editable,
-          controller: TextEditingController(text: value),
-          decoration: InputDecoration(
-            labelText: label,
-            border: const OutlineInputBorder(),
+        child: Container(
+          color: Colors.white,
+          child: TextField(
+            readOnly: editable,
+            controller: TextEditingController(text: value),
+            decoration: InputDecoration(
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: accentColor)),
+              labelText: label,
+              labelStyle: TextStyle(color: secondaryColor),
+              border: const OutlineInputBorder(),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMaintenanceRecordsTable() {
+  Widget _buildMaintenanceRecordsTable(
+      List<VehicleServiceRecordModel> serviceRecords) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+      decoration: const BoxDecoration(),
       child: PaginatedDataTable(
-        columns: const [
-          DataColumn(label: Text('Id')),
-          DataColumn(label: Text('Date')),
-          DataColumn(label: Text('Mileage')),
-          DataColumn(label: Text('Details')),
+        headingRowColor: MaterialStateProperty.all(secondaryColor),
+        arrowHeadColor: secondaryColor,
+        columns: [
+          DataColumn(
+              label: Text(
+            'Id',
+            style: TextStyle(color: fontColor),
+          )),
+          DataColumn(
+              label: Text(
+            'Date',
+            style: TextStyle(color: fontColor),
+          )),
+          DataColumn(
+              label: Text(
+            'Mileage',
+            style: TextStyle(color: fontColor),
+          )),
+          DataColumn(
+              label: Text(
+            'Details',
+            style: TextStyle(color: fontColor),
+          )),
         ],
         source: MaintenanceRecordsDataTableSource(
-            serviceRecords ?? [], context, serviceProvider),
+            serviceRecords, context, serviceProvider),
         rowsPerPage: 5,
       ),
     );
@@ -159,6 +212,15 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
         DataCell(Text(record.date.toString())),
         DataCell(Text(record.mileageAtTimeOfService.toString())),
         DataCell(ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            backgroundColor: secondaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.white),
+            ),
+          ),
           onPressed: () {
             _openDetailsDialog(context, record);
           },
@@ -173,26 +235,34 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Maintenance Record Details'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTextField('Date of Service', record.date.toString(), true),
-              _buildTextField('Mileage at Time of Service',
-                  record.mileageAtTimeOfService.toString(), true),
-              _buildServiceSection(record.serviceIdList),
-              //_buildDetailRow('Other Services', record. ?? '', false),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
+        return Center(
+          child: SingleChildScrollView(
+            child: AlertDialog(
+              elevation: 0,
+              backgroundColor: primaryBackgroundColor,
+              title: const Text('Maintenance Record Details'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTextField(
+                        'Date of Service', record.date.toString(), true),
+                    _buildTextField('Mileage at Time of Service',
+                        record.mileageAtTimeOfService.toString(), true),
+                    _buildServiceSection(record.serviceIdList),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -205,6 +275,11 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
         readOnly: editable,
         controller: TextEditingController(text: value),
         decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          floatingLabelStyle: TextStyle(color: secondaryColor),
+          enabledBorder:
+              OutlineInputBorder(borderSide: BorderSide(color: accentColor)),
           labelText: label,
           border: const OutlineInputBorder(),
         ),
@@ -234,9 +309,9 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  border: Border.all(color: primaryBackgroundColor),
+                  border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +320,15 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
                       Row(
                         children: [
                           Checkbox(
-                            value: true, // Set the value as per your logic
+                            checkColor: primaryBackgroundColor,
+                            fillColor:
+                                MaterialStateProperty.resolveWith((states) {
+                              if (states.contains(MaterialState.selected)) {
+                                return secondaryColor;
+                              }
+                              return null;
+                            }),
+                            value: true,
                             onChanged: null,
                           ),
                           Text(service!.name),
@@ -270,12 +353,10 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
 
     for (var serviceId in serviceIds) {
       try {
-        ServiceModel? service = await serviceProvider
-            .getById(serviceId); // Replace this with your actual default value
+        ServiceModel? service = await serviceProvider.getById(serviceId);
         selectedServices.add(service);
       } catch (error) {
         print('Error loading service: $error');
-        // Handle error loading service
       }
     }
 

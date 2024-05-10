@@ -3,11 +3,13 @@ class RequestModel {
   String vehicleName;
   String clientName;
   int id;
+  int statusId;
   DateTime dateRequested;
   DateTime dateCompleted;
   String? customRequest;
   List<int> serviceIdList;
-  int? vehicleId;
+  int vehicleId;
+  double? totalCost;
 
   RequestModel({
     required this.status,
@@ -16,14 +18,17 @@ class RequestModel {
     required this.id,
     required this.dateRequested,
     required this.dateCompleted,
+    required this.statusId,
     this.customRequest,
     required this.serviceIdList,
     required this.vehicleId,
+    this.totalCost,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
     return RequestModel(
       status: json['status'] ?? '',
+      statusId: json['statusId'] ?? '',
       vehicleName: json['vehicleName'] ?? '',
       clientName: json['clientName'] ?? '',
       id: json['id'] ?? 0,
@@ -34,12 +39,14 @@ class RequestModel {
       customRequest: json['customRequest'] ?? '',
       serviceIdList: List<int>.from(json['serviceIdList'] ?? []),
       vehicleId: json['vehicleId'],
+      totalCost: json['totalCost'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'status': status,
+      'statusId': statusId,
       'vehicleName': vehicleName,
       'clientName': clientName,
       'id': id,
@@ -48,6 +55,7 @@ class RequestModel {
       'customRequest': customRequest,
       'serviceIdList': serviceIdList,
       'vehicleId': vehicleId,
+      'totalCost': totalCost,
     };
   }
 }

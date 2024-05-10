@@ -5,7 +5,6 @@ class VehicleModel {
   String vin;
   int? manufactureYear;
   int? mileage;
-  //String? status;
   int? statusId;
   var status;
   String? vehicleFuelTypeName;
@@ -14,6 +13,7 @@ class VehicleModel {
   int? fuelTypeId;
   int? transmissionTypeId;
   int? vehicleTypeId;
+  bool? isArchived;
 
   VehicleModel({
     required this.id,
@@ -30,6 +30,7 @@ class VehicleModel {
     this.fuelTypeId,
     this.transmissionTypeId,
     this.vehicleTypeId,
+    this.isArchived,
   });
 
   Map<String, dynamic> toJson() {
@@ -48,6 +49,7 @@ class VehicleModel {
       'fuelTypeId': fuelTypeId,
       'transmissionTypeId': transmissionTypeId,
       'vehicleTypeId': vehicleTypeId,
+      'isArchived': isArchived,
     };
   }
 
@@ -67,6 +69,7 @@ class VehicleModel {
       fuelTypeId: json['fuelTypeId'],
       transmissionTypeId: json['transmissionTypeId'],
       vehicleTypeId: json['vehicleTypeId'],
+      isArchived: json['isArchived'],
     );
   }
 }

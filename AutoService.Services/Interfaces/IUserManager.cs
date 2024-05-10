@@ -8,6 +8,7 @@ namespace AutoService.Services.Interfaces
         public Task<UserDto> GetByUsernameOrEmail(string username, string email);
         public Task<UserDto> GetByUsername(string username);
         public Task<UserDto> GetUserById(Guid id);
+        public Task<User> ChangeActiveStatusUser(Guid id, bool active);
         public Task<List<UserDto>> GetAllUsers();
         public Task<int> CreateUser(UserDto dto);
         public Task<User> UpdateUser(UserDto dto);

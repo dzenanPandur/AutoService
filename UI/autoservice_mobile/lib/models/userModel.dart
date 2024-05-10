@@ -46,4 +46,22 @@ class userModel {
       role: json['roleName'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': userId,
+      'firstName': firstName,
+      'lastName': lastName,
+      'active': active,
+      'gender': gender,
+      'city': city,
+      'address': address,
+      'postalCode': postalCode,
+      'birthDate': birthDate.toIso8601String(),
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'userName': username,
+      'roleName': role,
+    };
+  }
 }

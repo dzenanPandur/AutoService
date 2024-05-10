@@ -9,6 +9,7 @@
         PendingPayment = 5,
         PickupReady = 6,
         Completed = 7,
-        Canceled = 8
+        Canceled = 8,
+        Idle = 9,
     }
 }

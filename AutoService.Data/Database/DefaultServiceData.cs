@@ -108,7 +108,7 @@ namespace AutoService.Data.Database
         public static IEnumerable<Request> Requests
         {
             get => new List<Request>() {
-                new Request
+               /* new Request
                 {
                     Id = 1,
                     AppointmentId = 1,
@@ -121,10 +121,10 @@ namespace AutoService.Data.Database
 
 
                 },
-
+               */
                 new Request
                 {
-                    Id = 2,
+                    Id = 1,
                     AppointmentId = 2,
                     ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change window",
@@ -132,10 +132,11 @@ namespace AutoService.Data.Database
                     DateRequested=DateTime.UtcNow,
                     Status= (Enums.Status)5,
                     VehicleId=1,
+                    TotalCost=400,
 
 
                 },
-                new Request
+               /* new Request
                 {
                     Id = 3,
                     AppointmentId = 3,
@@ -147,17 +148,18 @@ namespace AutoService.Data.Database
                     VehicleId=1,
 
 
-                },
+                },*/
                 new Request
                 {
-                    Id = 4,
+                    Id = 2,
                     AppointmentId = 4,
                     ClientId =Guid.Parse("813A46D4-A59A-47ED-A88F-3143456E6F13"),
                     CustomRequest="Change rims",
                     DateCompleted=DateTime.UtcNow,
                     DateRequested=DateTime.UtcNow,
                     Status= (Enums.Status)4,
-                    VehicleId=1,
+                    VehicleId=2,
+                    TotalCost = 700,
                 },
             };
         }
@@ -190,7 +192,7 @@ namespace AutoService.Data.Database
                     RequestId = 2,
                     ServiceId = 4
                 },
-                new ServiceRequest
+               /* new ServiceRequest
                 {
                     Id = 5,
                     RequestId = 3,
@@ -213,7 +215,7 @@ namespace AutoService.Data.Database
                     Id=8,
                     RequestId = 4,
                     ServiceId = 1
-                },
+                },*/
             };
         }
     }

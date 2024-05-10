@@ -26,6 +26,7 @@ public class Vehicle
         FuelTypeId = dto.FuelTypeId;
         TransmissionTypeId = dto.TransmissionTypeId;
         VehicleTypeId = dto.VehicleTypeId;
+        isArchived = dto.isArchived;
 
         if (dto.FuelType is not null)
         {
@@ -63,6 +64,7 @@ public class Vehicle
     public int? ManufactureYear { get; set; }
     public int? Mileage { get; set; }
     public Status Status { get; set; }
+    public bool isArchived { get; set; }
     public VehicleFuelType? FuelType { get; set; }
     public int? FuelTypeId { get; set; }
     public VehicleType? VehicleType { get; set; }

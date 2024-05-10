@@ -25,6 +25,7 @@ namespace AutoService.ViewModels.VehicleData
             VehicleTypeId = dto.VehicleTypeId;
             TransmissionTypeId = dto.TransmissionTypeId;
             FuelTypeId = dto.FuelTypeId;
+            isArchived = dto.isArchived;
         }
         public int StatusId { get; set; }
         public string Status { get; set; }

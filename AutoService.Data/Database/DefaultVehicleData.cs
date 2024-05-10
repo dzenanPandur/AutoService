@@ -113,8 +113,8 @@ namespace AutoService.Data.Database
                     TransmissionTypeId = 1,
                     Mileage = 195123,
                     Status = (Enums.Status)2,
-                    ManufactureYear=2016
-
+                    ManufactureYear=2016,
+                    isArchived = false
 
 
                 },
@@ -131,7 +131,8 @@ namespace AutoService.Data.Database
                     TransmissionTypeId = 1,
                     Mileage = 18590,
                     Status = (Enums.Status)4,
-                    ManufactureYear=2008
+                    ManufactureYear=2008,
+                    isArchived=false
                 }
             };
         }

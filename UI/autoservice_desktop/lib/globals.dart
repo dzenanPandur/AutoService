@@ -7,22 +7,30 @@ Color fontColor = const Color(0xFFE4DCCF);
 Color secondaryColor = const Color(0xFFEA5455);
 Color accentColor = const Color(0xFF002B5B);
 
+void showSnackBar(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+    ),
+  );
+}
+
 Widget buildDropdown(
     String label, List<String> options, TextEditingController controller) {
-  String initialValue = options.isNotEmpty ? options[0] : '';
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5),
     child: SizedBox(
       width: 230,
       child: DropdownButtonFormField<String>(
-        value: controller.text.isNotEmpty && options.contains(controller.text)
-            ? controller.text
-            : initialValue,
+        value: null,
         onChanged: (String? value) {
           controller.text = value!;
         },
         decoration: InputDecoration(
           labelText: label,
+          fillColor: Colors.white,
+          filled: true,
+          floatingLabelStyle: TextStyle(color: secondaryColor),
           border: const OutlineInputBorder(),
         ),
         items: options.map((String value) {
@@ -36,11 +44,8 @@ Widget buildDropdown(
   );
 }
 
-Widget buildRow(
-  String label,
-  TextEditingController controller,
-  bool editable,
-) {
+Widget buildRow(String label, TextEditingController controller, bool editable,
+    TextInputType? inputType, int? characters) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
@@ -51,8 +56,13 @@ Widget buildRow(
           child: TextField(
             controller: controller,
             readOnly: editable,
+            keyboardType: inputType,
+            maxLength: characters,
             decoration: InputDecoration(
               labelText: label,
+              floatingLabelStyle: TextStyle(color: secondaryColor),
+              filled: true,
+              fillColor: Colors.white,
               border: const OutlineInputBorder(),
             ),
           ),
@@ -74,8 +84,12 @@ Widget buildPasswordRow(String label, TextEditingController controller) {
           child: TextField(
             controller: controller,
             obscureText: isObscure,
+            maxLength: 50,
             decoration: InputDecoration(
               labelText: label,
+              filled: true,
+              fillColor: Colors.white,
+              floatingLabelStyle: TextStyle(color: secondaryColor),
               border: const OutlineInputBorder(),
             ),
           ),
@@ -121,7 +135,10 @@ Widget buildDatePicker(
         controller: controller,
         readOnly: true,
         decoration: InputDecoration(
+          floatingLabelStyle: TextStyle(color: secondaryColor),
           labelText: label,
+          filled: true,
+          fillColor: Colors.white,
           border: const OutlineInputBorder(),
         ),
         onTap: () async {

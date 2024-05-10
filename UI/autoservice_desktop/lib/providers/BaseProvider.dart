@@ -86,6 +86,23 @@ abstract class BaseProvider<T> with ChangeNotifier {
     }
   }
 
+  Future<T?> update2(dynamic request) async {
+    var url = "$baseUrl$_endpoint/Update";
+    var uri = Uri.parse(url);
+
+    Map<String, String> headers = createHeaders();
+
+    var jsonRequest = jsonEncode(request);
+    var response = await http!.put(uri, headers: headers, body: jsonRequest);
+
+    if (isValidResponseCode(response)) {
+      var data = jsonDecode(response.body);
+      return fromJson(data);
+    } else {
+      throw Exception("Failed to update data");
+    }
+  }
+
   Future<void> delete(int id) async {
     var url = "$baseUrl$_endpoint/Delete?id=$id";
     var uri = Uri.parse(url);
@@ -125,7 +142,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     } else if (response.statusCode == 204) {
       return true;
     } else if (response.statusCode == 400) {
-      throw Exception("Bad request");
+      throw Exception(response.body);
     } else if (response.statusCode == 401) {
       throw Exception("Unauthorized");
     } else if (response.statusCode == 403) {

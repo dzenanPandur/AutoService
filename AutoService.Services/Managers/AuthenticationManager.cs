@@ -83,6 +83,7 @@ namespace AutoService.Services.Managers
                 Username = user.UserName,
                 UserId = user.Id,
                 Gender = user.Gender,
+                isActive = user.Active,
 
             };
         }

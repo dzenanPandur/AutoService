@@ -1,6 +1,5 @@
 ﻿using AutoService.Data.DTO.ClientData;
 using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.VehicleData;
 using AutoService.Data.Enums;
 using System.Text.Json.Serialization;
@@ -24,6 +23,7 @@ namespace AutoService.Data.DTO.VehicleData
             FuelTypeId = vehicle.FuelTypeId;
             TransmissionTypeId = vehicle.TransmissionTypeId;
             VehicleTypeId = vehicle.VehicleTypeId;
+            isArchived = vehicle.isArchived;
 
             if (vehicle.FuelType is not null)
             {
@@ -60,6 +60,7 @@ namespace AutoService.Data.DTO.VehicleData
         public int? ManufactureYear { get; set; }
         public int? Mileage { get; set; }
         public Status Status { get; set; }
+        public bool isArchived { get; set; } = false;
         [JsonIgnore]
         public VehicleFuelTypeDto? FuelType { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

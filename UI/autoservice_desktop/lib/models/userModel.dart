@@ -2,7 +2,7 @@ class userModel {
   final String userId;
   final String firstName;
   final String lastName;
-  final bool active;
+  bool active;
   final int gender;
   final String city;
   final String address;
@@ -28,6 +28,23 @@ class userModel {
     required this.username,
     required this.role,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'id': userId,
+      'firstName': firstName,
+      'lastName': lastName,
+      'active': active,
+      'gender': gender,
+      'city': city,
+      'address': address,
+      'postalCode': postalCode,
+      'birthDate': birthDate.toIso8601String(),
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'userName': username,
+      'role': role,
+    };
+  }
 
   factory userModel.fromJson(Map<String, dynamic> json) {
     return userModel(

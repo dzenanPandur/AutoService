@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../providers/UserProvider.dart';
@@ -33,7 +35,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   TextEditingController passwordControllerAdd = TextEditingController();
   TextEditingController passwordConfirmControllerAdd = TextEditingController();
 
-  TextEditingController searchController = TextEditingController();
+  TextEditingController searchByNameController = TextEditingController();
+  TextEditingController searchByLocationController = TextEditingController();
 
   List<userModel> filteredEmployees = [];
 
@@ -41,7 +44,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Employee Management'),
+          backgroundColor: primaryBackgroundColor,
+          title: const Text(
+            'Employee Management',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         body: Column(children: [
           Padding(
@@ -50,14 +57,37 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: searchController,
+                    controller: searchByNameController,
                     decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
                       hintText: 'Search by Name',
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: searchByLocationController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Search by Location',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 50),
+                    backgroundColor: secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
                   onPressed: () {
                     _searchEmployees();
                   },
@@ -83,23 +113,43 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                     employees = snapshot.data;
 
                     List<userModel> displayedEmployees =
-                        filteredEmployees.isNotEmpty
-                            ? filteredEmployees
-                            : employees!;
+                        _getDisplayedEmployees();
 
                     return Column(
                       children: [
                         SizedBox(
                           width: double.infinity,
                           child: PaginatedDataTable(
-                            columns: const [
-                              DataColumn(label: Text('Full Name')),
-                              DataColumn(label: Text('Gender')),
-                              DataColumn(label: Text('Details')),
-                              DataColumn(label: Text('Delete')),
+                            headingRowColor:
+                                MaterialStateProperty.all(secondaryColor),
+                            arrowHeadColor: secondaryColor,
+                            columns: [
+                              DataColumn(
+                                  label: Text(
+                                'Full Name',
+                                style: TextStyle(color: fontColor),
+                              )),
+                              DataColumn(
+                                  label: Text(
+                                'Gender',
+                                style: TextStyle(color: fontColor),
+                              )),
+                              DataColumn(
+                                  label: Text(
+                                'Is Active',
+                                style: TextStyle(color: fontColor),
+                              )),
+                              DataColumn(
+                                  label: Text(
+                                'Details',
+                                style: TextStyle(color: fontColor),
+                              )),
                             ],
                             header: const Center(
-                              child: Text('Employees'),
+                              child: Text(
+                                'Employees',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                             rowsPerPage: 5,
                             source: EmployeeDataTableSource(
@@ -114,130 +164,224 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         const SizedBox(height: 16),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      backgroundColor: primaryBackgroundColor,
-                                      title: const Text(
-                                        'Add Employee',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      content: SingleChildScrollView(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  buildRow(
-                                                      "First Name",
-                                                      firstNameControllerAdd,
-                                                      false),
-                                                  buildRow(
-                                                      "Last Name",
-                                                      lastNameControllerAdd,
-                                                      false),
-                                                  buildDropdown(
-                                                      "Gender",
-                                                      ['Male', 'Female'],
-                                                      genderControllerAdd),
-                                                  buildRow("City",
-                                                      cityControllerAdd, false),
-                                                  buildRow(
-                                                      "Postal Code",
-                                                      postalCodeControllerAdd,
-                                                      false),
-                                                  buildRow(
-                                                      "Address",
-                                                      addressControllerAdd,
-                                                      false),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  buildDatePicker(
-                                                      "Birth Date",
-                                                      context,
-                                                      birthDateControllerAdd),
-                                                  buildRow(
-                                                      "Username",
-                                                      usernameControllerAdd,
-                                                      false),
-                                                  buildRow(
-                                                      "Email",
-                                                      emailControllerAdd,
-                                                      false),
-                                                  buildRow(
-                                                      "Phone Number",
-                                                      phoneControllerAdd,
-                                                      false),
-                                                  buildPasswordRow("Password",
-                                                      passwordControllerAdd),
-                                                  buildPasswordRow(
-                                                      "Password Confirm",
-                                                      passwordConfirmControllerAdd),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 35, vertical: 15),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 25, horizontal: 30),
+                                backgroundColor: secondaryColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: const BorderSide(color: Colors.white),
+                                ),
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        elevation: 0,
+                                        backgroundColor: primaryBackgroundColor,
+                                        title: const Text(
+                                          'Add Employee',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                      actions: [
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            try {
-                                              createUserModel request = createUserModel(
-                                                  firstName: firstNameControllerAdd
-                                                      .text,
-                                                  lastName: lastNameControllerAdd
-                                                      .text,
-                                                  active: true,
-                                                  gender:
-                                                      genderControllerAdd.text ==
-                                                              'Male'
-                                                          ? 1
-                                                          : 2,
-                                                  city: cityControllerAdd.text,
-                                                  address:
-                                                      addressControllerAdd.text,
-                                                  postalCode:
-                                                      int.tryParse(postalCodeControllerAdd.text) ??
-                                                          0,
-                                                  birthDate: DateTime.parse(
-                                                      birthDateControllerAdd
-                                                          .text),
-                                                  email:
-                                                      emailControllerAdd.text,
-                                                  phoneNumber:
-                                                      phoneControllerAdd.text,
-                                                  userName: usernameControllerAdd
-                                                      .text,
-                                                  roleId:
-                                                      "9F4392A8-80BC-4C4F-9A6A-8D2C6C875F84",
-                                                  password: passwordControllerAdd
-                                                      .text,
-                                                  passwordConfirm:
-                                                      passwordConfirmControllerAdd
-                                                          .text);
+                                        content: SingleChildScrollView(
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    buildRow(
+                                                        "First Name",
+                                                        firstNameControllerAdd,
+                                                        false,
+                                                        null,
+                                                        20),
+                                                    buildRow(
+                                                        "Last Name",
+                                                        lastNameControllerAdd,
+                                                        false,
+                                                        null,
+                                                        20),
+                                                    buildDropdown(
+                                                        "Gender",
+                                                        ['Male', 'Female'],
+                                                        genderControllerAdd),
+                                                    buildRow(
+                                                        "City",
+                                                        cityControllerAdd,
+                                                        false,
+                                                        null,
+                                                        20),
+                                                    buildRow(
+                                                        "Postal Code",
+                                                        postalCodeControllerAdd,
+                                                        false,
+                                                        null,
+                                                        10),
+                                                    buildRow(
+                                                        "Address",
+                                                        addressControllerAdd,
+                                                        false,
+                                                        null,
+                                                        50),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 16),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    buildRow(
+                                                        "Username",
+                                                        usernameControllerAdd,
+                                                        false,
+                                                        null,
+                                                        15),
+                                                    buildRow(
+                                                        "Email",
+                                                        emailControllerAdd,
+                                                        false,
+                                                        null,
+                                                        15),
+                                                    buildDatePicker(
+                                                        "Birth Date",
+                                                        context,
+                                                        birthDateControllerAdd),
+                                                    buildRow(
+                                                        "Phone Number",
+                                                        phoneControllerAdd,
+                                                        false,
+                                                        null,
+                                                        20),
+                                                    buildPasswordRow("Password",
+                                                        passwordControllerAdd),
+                                                    buildPasswordRow(
+                                                        "Password Confirm",
+                                                        passwordConfirmControllerAdd),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                        actions: [
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 20,
+                                                      horizontal: 20),
+                                              backgroundColor: secondaryColor,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                side: const BorderSide(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              try {
+                                                createUserModel request = createUserModel(
+                                                    firstName:
+                                                        firstNameControllerAdd
+                                                            .text,
+                                                    lastName:
+                                                        lastNameControllerAdd
+                                                            .text,
+                                                    active: true,
+                                                    gender: genderControllerAdd
+                                                                .text ==
+                                                            'Male'
+                                                        ? 1
+                                                        : 2,
+                                                    city:
+                                                        cityControllerAdd.text,
+                                                    address: addressControllerAdd
+                                                        .text,
+                                                    postalCode:
+                                                        int.tryParse(postalCodeControllerAdd.text) ??
+                                                            0,
+                                                    birthDate: DateTime.parse(
+                                                        birthDateControllerAdd
+                                                            .text),
+                                                    email:
+                                                        emailControllerAdd.text,
+                                                    phoneNumber:
+                                                        phoneControllerAdd.text,
+                                                    userName:
+                                                        usernameControllerAdd
+                                                            .text,
+                                                    roleId: "9F4392A8-80BC-4C4F-9A6A-8D2C6C875F84",
+                                                    password: passwordControllerAdd.text,
+                                                    passwordConfirm: passwordConfirmControllerAdd.text);
 
-                                              var createdUser =
-                                                  await userProvider
-                                                      .create(request);
+                                                await userProvider
+                                                    .create(request);
+                                                firstNameControllerAdd.text =
+                                                    '';
+                                                lastNameControllerAdd.text = '';
+                                                genderControllerAdd.text = '';
+                                                cityControllerAdd.text = '';
+                                                postalCodeControllerAdd.text =
+                                                    '';
+                                                addressControllerAdd.text = '';
+                                                birthDateControllerAdd.text =
+                                                    DateFormat('yyyy-MM-dd')
+                                                        .format(DateTime.now());
+                                                usernameControllerAdd.text = '';
+                                                emailControllerAdd.text = '';
+                                                phoneControllerAdd.text = '';
+                                                passwordControllerAdd.text = '';
+                                                passwordConfirmControllerAdd
+                                                    .text = '';
+
+                                                Navigator.pop(context);
+                                                _refreshData();
+                                                showSnackBar(context,
+                                                    'Successfully created employee.');
+                                              } catch (error) {
+                                                showSnackBar(context,
+                                                    'Failed to add employee. $error');
+                                              }
+                                            },
+                                            child: const Text(
+                                              'Add',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 20,
+                                                      horizontal: 20),
+                                              backgroundColor: secondaryColor,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                side: const BorderSide(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pop(context);
                                               firstNameControllerAdd.text = '';
                                               lastNameControllerAdd.text = '';
                                               genderControllerAdd.text = '';
@@ -253,44 +397,21 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                               passwordControllerAdd.text = '';
                                               passwordConfirmControllerAdd
                                                   .text = '';
-
-                                              Navigator.pop(context);
-                                              _refreshData();
-                                              print(
-                                                  'Employee created: $createdUser');
-                                            } catch (e) {
-                                              print(
-                                                  'Failed to create employee: $e');
-                                            }
-                                          },
-                                          child: const Text('Add'),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            firstNameControllerAdd.text = '';
-                                            lastNameControllerAdd.text = '';
-                                            genderControllerAdd.text = '';
-                                            cityControllerAdd.text = '';
-                                            postalCodeControllerAdd.text = '';
-                                            addressControllerAdd.text = '';
-                                            birthDateControllerAdd.text =
-                                                DateFormat('yyyy-MM-dd')
-                                                    .format(DateTime.now());
-                                            usernameControllerAdd.text = '';
-                                            emailControllerAdd.text = '';
-                                            phoneControllerAdd.text = '';
-                                            passwordControllerAdd.text = '';
-                                            passwordConfirmControllerAdd.text =
-                                                '';
-                                          },
-                                          child: const Text('Cancel'),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
-                            child: const Text('Add Employee'),
+                                            },
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                              child: const Text(
+                                'Add Employee',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -304,15 +425,37 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   }
 
   void _searchEmployees() {
-    String searchText = searchController.text.toLowerCase();
+    String nameSearchText = searchByNameController.text.toLowerCase();
+    String locationSearchText = searchByLocationController.text.toLowerCase();
 
     if (employees != null) {
       filteredEmployees = employees!
-          .where((employee) => '${employee.firstName} ${employee.lastName}'
-              .toLowerCase()
-              .contains(searchText))
+          .where((employee) =>
+              '${employee.firstName} ${employee.lastName}'
+                  .toLowerCase()
+                  .contains(nameSearchText) &&
+              employee.city.toLowerCase().contains(locationSearchText))
           .toList();
+
+      String message;
+      if (filteredEmployees.isNotEmpty) {
+        message =
+            '${filteredEmployees.length} employee(s) found for selected filters';
+      } else {
+        message = 'No employees found for selected filters';
+      }
+
+      showSnackBar(context, message);
+
       _refreshData();
+    }
+  }
+
+  List<userModel> _getDisplayedEmployees() {
+    if (filteredEmployees.isNotEmpty) {
+      return filteredEmployees;
+    } else {
+      return employees ?? [];
     }
   }
 
@@ -342,6 +485,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          elevation: 0,
           backgroundColor: primaryBackgroundColor,
           title: const Text(
             'Employee Details',
@@ -355,11 +499,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      buildRow("First Name", firstNameController, false),
-                      buildRow("Last Name", lastNameController, false),
-                      buildRow("Gender", genderController, true),
-                      buildRow("City", cityController, false),
-                      buildRow("Postal Code", postalCodeController, false),
+                      buildRow(
+                          "First Name", firstNameController, false, null, 20),
+                      buildRow(
+                          "Last Name", lastNameController, false, null, 20),
+                      buildRow("Gender", genderController, true, null, null),
+                      buildRow("City", cityController, false, null, 15),
+                      buildRow(
+                          "Postal Code", postalCodeController, false, null, 10),
                     ],
                   ),
                 ),
@@ -368,11 +515,13 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildRow("Address", addressController, false),
-                      buildRow("Birth Date", birthDateController, true),
-                      buildRow("Username", usernameController, false),
-                      buildRow("Email", emailController, false),
-                      buildRow("Phone Number", phoneController, false),
+                      buildRow("Address", addressController, false, null, 50),
+                      buildRow("Username", usernameController, false, null, 20),
+                      buildRow(
+                          "Birth Date", birthDateController, true, null, null),
+                      buildRow("Email", emailController, false, null, 50),
+                      buildRow(
+                          "Phone Number", phoneController, false, null, 50),
                     ],
                   ),
                 ),
@@ -382,6 +531,16 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           actions: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                backgroundColor: secondaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.white),
+                ),
+              ),
               onPressed: () async {
                 try {
                   updateUserModel update = updateUserModel(
@@ -399,15 +558,27 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   );
                   await userProvider.updateUser(update);
                   Navigator.pop(context);
+                  showSnackBar(context, 'Successfully saved changes.');
                   //_refreshData();
                 } catch (e) {
-                  print("Update failed: $e");
+                  // print("Update failed: $e");
+                  showSnackBar(context, 'Failed to save changes. $e');
                 }
                 _refreshData();
               },
               child: const Text('Save'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                backgroundColor: secondaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.white),
+                ),
+              ),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -444,49 +615,33 @@ class EmployeeDataTableSource extends DataTableSource {
       cells: [
         DataCell(Text('${employee.firstName} ${employee.lastName}')),
         DataCell(Text(employee.gender == 1 ? 'Male' : 'Female')),
+        DataCell(Checkbox(
+          value: employee.active,
+          onChanged: (bool? value) async {
+            employee.active = value ?? false;
+            await userProvider.updateUserActiveStatus(employee.userId, value!);
+
+            refreshData();
+
+            showSnackBar(context, 'Employee status updated successfully!');
+          },
+        )),
         DataCell(ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+            backgroundColor: secondaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.white),
+            ),
+          ),
           onPressed: () {
             showDetailsDialog(employee);
           },
           child: const Text('Details'),
         )),
-        DataCell(ElevatedButton(
-          onPressed: () {
-            _showDeleteConfirmationDialog(employee);
-          },
-          child: const Text('Delete'),
-        )),
       ],
-    );
-  }
-
-  Future<void> _showDeleteConfirmationDialog(userModel employee) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: primaryBackgroundColor,
-          title: const Text('Confirm Deletion'),
-          content: Text(
-              'Are you sure you want to delete ${employee.firstName} ${employee.lastName}?'),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await userProvider.deleteUser(employee.userId);
-                Navigator.of(context).pop();
-                refreshData();
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
     );
   }
 

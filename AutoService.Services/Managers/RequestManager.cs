@@ -9,11 +9,15 @@ namespace AutoService.Services.Managers
     public class RequestManager : IRequestManager
     {
         private readonly AutoServiceContext _context;
+        private readonly IVehicleServiceRecordManager _vehicleRecordManager;
+        private readonly IVehicleManager _vehicleManager;
         private readonly IAppointmentManager _appointmentManager;
-        public RequestManager(AutoServiceContext context, IAppointmentManager appointmentManager)
+        public RequestManager(AutoServiceContext context, IAppointmentManager appointmentManager, IVehicleServiceRecordManager vehicleRecordManager, IVehicleManager vehicleManager)
         {
             _context = context;
             _appointmentManager = appointmentManager;
+            _vehicleRecordManager = vehicleRecordManager;
+            _vehicleManager = vehicleManager;
         }
 
         public async Task<RequestDto> GetRequest(int id)
@@ -57,22 +61,31 @@ namespace AutoService.Services.Managers
             {
                 return null;
             }
+            /*
+            if (dto.Status == Data.Enums.Status.Completed)
+            {
+                var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
 
-            List<ServiceRequest> serviceRequests = await _context.ServiceRequest
+                RecordDto record = new RecordDto()
+                {
+                    Cost = dto.TotalCost,
+                    ServiceIdList = dto.ServiceIdList,
+                    VehicleId = dto.VehicleId,
+                    Date = dto.DateCompleted,
+                    Notes = string.Empty,
+                    MileageAtTimeOfService = vehicle.Mileage,
+                };
+                await _vehicleRecordManager.CreateVehicleServiceRecord(record);
+            }
+            */
+            /*List<ServiceRequest> serviceRequests = await _context.ServiceRequest
                 .Where(sr => sr.RequestId == dto.Id)
                 .ToListAsync();
-
+            
             _context.ServiceRequest.RemoveRange(serviceRequests);
-
+            */
             requestDto.Status = dto.Status;
-            requestDto.CustomRequest = dto.CustomRequest;
-            requestDto.DateRequested = dto.DateRequested;
-            requestDto.DateCompleted = dto.DateCompleted;
-            requestDto.AppointmentId = dto.AppointmentId;
-
-            requestDto.ServiceIdList = dto.ServiceIdList
-                .Distinct()
-                .ToList();
+            requestDto.TotalCost = dto.TotalCost;
 
             Request request = new Request(requestDto);
 

@@ -1,5 +1,6 @@
 class VehicleModel {
   String status;
+  int statusId;
   String vehicleTypeName;
   String transmissionTypeName;
   String vehicleFuelTypeName;
@@ -12,6 +13,7 @@ class VehicleModel {
   String clientName;
 
   VehicleModel({
+    required this.statusId,
     required this.status,
     required this.vehicleTypeName,
     required this.transmissionTypeName,
@@ -27,6 +29,7 @@ class VehicleModel {
 
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
     return VehicleModel(
+        statusId: json['statusId'] ?? 0,
         status: json['status'] ?? 'No status',
         vehicleTypeName: json['vehicleTypeName'] ?? '',
         transmissionTypeName: json['transmissionTypeName'] ?? '',

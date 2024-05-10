@@ -5,6 +5,7 @@ import '../models/storageService.dart';
 import 'package:flutter/material.dart';
 import '../providers/AuthProvider.dart';
 import 'home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthProvider authProvider;
@@ -20,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String _errorText = '';
+  bool _isLoading = false;
 
   bool _isLoginButtonEnabled() {
     return _usernameController.text.isNotEmpty &&
@@ -27,16 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login(BuildContext context) async {
-    if (!_isLoginButtonEnabled()) {
+    if (!_isLoginButtonEnabled() || _isLoading) {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
     final String username = _usernameController.text;
     final String password = _passwordController.text;
-
     StorageService? storageService =
         await widget.authProvider.login(username, password);
-
     if (storageService != null && storageService.role == 'Client') {
       Navigator.pushReplacement(
         context,
@@ -48,10 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
     } else if (storageService == null) {
       setState(() {
         _errorText = 'Wrong username or password!';
+        _isLoading = false;
       });
     } else {
       setState(() {
         _errorText = 'Invalid user role!';
+        _isLoading = false;
       });
     }
   }
@@ -63,9 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                 Image.asset(
                   'assets/images/logo.png',
                 ),
@@ -127,44 +132,58 @@ class _LoginScreenState extends State<LoginScreen> {
                     _errorText,
                     style: const TextStyle(color: Colors.red),
                   ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 140),
-                      backgroundColor: secondaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: Colors.white),
-                      ),
-                    ),
-                    onPressed: () {
-                      _login(context);
-                    },
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 140),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          onPressed: () {
+                            _login(context);
+                          },
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 25),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  const Text('Not a member? ',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      )),
-                  Text('Register now',
-                      style: TextStyle(
-                          color: secondaryColor, fontWeight: FontWeight.bold)),
-                ]),
-              ],
-            ),
-          ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Not a member? ',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Register now',
+                        style: TextStyle(
+                            color: secondaryColor, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ])),
         ),
       ),
     );

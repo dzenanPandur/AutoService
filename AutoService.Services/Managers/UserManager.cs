@@ -110,39 +110,6 @@ namespace AutoService.Services.Managers
 
         public async Task<int> CreateUser(UserDto dto)
         {
-            if (string.IsNullOrEmpty(dto.FirstName) ||
-                string.IsNullOrEmpty(dto.LastName) ||
-                string.IsNullOrEmpty(dto.Gender.ToString()) ||
-                string.IsNullOrEmpty(dto.City) ||
-                string.IsNullOrEmpty(dto.PostalCode?.ToString()) ||
-                string.IsNullOrEmpty(dto.Address) ||
-                string.IsNullOrEmpty(dto.BirthDate.ToString()) ||
-                string.IsNullOrEmpty(dto.UserName) ||
-                string.IsNullOrEmpty(dto.Email) ||
-                string.IsNullOrEmpty(dto.PhoneNumber) ||
-                string.IsNullOrEmpty(dto.Password) ||
-                string.IsNullOrEmpty(dto.PasswordConfirm))
-            {
-                throw new Exception("All fields must be filled!");
-            }
-
-            if (dto.UserName.Length < 5)
-                throw new Exception("Username minimum length is 5 characters!");
-
-            if (dto.Password.Length < 6)
-                throw new Exception("Password minimum length is 6 characters!");
-
-            if (_userManager.FindByNameAsync(dto.UserName).Result != null)
-                throw new Exception("Username already taken!");
-
-            if (_userManager.FindByEmailAsync(dto.Email).Result != null)
-                throw new Exception("Account with that email already exists!");
-
-            if (dto.Password != dto.PasswordConfirm)
-                throw new Exception("Password and password confirm do not match!");
-
-
-
 
             var user = new User(dto);
             _context.ChangeTracker.Clear();
@@ -179,16 +146,7 @@ namespace AutoService.Services.Managers
             {
                 throw new Exception("Not found");
             }
-            if (dto.UserName != user.UserName)
-            {
-                if (_userManager.FindByNameAsync(dto.UserName).Result != null)
-                    throw new Exception("Username already taken!");
-            }
-            if (dto.Email != user.Email)
-            {
-                if (_userManager.FindByEmailAsync(dto.Email).Result != null)
-                    throw new Exception("Account with that email already exists!");
-            }
+
 
             _context.ChangeTracker.Clear();
 
@@ -203,6 +161,23 @@ namespace AutoService.Services.Managers
             user.Active = dto.Active;
 
             //User user = new User(userDto);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<User> ChangeActiveStatusUser(Guid id, bool active)
+        {
+            var user = await _context.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new Exception("Not found");
+            }
+            _context.ChangeTracker.Clear();
+            user.Active = active;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();

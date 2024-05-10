@@ -78,7 +78,11 @@ namespace AutoService.Services.Managers
                 return 0;
             }
 
-            _context.Vehicles.Remove(vehicle);
+            //_context.Vehicles.Remove(vehicle);
+
+            vehicle.isArchived = true;
+
+            _context.Vehicles.Update(vehicle);
             return await _context.SaveChangesAsync();
         }
     }
