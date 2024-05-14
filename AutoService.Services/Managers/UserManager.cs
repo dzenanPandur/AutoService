@@ -77,12 +77,6 @@ namespace AutoService.Services.Managers
             return user;
         }
 
-        //public async Task<List<User>> GetAllUsers()
-        //{
-        //    List<User> users = await _context.Users.ToListAsync();
-        //    return users;
-
-        //}
         public async Task<List<UserDto>> GetAllUsers()
         {
             List<User> users = await _context.Users.ToListAsync();
@@ -127,11 +121,6 @@ namespace AutoService.Services.Managers
             await _userManager.CreateAsync(user, dto.Password);
 
             _context.Users.Add(user);
-            //_context.UserRoles.Add(new IdentityUserRole<Guid>
-            //{
-            //    UserId = user.Id,
-            //    RoleId = user.RoleId
-            //});
 
 
             return await _context.SaveChangesAsync();
@@ -139,7 +128,6 @@ namespace AutoService.Services.Managers
 
         public async Task<User> UpdateUser(UserDto dto)
         {
-            //UserDto userDto = await GetUserById(dto.Id);
             var user = await _context.Users.Where(x => x.Id == dto.Id).FirstOrDefaultAsync();
 
             if (user == null)
@@ -159,8 +147,7 @@ namespace AutoService.Services.Managers
             user.City = dto.City;
             user.PostalCode = dto.PostalCode;
             user.Active = dto.Active;
-
-            //User user = new User(userDto);
+            user.Gender = dto.Gender;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();

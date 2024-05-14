@@ -1,5 +1,6 @@
 import 'package:autoservice_desktop/providers/ServiceProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../globals.dart';
 import '../../models/Employee/serviceModel.dart';
 import '../../models/Employee/vehicleModel.dart';
@@ -9,10 +10,10 @@ import '../../providers/VehicleServiceRecordProvider.dart';
 class VehicleDetailsScreen extends StatefulWidget {
   final VehicleModel vehicle;
 
-  const VehicleDetailsScreen({
-    Key? key,
-    required this.vehicle,
-  }) : super(key: key);
+  final VoidCallback onVehicleUpdated;
+  const VehicleDetailsScreen(
+      {Key? key, required this.vehicle, required this.onVehicleUpdated})
+      : super(key: key);
 
   @override
   _VehicleDetailsScreenState createState() => _VehicleDetailsScreenState();
@@ -36,7 +37,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           .getAllRecordsByVehicle(widget.vehicle.id);
     } catch (error) {
       print('Error loading service records: $error');
-      throw error;
+      return [];
     }
   }
 
@@ -47,7 +48,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              if (Navigator.of(context).canPop()) {
+                Navigator.pop(context);
+              } else {
+                widget.onVehicleUpdated();
+              }
             },
             icon: const Icon(
               Icons.chevron_left,
@@ -161,35 +166,37 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(),
-      child: PaginatedDataTable(
-        headingRowColor: MaterialStateProperty.all(secondaryColor),
-        arrowHeadColor: secondaryColor,
-        columns: [
-          DataColumn(
-              label: Text(
-            'Id',
-            style: TextStyle(color: fontColor),
-          )),
-          DataColumn(
-              label: Text(
-            'Date',
-            style: TextStyle(color: fontColor),
-          )),
-          DataColumn(
-              label: Text(
-            'Mileage',
-            style: TextStyle(color: fontColor),
-          )),
-          DataColumn(
-              label: Text(
-            'Details',
-            style: TextStyle(color: fontColor),
-          )),
-        ],
-        source: MaintenanceRecordsDataTableSource(
-            serviceRecords, context, serviceProvider),
-        rowsPerPage: 5,
-      ),
+      child: serviceRecords.isEmpty
+          ? const Center(child: Text('No maintenance records available'))
+          : PaginatedDataTable(
+              headingRowColor: MaterialStateProperty.all(secondaryColor),
+              arrowHeadColor: secondaryColor,
+              columns: [
+                DataColumn(
+                    label: Text(
+                  'Id',
+                  style: TextStyle(color: fontColor),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Date',
+                  style: TextStyle(color: fontColor),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Mileage',
+                  style: TextStyle(color: fontColor),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Details',
+                  style: TextStyle(color: fontColor),
+                )),
+              ],
+              source: MaintenanceRecordsDataTableSource(
+                  serviceRecords, context, serviceProvider),
+              rowsPerPage: 5,
+            ),
     );
   }
 }
@@ -204,12 +211,20 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
 
   @override
   DataRow getRow(int index) {
+    if (index >= _serviceRecords.length) {
+      return const DataRow(cells: [
+        DataCell(Text('')),
+        DataCell(Text('')),
+        DataCell(Text('')),
+        DataCell(Text(''))
+      ]);
+    }
     final VehicleServiceRecordModel record = _serviceRecords[index];
 
     return DataRow(
       cells: [
         DataCell(Text(record.id.toString())),
-        DataCell(Text(record.date.toString())),
+        DataCell(Text(DateFormat('dd-MM-yyyy').format(record.date))),
         DataCell(Text(record.mileageAtTimeOfService.toString())),
         DataCell(ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -245,11 +260,13 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildTextField(
-                        'Date of Service', record.date.toString(), true),
+                    _buildTextField('Date of Service',
+                        DateFormat('dd-MM-yyyy').format(record.date), true),
                     _buildTextField('Mileage at Time of Service',
                         record.mileageAtTimeOfService.toString(), true),
                     _buildServiceSection(record.serviceIdList),
+                    _buildTextField('Cost', record.cost.toString(), true),
+                    _buildTextField('Notes', record.notes, true)
                   ],
                 ),
               ),

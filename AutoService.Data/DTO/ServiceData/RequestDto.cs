@@ -24,6 +24,7 @@ namespace AutoService.Data.DTO.ServiceData
             ClientId = request.ClientId;
             VehicleId = request.VehicleId;
             TotalCost = request.TotalCost;
+            Message = request.Message;
 
 
             if (request.Services is not null)
@@ -42,6 +43,11 @@ namespace AutoService.Data.DTO.ServiceData
             {
                 Vehicle = new VehicleDto(request.Vehicle);
             }
+
+            if (request.Appointment is not null)
+            {
+                Appointment = new AppointmentDto(request.Appointment);
+            }
         }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
@@ -50,6 +56,7 @@ namespace AutoService.Data.DTO.ServiceData
         public DateTime? DateCompleted { get; set; }
         public decimal? TotalCost { get; set; }
         public string? CustomRequest { get; set; }
+        public string? Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public AppointmentDto? Appointment { get; set; }
         [JsonIgnore]
@@ -60,7 +67,6 @@ namespace AutoService.Data.DTO.ServiceData
         public Guid ClientId { get; set; }
         [JsonIgnore]
         public VehicleDto? Vehicle { get; set; }
-        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int VehicleId { get; set; }
         [JsonIgnore]
         public ICollection<ServiceDto> Services { get; set; } = new List<ServiceDto>();

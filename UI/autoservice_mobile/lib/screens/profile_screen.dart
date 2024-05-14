@@ -36,6 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _initializeDataFuture = _initializeData();
     _selectedDate = DateTime.now();
+    _initializeData();
   }
 
   Future<void> _initializeData() async {
@@ -58,11 +59,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _selectedGender = client.gender.toString();
       });
     } catch (error) {
-      print('Error fetching user data: $error');
+      showSnackBar(context, 'Error fetching user data: $error', secondaryColor);
     }
   }
 
   Future<void> _updateProfile() async {
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _userNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _addressController.text.isEmpty ||
+        _postalCodeController.text.isEmpty ||
+        _phoneNumberController.text.isEmpty ||
+        _birthDateController.text.isEmpty) {
+      showSnackBar(context, 'Please fill in all the fields!', secondaryColor);
+      return;
+    }
     userModel updatedClient = userModel(
       userId: widget.userId,
       firstName: _firstNameController.text,
@@ -98,18 +111,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         initialDate: _selectedDate,
         firstDate: DateTime(1900),
         lastDate: DateTime.now());
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
         _birthDateController.text = _formatDate(_selectedDate);
       });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Profile'),
+          surfaceTintColor: secondaryColor,
+          title: Container(
+            margin: const EdgeInsets.only(left: 10.0),
+            child: const Text('Profile'),
+          ),
         ),
         body: Padding(
             padding: const EdgeInsets.all(16.0),

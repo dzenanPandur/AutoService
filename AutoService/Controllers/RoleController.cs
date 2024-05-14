@@ -15,8 +15,6 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
-        //[AllowAnonymous]
-        //[Authorize]
         public async Task<IActionResult> GetRoleById(Guid id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -35,8 +33,6 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetRoleByName")]
-        //[AllowAnonymous]
-        //[Authorize]
         public async Task<IActionResult> GetRoleByName(string name)
         {
             if (string.IsNullOrEmpty(name))

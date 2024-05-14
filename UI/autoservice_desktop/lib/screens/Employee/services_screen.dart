@@ -298,6 +298,29 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                           ),
                                         ),
                                         onPressed: () async {
+                                          if (serviceNameControllerAdd
+                                              .text.isEmpty) {
+                                            showSnackBar(
+                                              context,
+                                              "Please input the service name.",
+                                            );
+                                            return;
+                                          }
+                                          if (serviceCategoryControllerAdd
+                                              .text.isEmpty) {
+                                            showSnackBar(
+                                              context,
+                                              "Please choose a category.",
+                                            );
+                                            return;
+                                          }
+                                          if (priceControllerAdd.text.isEmpty) {
+                                            showSnackBar(
+                                              context,
+                                              "Please input the price.",
+                                            );
+                                            return;
+                                          }
                                           try {
                                             ServiceModel request = ServiceModel(
                                               id: 0,

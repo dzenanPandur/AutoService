@@ -1,5 +1,6 @@
 ﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -16,6 +17,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllCategories()
         {
 
@@ -27,19 +29,11 @@ namespace AutoService.Controllers
             }
 
             return Ok(categories);
-            //List<UserViewModel> userViewModels = new List<UserViewModel>();
 
-            //foreach (UserDto userDto in users)
-            //{
-            //    UserViewModel userViewModel = new UserViewModel(userDto);
-            //    userViewModels.Add(userViewModel);
-            //}
-
-            //return Ok(userViewModels);
         }
 
         [HttpGet("GetById")]
-
+        [Authorize]
         public async Task<IActionResult> GetCategoryById(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -58,7 +52,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateCategory(CategoryDto dto)
         {
             int message = await _categoryManager.CreateCategory(dto);
@@ -73,7 +67,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateCategory(CategoryDto dto)
         {
             CategoryDto category = await _categoryManager.UpdateCategory(dto);
@@ -87,7 +81,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

@@ -76,7 +76,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           widget.vehicle.manufactureYear.toString();
       _mileageController.text = widget.vehicle.mileage.toString();
     } catch (error) {
-      print('Error fetching data: $error');
+      showSnackBar(context, 'Error fetching data: $error', secondaryColor);
     }
   }
 
@@ -123,9 +123,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 35,
+            ),
+          ),
           backgroundColor: secondaryColor,
           foregroundColor: fontColor,
-          title: const Text('Vehicle details'),
+          title: const Text(
+            'Vehicle details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.delete, color: fontColor),
@@ -134,6 +146,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
+                      elevation: 0,
+                      backgroundColor: primaryBackgroundColor,
                       title: const Text('Confirm Deletion'),
                       content: const Text(
                           'Are you sure you want to delete this vehicle?'),
@@ -142,14 +156,20 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Cancel'),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: secondaryColor),
+                          ),
                         ),
                         TextButton(
                           onPressed: () {
                             _deleteVehicle();
                             Navigator.of(context).pop();
                           },
-                          child: const Text("Delete"),
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(color: secondaryColor),
+                          ),
                         ),
                       ],
                     );
@@ -340,7 +360,17 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         ),
                         const SizedBox(height: 20),
                         Center(
-                          child: TextButton(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 20),
+                              backgroundColor: primaryBackgroundColor,
+                              foregroundColor: secondaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(color: Colors.white),
+                              ),
+                            ),
                             onPressed: () {
                               Navigator.push(
                                   context,
@@ -350,9 +380,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             vehicle: widget.vehicle),
                                   ));
                             },
-                            style: TextButton.styleFrom(
-                              side: const BorderSide(color: Colors.black),
-                            ),
                             child: const Padding(
                               padding: EdgeInsets.only(left: 60, right: 60),
                               child: Text('Past Maintenance Records'),
@@ -364,15 +391,20 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                           child: ElevatedButton(
                             onPressed: _updateVehicle,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.black),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 20),
+                              backgroundColor: secondaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(color: Colors.white),
+                              ),
                             ),
                             child: const Padding(
                               padding: EdgeInsets.all(12.0),
                               child: Text(
                                 'Save Changes',
                                 style: TextStyle(
-                                  color: Colors.red,
                                   fontSize: 23,
                                 ),
                               ),

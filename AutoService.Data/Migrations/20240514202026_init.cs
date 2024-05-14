@@ -4,7 +4,7 @@
 
 namespace AutoService.Data.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,32 +22,6 @@ namespace AutoService.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProfilePhotos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Active = table.Column<bool>(type: "bit", nullable: true),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileSystemPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SizeInBytes = table.Column<long>(type: "bigint", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Format = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Height = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Width = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Xresolution = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Yresolution = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ResolutionUnit = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProfilePhotos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -319,6 +293,7 @@ namespace AutoService.Data.Migrations
                     ManufactureYear = table.Column<int>(type: "int", nullable: true),
                     Mileage = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    isArchived = table.Column<bool>(type: "bit", nullable: false),
                     FuelTypeId = table.Column<int>(type: "int", nullable: true),
                     VehicleTypeId = table.Column<int>(type: "int", nullable: true),
                     TransmissionTypeId = table.Column<int>(type: "int", nullable: true),
@@ -360,9 +335,11 @@ namespace AutoService.Data.Migrations
                     DateRequested = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CustomRequest = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     AppointmentId = table.Column<int>(type: "int", nullable: true),
                     ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VehicleId = table.Column<int>(type: "int", nullable: true)
+                    VehicleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -458,39 +435,7 @@ namespace AutoService.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.InsertData(
-                schema: "dbo",
-                table: "Role",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"), null, "Employee", null },
-                    { new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"), null, "Admin", null },
-                    { new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"), null, "Client", null }
-                });
 
-            migrationBuilder.InsertData(
-               schema: "dbo",
-               table: "User",
-               columns: new[] { "Id", "AccessFailedCount", "Active", "Address", "BirthDate", "City", "ConcurrencyStamp", "CreatedDate", "Discriminator", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "ModifiedDate", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PostalCode", "RoleId", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-               values: new object[,]
-               {
-                    { new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 0, true, "Ulica 3", new DateTime(1998, 1, 4, 16, 22, 29, 961, DateTimeKind.Unspecified), "Sarajevo", "650492b3-5975-4a30-b796-b27c56a065a3", new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(607), "User", "client@client.com", false, "Client", 2, "User", false, null, new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(637), "CLIENT@CLIENT.COM", "CLIENT", "AQAAAAIAAYagAAAAEIPOmlsV57rPJlEsDCfu4rsP2GBDN7KXIcFymvHL2ZLzlyCbzIn+LGx6DSCe6BV2og==", "123456789", false, 88104, new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"), "f5f9fa28-8f00-45a5-b3d9-e0921a1a104d", false, "Client" },
-                    { new Guid("b8396f1d-a29a-4856-a4c1-1312dc97a4a1"), 0, true, "Ulica 2", new DateTime(2000, 1, 11, 16, 22, 29, 961, DateTimeKind.Unspecified), "Mostar", "97e229af-2604-4b7c-b579-d44e43b88576", new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9869), "User", "employee@employee.com", false, "Employee", 1, "User", false, null, new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9930), "EMPLOYEE@EMPLOYEE.COM", "EMPLOYEE", "AQAAAAIAAYagAAAAEEIHvjeCGSTaZfqUVK9IC/ONuj5fJj5vKIhHnJkXRWgMCEspYS9/+gr3DBICkveXKg==", "123456789", false, 88104, new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"), "2bb56497-5c49-4c01-8bc7-e2df21ef5d53", false, "EMPLOYEE" },
-                    { new Guid("f760ee5c-435b-4875-91a5-21a6a554513b"), 0, true, "Ulica 1", new DateTime(2000, 1, 1, 16, 22, 29, 961, DateTimeKind.Unspecified), "Mostar", "2ee39f74-519d-400f-bb89-c937f284b676", new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1253), "User", "admin@admin.com", false, "Admin", 1, "User", false, null, new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1765), "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEI9PHasKoFp5DwWoGI8pTvKMeEUkZzfCkdtjIVgv1IWGNUMP9gHa01RFqELzQq5isw==", "123456789", false, 88000, new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"), "76cbb512-37af-4f7a-aef4-4b52eb2c7618", false, "Admin" }
-               });
-
-
-            migrationBuilder.InsertData(
-                table: "Appointments",
-                columns: new[] { "Id", "ClientId", "Date", "IsOccupied", "RequestId" },
-                values: new object[,]
-                {
-                    { 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6942), true, 1 },
-                    { 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6945), false, 2 },
-                    { 3, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6946), true, 3 },
-                    { 4, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6948), false, 4 }
-                });
 
             migrationBuilder.InsertData(
                 table: "Categories",
@@ -502,7 +447,16 @@ namespace AutoService.Data.Migrations
                     { 3, "Tuning" }
                 });
 
-
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "Role",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"), null, "Employee", null },
+                    { new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"), null, "Admin", null },
+                    { new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"), null, "Client", null }
+                });
 
             migrationBuilder.InsertData(
                 table: "TransmissionTypes",
@@ -547,29 +501,54 @@ namespace AutoService.Data.Migrations
                 {
                     { 1, 2, true, "Change oil", 80m },
                     { 2, 2, true, "Change brakes", 250m },
-                    { 3, 1, true, "Check lights", 5m },
-                    { 4, 3, true, "ECU Tune", 300m }
+                    { 3, 2, true, "Change freon", 80m },
+                    { 4, 2, true, "Change lights", 35m },
+                    { 5, 1, true, "Check oil", 5m },
+                    { 6, 1, true, "Check brakes", 60m },
+                    { 7, 1, true, "Check lights", 5m },
+                    { 8, 1, true, "Check freon", 10m },
+                    { 9, 3, true, "ECU Tune", 300m }
                 });
 
+            migrationBuilder.InsertData(
+                schema: "dbo",
+                table: "User",
+                columns: new[] { "Id", "AccessFailedCount", "Active", "Address", "BirthDate", "City", "ConcurrencyStamp", "CreatedDate", "Discriminator", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "ModifiedDate", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PostalCode", "RoleId", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 0, true, "Ulica 3", new DateTime(1998, 1, 4, 16, 22, 29, 961, DateTimeKind.Unspecified), "Sarajevo", "650492b3-5975-4a30-b796-b27c56a065a3", new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(607), "User", "client@client.com", false, "Client", 2, "User", false, null, new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(637), "CLIENT@CLIENT.COM", "CLIENT", "AQAAAAIAAYagAAAAEIPOmlsV57rPJlEsDCfu4rsP2GBDN7KXIcFymvHL2ZLzlyCbzIn+LGx6DSCe6BV2og==", "123456789", false, 88104, new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"), "f5f9fa28-8f00-45a5-b3d9-e0921a1a104d", false, "Client" },
+                    { new Guid("b8396f1d-a29a-4856-a4c1-1312dc97a4a1"), 0, true, "Ulica 2", new DateTime(2000, 1, 11, 16, 22, 29, 961, DateTimeKind.Unspecified), "Mostar", "97e229af-2604-4b7c-b579-d44e43b88576", new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9869), "User", "employee@employee.com", false, "Employee", 1, "User", false, null, new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9930), "EMPLOYEE@EMPLOYEE.COM", "EMPLOYEE", "AQAAAAIAAYagAAAAEEIHvjeCGSTaZfqUVK9IC/ONuj5fJj5vKIhHnJkXRWgMCEspYS9/+gr3DBICkveXKg==", "123456789", false, 88104, new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"), "2bb56497-5c49-4c01-8bc7-e2df21ef5d53", false, "EMPLOYEE" },
+                    { new Guid("f760ee5c-435b-4875-91a5-21a6a554513b"), 0, true, "Ulica 1", new DateTime(2000, 1, 1, 16, 22, 29, 961, DateTimeKind.Unspecified), "Mostar", "2ee39f74-519d-400f-bb89-c937f284b676", new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1253), "User", "admin@admin.com", false, "Admin", 1, "User", false, null, new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1765), "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEI9PHasKoFp5DwWoGI8pTvKMeEUkZzfCkdtjIVgv1IWGNUMP9gHa01RFqELzQq5isw==", "123456789", false, 88000, new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"), "76cbb512-37af-4f7a-aef4-4b52eb2c7618", false, "Admin" }
+                });
+            migrationBuilder.InsertData(
+                table: "Appointments",
+                columns: new[] { "Id", "ClientId", "Date", "IsOccupied", "RequestId" },
+                values: new object[,]
+                {
+                    { 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 5, 20, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2709), true, 1 },
+                    { 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 5, 19, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2712), false, 2 },
+                    { 3, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 5, 21, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2714), true, 3 },
+                    { 4, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), new DateTime(2024, 5, 22, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2716), false, 4 }
+                });
 
             migrationBuilder.InsertData(
                 table: "Vehicles",
-                columns: new[] { "Id", "ClientId", "FuelTypeId", "Make", "ManufactureYear", "Mileage", "Model", "Status", "TransmissionTypeId", "VehicleTypeId", "Vin" },
+                columns: new[] { "Id", "ClientId", "FuelTypeId", "Make", "ManufactureYear", "Mileage", "Model", "Status", "TransmissionTypeId", "VehicleTypeId", "Vin", "isArchived" },
                 values: new object[,]
                 {
-                    { 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 2, "Peugeot", 2016, 195123, "308", 2, 1, 2, "1231AKHJKHJ1213JH" },
-                    { 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 1, "Toyota", 2008, 18590, "Yaris", 4, 1, 2, "12151AKGHEQRH15121JH" }
+                    { 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 2, "Peugeot", 2016, 195123, "308", 2, 1, 2, "1231AKHJKHJ1213JH", false },
+                    { 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), 1, "Toyota", 2008, 18590, "Yaris", 4, 1, 2, "12151AKGHEQRH15121JH", false }
                 });
 
             migrationBuilder.InsertData(
                 table: "Request",
-                columns: new[] { "Id", "AppointmentId", "ClientId", "CustomRequest", "DateCompleted", "DateRequested", "Status", "VehicleId" },
+                columns: new[] { "Id", "AppointmentId", "ClientId", "CustomRequest", "DateCompleted", "DateRequested", "Message", "Status", "TotalCost", "VehicleId" },
                 values: new object[,]
                 {
-                    { 1, 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change tires", new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6927), new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6928), 2, 1 },
-                    { 2, 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change window", new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6930), new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6930), 5, 1 },
-                    { 3, 3, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change bumper", new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6931), new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6932), 3, 1 },
-                    { 4, 4, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change rims", new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6933), new DateTime(2024, 2, 28, 19, 13, 21, 507, DateTimeKind.Utc).AddTicks(6933), 4, 1 }
+                    { 1, 1, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change tires", new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693), new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693), " ", 2, 600m, 1 },
+                    { 2, 2, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change window", new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696), new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696), " ", 6, 450m, 1 },
+                    { 3, 3, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change bumper", new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698), new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698), " ", 7, 400m, 1 },
+                    { 4, 4, new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"), "Change rims", new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2699), new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2700), " ", 4, 700m, 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -577,8 +556,8 @@ namespace AutoService.Data.Migrations
                 columns: new[] { "Id", "Cost", "Date", "MileageAtTimeOfService", "Notes", "VehicleId" },
                 values: new object[,]
                 {
-                    { 1, 1500m, new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6851), 185100, "Found broken light", 1 },
-                    { 2, 500m, new DateTime(2024, 2, 28, 20, 13, 21, 507, DateTimeKind.Local).AddTicks(6875), 17800, "", 2 }
+                    { 1, 1500m, new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2617), 185100, "Found broken light", 1 },
+                    { 2, 500m, new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2638), 17800, "", 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -586,14 +565,14 @@ namespace AutoService.Data.Migrations
                 columns: new[] { "Id", "RequestId", "ServiceId" },
                 values: new object[,]
                 {
-                    { 1, 1, 1 },
-                    { 2, 1, 2 },
-                    { 3, 2, 3 },
-                    { 4, 2, 4 },
-                    { 5, 3, 1 },
-                    { 6, 3, 2 },
-                    { 7, 3, 3 },
-                    { 8, 4, 1 }
+                    { 1, 4, 1 },
+                    { 2, 3, 3 },
+                    { 3, 3, 2 },
+                    { 4, 3, 1 },
+                    { 5, 2, 4 },
+                    { 6, 2, 3 },
+                    { 7, 1, 2 },
+                    { 8, 1, 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -736,9 +715,6 @@ namespace AutoService.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AspNetUserRoles");
-
-            migrationBuilder.DropTable(
-                name: "ProfilePhotos");
 
             migrationBuilder.DropTable(
                 name: "RoleClaim",

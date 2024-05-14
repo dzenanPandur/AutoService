@@ -47,11 +47,7 @@ namespace AutoService.Services.Managers
             ServiceDto serviceDto = await GetService(dto.Id);
             _context.ChangeTracker.Clear();
 
-            //serviceDto.Price = dto.Price;
             serviceDto.IsActive = dto.IsActive;
-            //serviceDto.Name = dto.Name;
-            // serviceDto.Category = dto.Category;
-            //serviceDto.CategoryId = dto.CategoryId;
 
             Service service = new Service(serviceDto);
 

@@ -20,6 +20,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllVehicles()
         {
 
@@ -30,7 +31,6 @@ namespace AutoService.Controllers
                 return NotFound("No Vehicles found.");
             }
 
-            //return Ok(vehicles);
 
             List<VehicleViewModel> vehicleViewModels = new List<VehicleViewModel>();
 
@@ -46,6 +46,7 @@ namespace AutoService.Controllers
             return Ok(vehicleViewModels);
         }
 
+        [Authorize]
         [HttpGet("GetById")]
         public async Task<IActionResult> GetVehicle(int id)
         {
@@ -88,19 +89,11 @@ namespace AutoService.Controllers
             {
                 return Problem(e.InnerException.ToString());
             }
-            //int message = await _vehicleManager.CreateVehicle(dto);
-            //if (message > 0)
-            //{
-            //    return Ok("Vehicle created successfully.");
-            //}
-            //else
-            //{
-            //    return BadRequest("Failed to create Vehicle.");
-            //}
+
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateVehicle(VehicleDto dto)
         {
             VehicleDto vehicle = await _vehicleManager.UpdateVehicle(dto);
@@ -114,7 +107,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteVehicle(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -123,6 +116,14 @@ namespace AutoService.Controllers
             }
 
             var vehicle = await _vehicleManager.GetVehicle(id);
+
+            if (vehicle.Status != Data.Enums.Status.Idle
+                || vehicle.Status != Data.Enums.Status.Rejected
+                || vehicle.Status != Data.Enums.Status.Canceled
+                || vehicle.Status != Data.Enums.Status.Completed)
+            {
+                return BadRequest("Cannot delete vehicle while request is in progress!");
+            }
 
             if (vehicle == null)
             {

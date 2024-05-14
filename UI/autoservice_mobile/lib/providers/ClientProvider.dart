@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'package:autoservice_mobile/models/requestModel.dart';
+
+import 'package:autoservice_mobile/models/request/messagesModel.dart';
 
 import '../../providers/baseProvider.dart';
 import '../globals.dart';
+import '../models/request/requestModel.dart';
 import '../models/userModel.dart';
 import '../models/vehicleModel.dart';
 
@@ -43,6 +45,22 @@ class ClientProvider extends BaseProvider<userModel> {
     if (isValidResponseCode(response)) {
       var data = jsonDecode(response.body);
       return List<RequestModel>.from(data.map((x) => RequestModel.fromJson(x)));
+    } else {
+      throw Exception("Failed to fetch all requests.");
+    }
+  }
+
+  Future<List<MessageModel>> getAllMessagesByClient(String id) async {
+    var url = "$baseUrl$_endpoint/GetAllMessagesByClient?id=$id";
+    var uri = Uri.parse(url);
+
+    Map<String, String> headers = createHeaders();
+
+    var response = await http!.get(uri, headers: headers);
+
+    if (isValidResponseCode(response)) {
+      var data = jsonDecode(response.body);
+      return List<MessageModel>.from(data.map((x) => MessageModel.fromJson(x)));
     } else {
       throw Exception("Failed to fetch all requests.");
     }

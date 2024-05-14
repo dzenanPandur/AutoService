@@ -24,6 +24,7 @@ class _MaintenanceRecordDetailsScreenState
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _mileageController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _costController = TextEditingController();
   final ServiceProvider serviceProvider = ServiceProvider();
   final VehicleServiceRecordProvider recordProvider =
       VehicleServiceRecordProvider();
@@ -37,6 +38,7 @@ class _MaintenanceRecordDetailsScreenState
     _dateController.text = DateFormat('yyyy-MM-dd').format(widget.record.date);
     _mileageController.text = widget.record.mileageAtTimeOfService.toString();
     _notesController.text = widget.record.notes;
+    _costController.text = widget.record.cost.toString();
     _initializeDataFuture = loadServices();
   }
 
@@ -49,9 +51,21 @@ class _MaintenanceRecordDetailsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 35,
+            ),
+          ),
           backgroundColor: secondaryColor,
           foregroundColor: fontColor,
-          title: const Text('Maintenance details'),
+          title: const Text(
+            'Maintenance details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         body: SingleChildScrollView(
             child: Padding(
@@ -94,8 +108,28 @@ class _MaintenanceRecordDetailsScreenState
                         controller: _notesController,
                       ),
                       const SizedBox(height: 20),
+                      Text('Cost:',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold)),
+                      TextFormField(
+                        maxLength: 15,
+                        controller: _costController,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
                           onPressed: _saveChanges,
                           child: const Padding(
                             padding: EdgeInsets.all(12.0),
@@ -162,31 +196,49 @@ class _MaintenanceRecordDetailsScreenState
             borderRadius: BorderRadius.circular(8.0),
             color: const Color.fromARGB(214, 231, 229, 229),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var service in services)
-                Row(
-                  children: [
-                    Checkbox(
-                      value: widget.record.serviceIdList.contains(service.id),
-                      onChanged: (newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            if (newValue) {
-                              widget.record.serviceIdList.add(service.id);
-                            } else {
-                              widget.record.serviceIdList.remove(service.id);
-                            }
-                          });
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 3,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: services.length,
+            itemBuilder: (context, index) {
+              final service = services[index];
+              return Row(
+                children: [
+                  Checkbox(
+                    checkColor: primaryBackgroundColor,
+                    fillColor: MaterialStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return secondaryColor;
                         }
+                        return null;
                       },
                     ),
-                    Text(service.name),
-                  ],
-                ),
-              const SizedBox(height: 4),
-            ],
+                    value: widget.record.serviceIdList.contains(service.id),
+                    onChanged: (newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          if (newValue) {
+                            widget.record.serviceIdList.add(service.id);
+                          } else {
+                            widget.record.serviceIdList.remove(service.id);
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: Text(service.name),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -205,9 +257,9 @@ class _MaintenanceRecordDetailsScreenState
           date: updatedDate,
           mileageAtTimeOfService: updatedMileage,
           notes: updatedNotes,
-          cost: 0,
+          cost: double.parse(_costController.text),
           vehicleId: widget.record.vehicleId,
-          serviceIdList: widget.record.serviceIdList);
+          serviceIdList: List.from(widget.record.serviceIdList));
 
       await recordProvider.update(updatedRecord);
 

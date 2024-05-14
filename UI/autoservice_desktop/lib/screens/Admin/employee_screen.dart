@@ -254,7 +254,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                         emailControllerAdd,
                                                         false,
                                                         null,
-                                                        15),
+                                                        50),
                                                     buildDatePicker(
                                                         "Birth Date",
                                                         context,
@@ -296,14 +296,52 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                               ),
                                             ),
                                             onPressed: () async {
+                                              if (firstNameControllerAdd.text.isEmpty ||
+                                                  lastNameControllerAdd
+                                                      .text.isEmpty ||
+                                                  emailControllerAdd
+                                                      .text.isEmpty ||
+                                                  cityControllerAdd
+                                                      .text.isEmpty ||
+                                                  addressControllerAdd
+                                                      .text.isEmpty ||
+                                                  postalCodeControllerAdd
+                                                      .text.isEmpty ||
+                                                  phoneControllerAdd
+                                                      .text.isEmpty ||
+                                                  birthDateControllerAdd
+                                                      .text.isEmpty ||
+                                                  genderControllerAdd
+                                                      .text.isEmpty ||
+                                                  passwordControllerAdd
+                                                      .text.isEmpty ||
+                                                  passwordConfirmControllerAdd
+                                                      .text.isEmpty ||
+                                                  usernameControllerAdd
+                                                      .text.isEmpty) {
+                                                showSnackBar(context,
+                                                    'Please fill in all the fields!');
+                                                return;
+                                              }
+                                              if (passwordControllerAdd.text !=
+                                                  passwordConfirmControllerAdd
+                                                      .text) {
+                                                showSnackBar(context,
+                                                    'Passwords do not match!');
+                                                return;
+                                              }
+                                              String pickedDateString =
+                                                  birthDateControllerAdd.text;
+                                              DateTime pickedDate =
+                                                  DateFormat('dd-MM-yyyy')
+                                                      .parse(pickedDateString);
                                               try {
                                                 createUserModel request = createUserModel(
                                                     firstName:
                                                         firstNameControllerAdd
                                                             .text,
-                                                    lastName:
-                                                        lastNameControllerAdd
-                                                            .text,
+                                                    lastName: lastNameControllerAdd
+                                                        .text,
                                                     active: true,
                                                     gender: genderControllerAdd
                                                                 .text ==
@@ -314,12 +352,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                         cityControllerAdd.text,
                                                     address: addressControllerAdd
                                                         .text,
-                                                    postalCode:
-                                                        int.tryParse(postalCodeControllerAdd.text) ??
-                                                            0,
-                                                    birthDate: DateTime.parse(
-                                                        birthDateControllerAdd
-                                                            .text),
+                                                    postalCode: int.tryParse(
+                                                            postalCodeControllerAdd
+                                                                .text) ??
+                                                        0,
+                                                    birthDate: pickedDate,
                                                     email:
                                                         emailControllerAdd.text,
                                                     phoneNumber:
@@ -327,9 +364,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                     userName:
                                                         usernameControllerAdd
                                                             .text,
-                                                    roleId: "9F4392A8-80BC-4C4F-9A6A-8D2C6C875F84",
-                                                    password: passwordControllerAdd.text,
-                                                    passwordConfirm: passwordConfirmControllerAdd.text);
+                                                    roleId:
+                                                        "9F4392A8-80BC-4C4F-9A6A-8D2C6C875F84",
+                                                    password:
+                                                        passwordControllerAdd
+                                                            .text,
+                                                    passwordConfirm:
+                                                        passwordConfirmControllerAdd
+                                                            .text);
 
                                                 await userProvider
                                                     .create(request);
@@ -342,7 +384,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                     '';
                                                 addressControllerAdd.text = '';
                                                 birthDateControllerAdd.text =
-                                                    DateFormat('yyyy-MM-dd')
+                                                    DateFormat('dd-MM-yyyy')
                                                         .format(DateTime.now());
                                                 usernameControllerAdd.text = '';
                                                 emailControllerAdd.text = '';
@@ -389,7 +431,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                               postalCodeControllerAdd.text = '';
                                               addressControllerAdd.text = '';
                                               birthDateControllerAdd.text =
-                                                  DateFormat('yyyy-MM-dd')
+                                                  DateFormat('dd-MM-yyyy')
                                                       .format(DateTime.now());
                                               usernameControllerAdd.text = '';
                                               emailControllerAdd.text = '';
@@ -473,7 +515,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     TextEditingController addressController =
         TextEditingController(text: employee.address);
     TextEditingController birthDateController = TextEditingController(
-        text: DateFormat('yyyy-MM-dd').format(employee.birthDate));
+        text: DateFormat('dd-MM-yyyy').format(employee.birthDate));
     TextEditingController usernameController =
         TextEditingController(text: employee.username);
     TextEditingController emailController =
@@ -543,6 +585,17 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
               ),
               onPressed: () async {
                 try {
+                  if (firstNameController.text.isEmpty ||
+                      lastNameController.text.isEmpty ||
+                      cityController.text.isEmpty ||
+                      addressController.text.isEmpty ||
+                      postalCodeController.text.isEmpty ||
+                      phoneController.text.isEmpty ||
+                      birthDateController.text.isEmpty ||
+                      usernameController.text.isEmpty) {
+                    showSnackBar(context, 'Please fill in all the fields!');
+                    return;
+                  }
                   updateUserModel update = updateUserModel(
                     id: employee.userId,
                     email: emailController.text,
@@ -553,15 +606,12 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                     city: cityController.text,
                     postalCode: int.tryParse(postalCodeController.text),
                     userName: usernameController.text,
-                    active: true,
-                    //gender: 2,
+                    active: employee.active,
                   );
                   await userProvider.updateUser(update);
                   Navigator.pop(context);
                   showSnackBar(context, 'Successfully saved changes.');
-                  //_refreshData();
                 } catch (e) {
-                  // print("Update failed: $e");
                   showSnackBar(context, 'Failed to save changes. $e');
                 }
                 _refreshData();

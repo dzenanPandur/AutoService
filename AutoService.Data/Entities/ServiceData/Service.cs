@@ -19,7 +19,7 @@ public class Service
         Price = dto.Price;
         CategoryId = dto.CategoryId;
 
-        if (dto.Category is not null )
+        if (dto.Category is not null)
         {
             Category = new Category(dto.Category);
         }
@@ -33,7 +33,7 @@ public class Service
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
     public ICollection<Request> Requests { get; set; } = new List<Request>();
-    public ICollection<ServiceRequest> ServiceRequests { get; set; } = new List<ServiceRequest>();
+    public ICollection<ServiceRequest> ServiceRequests { get; set; }
     public ICollection<VehicleServiceRecord> Records { get; set; } = new List<VehicleServiceRecord>();
     public ICollection<ServicesPerformed> ServicesPerformeds { get; set; } = new List<ServicesPerformed>();
 

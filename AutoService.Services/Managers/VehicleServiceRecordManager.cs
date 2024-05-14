@@ -1,5 +1,6 @@
 ﻿using AutoService.Data.Database;
 using AutoService.Data.DTO.VehicleData;
+using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.VehicleData;
 using AutoService.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -58,12 +59,19 @@ namespace AutoService.Services.Managers
         {
             RecordDto vehicleServiceRecordDto = await GetVehicleServiceRecord(dto.Id);
             _context.ChangeTracker.Clear();
+            List<ServicesPerformed> servicesPerformed = await _context.ServicesPerformed
+                .Where(sp => sp.RecordId == dto.Id)
+                .ToListAsync();
+
+            _context.ServicesPerformed.RemoveRange(servicesPerformed);
 
             vehicleServiceRecordDto.Cost = dto.Cost;
             vehicleServiceRecordDto.Date = dto.Date;
             vehicleServiceRecordDto.MileageAtTimeOfService = dto.MileageAtTimeOfService;
             vehicleServiceRecordDto.Notes = dto.Notes;
-            vehicleServiceRecordDto.ServiceIdList = dto.ServiceIdList;
+            vehicleServiceRecordDto.ServiceIdList = dto.ServiceIdList
+                .Distinct()
+                .ToList();
 
             VehicleServiceRecord vehicleServiceRecord = new VehicleServiceRecord(vehicleServiceRecordDto);
 

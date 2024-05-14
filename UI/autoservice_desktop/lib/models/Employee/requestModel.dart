@@ -10,6 +10,7 @@ class RequestModel {
   List<int> serviceIdList;
   int vehicleId;
   double? totalCost;
+  String? message;
 
   RequestModel({
     required this.status,
@@ -23,24 +24,25 @@ class RequestModel {
     required this.serviceIdList,
     required this.vehicleId,
     this.totalCost,
+    this.message,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
     return RequestModel(
-      status: json['status'] ?? '',
-      statusId: json['statusId'] ?? '',
-      vehicleName: json['vehicleName'] ?? '',
-      clientName: json['clientName'] ?? '',
-      id: json['id'] ?? 0,
-      dateRequested:
-          DateTime.parse(json['dateRequested'] ?? DateTime.now().toString()),
-      dateCompleted:
-          DateTime.parse(json['dateCompleted'] ?? DateTime.now().toString()),
-      customRequest: json['customRequest'] ?? '',
-      serviceIdList: List<int>.from(json['serviceIdList'] ?? []),
-      vehicleId: json['vehicleId'],
-      totalCost: json['totalCost'],
-    );
+        status: json['status'] ?? '',
+        statusId: json['statusId'] ?? '',
+        vehicleName: json['vehicleName'] ?? '',
+        clientName: json['clientName'] ?? '',
+        id: json['id'] ?? 0,
+        dateRequested:
+            DateTime.parse(json['dateRequested'] ?? DateTime.now().toString()),
+        dateCompleted:
+            DateTime.parse(json['dateCompleted'] ?? DateTime.now().toString()),
+        customRequest: json['customRequest'] ?? '',
+        serviceIdList: List<int>.from(json['serviceIdList'] ?? []),
+        vehicleId: json['vehicleId'],
+        totalCost: json['totalCost'],
+        message: json['message']);
   }
 
   Map<String, dynamic> toJson() {
@@ -56,6 +58,7 @@ class RequestModel {
       'serviceIdList': serviceIdList,
       'vehicleId': vehicleId,
       'totalCost': totalCost,
+      'message': message,
     };
   }
 }

@@ -1,14 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:autoservice_desktop/models/Employee/vehicleModel.dart';
 import 'package:autoservice_desktop/providers/VehicleProvider.dart';
-import 'package:autoservice_desktop/screens/Employee/vehicle_details_screen.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import '../../enum.dart';
 import '../../globals.dart';
 
 class VehiclesScreen extends StatefulWidget {
-  const VehiclesScreen({super.key});
+  final Function(VehicleModel) onVehicleSelected;
+  const VehiclesScreen({super.key, required this.onVehicleSelected});
 
   @override
   _VehiclesScreenState createState() => _VehiclesScreenState();
@@ -23,9 +31,25 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   TextEditingController searchByVehicleName = TextEditingController();
   List<Status> selectedStatuses = [];
   List<VehicleModel> filteredVehicles = [];
+
+  List<VehicleModel> _activeVehicles = [];
+
+  Future<void> _fetchVehicles() async {
+    vehicles = await vehicleProvider.getAll();
+    _activeVehicles =
+        vehicles!.where((vehicle) => !vehicle.isArchived!).toList();
+    filteredVehicles = _activeVehicles;
+    setState(() {});
+  }
+
+  void _refreshVehicles() {
+    _fetchVehicles();
+  }
+
   @override
   void initState() {
     super.initState();
+    _fetchVehicles();
   }
 
   @override
@@ -180,12 +204,12 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                 ),
                               ),
                               rowsPerPage: 5,
-                              source: VehicleDataTableSource(
-                                displayedVehicles,
-                                vehicleProvider: vehicleProvider,
-                                context: context,
-                                refreshData: _refreshData,
-                              ),
+                              source: VehicleDataTableSource(displayedVehicles,
+                                  vehicleProvider: vehicleProvider,
+                                  context: context,
+                                  refreshData: _refreshData,
+                                  onVehicleUpdated: _refreshVehicles,
+                                  onVehicleSelected: widget.onVehicleSelected),
                             ),
                           ),
                         ],
@@ -193,6 +217,92 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                     );
                   }
                 },
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () async {
+                  final pdf = pw.Document();
+
+                  List<VehicleModel> reportVehicles =
+                      filteredVehicles.isNotEmpty
+                          ? filteredVehicles
+                          : vehicles ?? [];
+
+                  pdf.addPage(pw.Page(
+                    pageFormat: PdfPageFormat.a4,
+                    build: (pw.Context context) {
+                      return pw.Column(
+                        children: [
+                          pw.Center(
+                            child: pw.Text(
+                              'AutoService',
+                              style: pw.TextStyle(
+                                fontSize: 24,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.Text(
+                            'Vehicles report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
+                            style: const pw.TextStyle(fontSize: 16),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.TableHelper.fromTextArray(
+                            headers: [
+                              'Id',
+                              'Status',
+                              'Client name',
+                              'Vehicle name',
+                            ],
+                            data: reportVehicles
+                                .map((vehicle) => [
+                                      vehicle.id.toString(),
+                                      vehicle.status,
+                                      vehicle.clientName,
+                                      '${vehicle.make} ${vehicle.model}',
+                                    ])
+                                .toList(),
+                            border: pw.TableBorder.all(),
+                            cellAlignment: pw.Alignment.centerLeft,
+                            headerStyle:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            cellStyle: const pw.TextStyle(fontSize: 12),
+                            cellPadding: const pw.EdgeInsets.all(8),
+                          ),
+                        ],
+                      );
+                    },
+                  ));
+
+                  final bytes = await pdf.save();
+
+                  final directory =
+                      await FilePicker.platform.getDirectoryPath();
+                  if (directory != null) {
+                    final file = File(
+                        '$directory/Vehicles_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
+                    await file.writeAsBytes(bytes);
+                    showSnackBar(
+                        context, 'PDF saved successfully at ${file.path}');
+                  }
+                },
+                child: const Text('Generate Report'),
               ),
             ),
           ),
@@ -206,7 +316,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
     String vehicleNameSearchText = searchByVehicleName.text.toLowerCase();
 
     if (vehicles != null) {
-      filteredVehicles = vehicles!
+      filteredVehicles = _activeVehicles
           .where((vehicle) =>
               vehicle.clientName.toLowerCase().contains(clientNameSearchText) &&
               '${vehicle.make}' '${vehicle.model}'
@@ -235,7 +345,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
     if (filteredVehicles.isNotEmpty) {
       return filteredVehicles;
     } else {
-      return vehicles ?? [];
+      return _activeVehicles;
     }
   }
 
@@ -249,11 +359,15 @@ class VehicleDataTableSource extends DataTableSource {
   final VehicleProvider vehicleProvider;
   final BuildContext context;
   final Function refreshData;
+  final VoidCallback onVehicleUpdated;
+  final Function(VehicleModel) onVehicleSelected;
 
   VehicleDataTableSource(this._vehicles,
       {required this.refreshData,
       required this.vehicleProvider,
-      required this.context});
+      required this.context,
+      required this.onVehicleSelected,
+      required this.onVehicleUpdated});
 
   @override
   DataRow getRow(int index) {
@@ -285,12 +399,7 @@ class VehicleDataTableSource extends DataTableSource {
   }
 
   void _openDetailsScreen(BuildContext context, VehicleModel vehicle) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VehicleDetailsScreen(vehicle: vehicle),
-      ),
-    );
+    onVehicleSelected(vehicle);
   }
 
   @override

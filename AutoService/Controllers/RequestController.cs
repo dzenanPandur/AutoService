@@ -2,6 +2,7 @@
 using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.ServiceData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -25,6 +26,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllRequests()
         {
 
@@ -35,7 +37,7 @@ namespace AutoService.Controllers
                 return NotFound("No Requests found.");
             }
 
-            //return Ok(requests);
+
             List<RequestViewModel> requestViewModels = new List<RequestViewModel>();
 
             foreach (RequestDto requestDto in requests)
@@ -46,6 +48,7 @@ namespace AutoService.Controllers
                 requestViewModel.VehicleName = vehicle.Make + " " + vehicle.Model;
                 requestViewModel.ClientName = client.FirstName + " " + client.LastName;
                 requestViewModel.VehicleId = requestDto.VehicleId;
+                requestViewModel.AppointmentDate = (DateTime)requestDto.Appointment.Date;
                 requestViewModels.Add(requestViewModel);
             }
 
@@ -53,7 +56,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
-
+        [Authorize]
         public async Task<IActionResult> GetRequest(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -72,27 +75,27 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateRequest(RequestDto dto)
         {
             try
             {
-                //dto.ClientId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-                if (dto.Status == Data.Enums.Status.InService
-                    || dto.Status == Data.Enums.Status.PendingPayment
-                    || dto.Status == Data.Enums.Status.PickupReady
-                    || dto.Status == Data.Enums.Status.New
-                    || dto.Status == Data.Enums.Status.AwaitingCar)
+                var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
+                if (vehicle.Status == Data.Enums.Status.InService
+                    || vehicle.Status == Data.Enums.Status.PendingPayment
+                    || vehicle.Status == Data.Enums.Status.PickupReady
+                    || vehicle.Status == Data.Enums.Status.New
+                    || vehicle.Status == Data.Enums.Status.AwaitingCar)
                     return BadRequest("Cannot create a new request while vehicle is busy!");
 
-                dto.Id = await _requestManager.CreateRequest(dto);
                 dto.Appointment.ClientId = dto.ClientId;
-                dto.Appointment.RequestId = dto.Id;
+                int requestId = await _requestManager.CreateRequest(dto);
+                RequestDto requestDto = await _requestManager.GetRequest(requestId);
 
-                dto.AppointmentId = await _appointmentManager.CreateAppointment(dto.Appointment);
-                await _requestManager.UpdateRequest(dto);
+                dto.Appointment.Id = (int)requestDto.AppointmentId!;
+                dto.Appointment.RequestId = requestDto.Id;
 
+                await _appointmentManager.UpdateAppointment(dto.Appointment);
                 return Ok("Request created successfully.");
             }
             catch (Exception e)
@@ -102,35 +105,57 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateRequest(RequestDto dto)
         {
-            //var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
+            var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
             if (dto.Status == Data.Enums.Status.Completed)
             {
-                var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
+
+                RequestDto requestDto = await _requestManager.GetRequest(dto.Id);
 
                 RecordDto record = new RecordDto()
                 {
                     Cost = dto.TotalCost,
-                    ServiceIdList = dto.ServiceIdList,
+                    ServiceIdList = requestDto.ServiceIdList,
                     VehicleId = dto.VehicleId,
-                    Date = dto.DateCompleted,
-                    Notes = string.Empty,
+                    Date = DateTime.Now,
+                    Notes = requestDto.CustomRequest,
                     MileageAtTimeOfService = vehicle.Mileage,
                 };
                 await _vehicleRecordManager.CreateVehicleServiceRecord(record);
             }
-            //null reference, get actual vehicle
-            /*if (dto.Status == Data.Enums.Status.Canceled
-                    || dto.Status == Data.Enums.Status.Rejected
-                    || dto.Status == Data.Enums.Status.Completed)
-                dto.Vehicle.Status = Data.Enums.Status.Idle;
-            else
-                dto.Vehicle.Status = dto.Status;
-            */
 
-            //vehicle.Status = dto.Status;
+
+            Data.Enums.Status newStatus;
+
+            if (dto.Status == Data.Enums.Status.Canceled
+                || dto.Status == Data.Enums.Status.Rejected
+                || dto.Status == Data.Enums.Status.Completed)
+            {
+                newStatus = Data.Enums.Status.Idle;
+            }
+            else
+            {
+                newStatus = dto.Status;
+            }
+
+            VehicleDto vehicleDto = new VehicleDto
+            {
+                Id = dto.VehicleId,
+                Status = newStatus,
+                Make = vehicle.Make,
+                ManufactureYear = vehicle.ManufactureYear,
+                Mileage = vehicle.Mileage,
+                Model = vehicle.Model,
+                Vin = vehicle.Vin,
+                TransmissionTypeId = vehicle.TransmissionTypeId,
+                FuelTypeId = vehicle.FuelTypeId,
+                VehicleTypeId = vehicle.VehicleTypeId,
+            };
+
+
+            await _vehicleManager.UpdateVehicle(vehicleDto);
 
             RequestDto request = await _requestManager.UpdateRequest(dto);
 
@@ -143,7 +168,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteRequest(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

@@ -40,7 +40,6 @@ namespace AutoService.Data.DTO.VehicleData
         public string? Notes { get; set; }
         [JsonIgnore]
         public Vehicle? Vehicle { get; set; }
-        //[JsonIgnore(Condition =JsonIgnoreCondition.WhenWritingNull)]
         public int? VehicleId { get; set; }
         [JsonIgnore]
         public ICollection<ServiceDto> Services { get; set; } = new List<ServiceDto>();

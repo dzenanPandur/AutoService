@@ -75,19 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   'assets/images/logo.png',
                 ),
                 const SizedBox(height: 20),
-                /*
-                const Text(
-                  'Hello again!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Welcome back, you\'ve been missed!',
-                  style: TextStyle(fontSize: 20),
-                ),*/
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Container(

@@ -1,5 +1,6 @@
 ﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -15,6 +16,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllAppointments()
         {
 
@@ -26,19 +28,11 @@ namespace AutoService.Controllers
             }
 
             return Ok(appointments);
-            //List<UserViewModel> userViewModels = new List<UserViewModel>();
 
-            //foreach (UserDto userDto in users)
-            //{
-            //    UserViewModel userViewModel = new UserViewModel(userDto);
-            //    userViewModels.Add(userViewModel);
-            //}
-
-            //return Ok(userViewModels);
         }
 
         [HttpGet("GetById")]
-
+        [Authorize]
         public async Task<IActionResult> GetAppointment(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -57,7 +51,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateAppointment(AppointmentDto dto)
         {
             int message = await _appointmentManager.CreateAppointment(dto);
@@ -72,7 +66,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateAppointment(AppointmentDto dto)
         {
             AppointmentDto appointment = await _appointmentManager.UpdateAppointment(dto);
@@ -86,7 +80,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteAppointment(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:autoservice_mobile/globals.dart';
-import 'package:autoservice_mobile/models/requestModel.dart';
 import 'package:autoservice_mobile/providers/ClientProvider.dart';
 import 'package:autoservice_mobile/screens/request_details_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../models/request/requestModel.dart';
+import '../models/request/updateRequestModel.dart';
+import '../providers/RequestProvider.dart';
 
 class RequestsScreen extends StatefulWidget {
   final String userId;
@@ -25,7 +30,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
     try {
       _requestFuture = ClientProvider().getAllRequestsByClient(widget.userId);
     } catch (e) {
-      print('Error deleting request: $e');
+      showSnackBar(context, 'Error fetching request: $e', secondaryColor);
     }
   }
 
@@ -33,9 +38,21 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 35,
+          ),
+        ),
         backgroundColor: secondaryColor,
         foregroundColor: fontColor,
-        title: const Text('My service requests'),
+        title: const Text(
+          'My service requests',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: FutureBuilder<List<RequestModel>>(
         future: _requestFuture,
@@ -158,6 +175,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     DataColumn(
                         label: Text('Status',
                             style: TextStyle(color: secondaryColor))),
+                    if (headerText == 'New service requests')
+                      DataColumn(
+                        label: Text('Cancel',
+                            style: TextStyle(color: secondaryColor)),
+                      ),
                   ],
                   rows: requests.map((request) {
                     return DataRow(
@@ -165,7 +187,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RequestDetailsScreen(),
+                            builder: (context) =>
+                                RequestDetailsScreen(request: request),
                           ),
                         ).then((_) => setState(() {
                               _fetchRequests();
@@ -175,6 +198,78 @@ class _RequestsScreenState extends State<RequestsScreen> {
                         DataCell(Text(request.id.toString())),
                         DataCell(Text(request.vehicleName)),
                         DataCell(Text(request.status)),
+                        if (headerText == 'New service requests')
+                          DataCell(
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: secondaryColor,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      elevation: 0,
+                                      backgroundColor: primaryBackgroundColor,
+                                      title: const Text("Confirmation"),
+                                      content: const Text(
+                                          "Are you sure you want to cancel the request?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            "No",
+                                            style: TextStyle(
+                                                color: secondaryColor),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            UpdateRequestModel updateRequest =
+                                                UpdateRequestModel(
+                                                    status: 8,
+                                                    id: request.id,
+                                                    totalCost:
+                                                        request.totalCost,
+                                                    vehicleId:
+                                                        request.vehicleId,
+                                                    message: null);
+
+                                            try {
+                                              await RequestProvider()
+                                                  .updateRequest(updateRequest);
+
+                                              showSnackBar(
+                                                  context,
+                                                  'Successfully cancelled reqeust.',
+                                                  null);
+                                            } catch (error) {
+                                              showSnackBar(
+                                                  context,
+                                                  'Failed to save changes. $error',
+                                                  secondaryColor);
+                                            }
+                                            Navigator.of(context).pop();
+                                            setState(() {
+                                              _fetchRequests();
+                                            });
+                                          },
+                                          child: Text(
+                                            "Yes",
+                                            style: TextStyle(
+                                                color: secondaryColor),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
                       ],
                     );
                   }).toList(),

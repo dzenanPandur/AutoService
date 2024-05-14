@@ -26,6 +26,7 @@ class _AddMaintenanceRecordScreenState
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _mileageController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _costController = TextEditingController();
   final ServiceProvider serviceProvider = ServiceProvider();
   final CategoryProvider categoryProvider = CategoryProvider();
   final VehicleServiceRecordProvider recordProvider =
@@ -51,9 +52,21 @@ class _AddMaintenanceRecordScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 35,
+            ),
+          ),
           backgroundColor: secondaryColor,
           foregroundColor: fontColor,
-          title: const Text('Add new record'),
+          title: const Text(
+            'Add new record',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         body: SingleChildScrollView(
             child: Padding(
@@ -96,8 +109,28 @@ class _AddMaintenanceRecordScreenState
                         controller: _notesController,
                       ),
                       const SizedBox(height: 20),
+                      Text('Cost:',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.bold)),
+                      TextFormField(
+                        maxLength: 15,
+                        controller: _costController,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
                           onPressed: _addRecord,
                           child: const Padding(
                             padding: EdgeInsets.all(12.0),
@@ -164,29 +197,47 @@ class _AddMaintenanceRecordScreenState
             borderRadius: BorderRadius.circular(8.0),
             color: const Color.fromARGB(214, 231, 229, 229),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var service in services)
-                Row(
-                  children: [
-                    Checkbox(
-                      value: selectedServiceIds.contains(service.id),
-                      onChanged: (value) {
-                        setState(() {
-                          if (value!) {
-                            selectedServiceIds.add(service.id);
-                          } else {
-                            selectedServiceIds.remove(service.id);
-                          }
-                        });
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 3,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: services.length,
+            itemBuilder: (context, index) {
+              final service = services[index];
+              return Row(
+                children: [
+                  Checkbox(
+                    checkColor: primaryBackgroundColor,
+                    fillColor: MaterialStateProperty.resolveWith(
+                      (states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return secondaryColor;
+                        }
+                        return null;
                       },
                     ),
-                    Text(service.name),
-                  ],
-                ),
-              const SizedBox(height: 4),
-            ],
+                    value: selectedServiceIds.contains(service.id),
+                    onChanged: (value) {
+                      setState(() {
+                        if (value!) {
+                          selectedServiceIds.add(service.id);
+                        } else {
+                          selectedServiceIds.remove(service.id);
+                        }
+                      });
+                    },
+                  ),
+                  Expanded(
+                    child: Text(service.name),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -194,6 +245,38 @@ class _AddMaintenanceRecordScreenState
   }
 
   void _addRecord() async {
+    if (_dateController.text.isEmpty) {
+      showSnackBar(
+        context,
+        "Please select a date for the service.",
+        secondaryColor,
+      );
+      return;
+    }
+    if (_mileageController.text.isEmpty) {
+      showSnackBar(
+        context,
+        "Please input mileage at time of service.",
+        secondaryColor,
+      );
+      return;
+    }
+    if (selectedServiceIds.isEmpty) {
+      showSnackBar(
+        context,
+        "Please select at least one service.",
+        secondaryColor,
+      );
+      return;
+    }
+    if (_costController.text.isEmpty) {
+      showSnackBar(
+        context,
+        "Please input the cost.",
+        secondaryColor,
+      );
+      return;
+    }
     try {
       DateTime date = DateFormat('yyyy-MM-dd').parse(_dateController.text);
       int mileage = int.parse(_mileageController.text);
@@ -203,7 +286,7 @@ class _AddMaintenanceRecordScreenState
         id: 0,
         date: date,
         mileageAtTimeOfService: mileage,
-        cost: 0,
+        cost: double.parse(_costController.text),
         notes: notes,
         vehicleId: widget.vehicle.id,
         serviceIdList: selectedServiceIds,

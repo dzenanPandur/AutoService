@@ -1,6 +1,7 @@
 ﻿using AutoService.Data.DTO.ServiceData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.ServiceData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +19,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllServices()
         {
 
@@ -28,7 +30,6 @@ namespace AutoService.Controllers
                 return NotFound("No Services found.");
             }
 
-            //return Ok(services);
             List<ServiceViewModel> serviceViewModels = new List<ServiceViewModel>();
 
             foreach (ServiceDto serviceDto in services)
@@ -41,7 +42,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
-
+        [Authorize]
         public async Task<IActionResult> GetServiceById(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -60,7 +61,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateService(ServiceDto dto)
         {
 
@@ -81,7 +82,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateService(ServiceDto dto)
         {
             ServiceDto service = await _serviceManager.UpdateService(dto);
@@ -95,7 +96,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteService(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

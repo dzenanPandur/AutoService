@@ -17,12 +17,13 @@ namespace AutoService.Services.Managers
 
         public async Task<VehicleDto> GetVehicle(int id)
         {
-            VehicleDto vehicle = await _context.Vehicles.Where(a => a.Id == id)
+            Vehicle vehicle = await _context.Vehicles.Where(a => a.Id == id)
                 .Include(v => v.VehicleType)
                 .Include(t => t.TransmissionType)
-                .Include(f => f.FuelType)
-                .Select(a => new VehicleDto(a)).FirstOrDefaultAsync();
-            return vehicle;
+                .Include(f => f.FuelType).FirstOrDefaultAsync();
+            _context.Entry(vehicle).State = EntityState.Detached;
+            VehicleDto dto = new VehicleDto(vehicle);
+            return dto;
         }
 
         public async Task<IEnumerable<VehicleDto>> GetAllVehicles()
@@ -56,10 +57,9 @@ namespace AutoService.Services.Managers
             vehicleDto.ManufactureYear = dto.ManufactureYear;
             vehicleDto.Mileage = dto.Mileage;
             vehicleDto.Model = dto.Model;
-            //vehicleDto.FuelType.Id = (int)dto.FuelTypeId;
-            //vehicleDto.TransmissionType.Id = (int)dto.TransmissionTypeId;
-            //vehicleDto.VehicleType.Id = (int)dto.VehicleTypeId;
-            //vehicleDto.FuelType.Name = dto.VehicleType.Name;
+            vehicleDto.FuelTypeId = dto.FuelTypeId;
+            vehicleDto.TransmissionTypeId = dto.TransmissionTypeId;
+            vehicleDto.VehicleTypeId = dto.VehicleTypeId;
 
             Vehicle vehicle = new Vehicle(vehicleDto);
 
@@ -78,7 +78,6 @@ namespace AutoService.Services.Managers
                 return 0;
             }
 
-            //_context.Vehicles.Remove(vehicle);
 
             vehicle.isArchived = true;
 

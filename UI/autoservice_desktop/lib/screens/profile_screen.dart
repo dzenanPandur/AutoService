@@ -8,7 +8,6 @@ import '../models/userModel.dart';
 import '../models/storageService.dart';
 import '../models/updateUserModel.dart';
 
-//final StorageService? storageService = StorageService();
 final UserProvider userProvider = UserProvider();
 
 class ProfileScreen extends StatelessWidget {
@@ -50,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
             TextEditingController addressController =
                 TextEditingController(text: user.address);
             TextEditingController birthDateController = TextEditingController(
-                text: DateFormat('yyyy-MM-dd').format(user.birthDate));
+                text: DateFormat('dd-MM-yyyy').format(user.birthDate));
             TextEditingController usernameController =
                 TextEditingController(text: user.username);
             TextEditingController emailController =
@@ -107,6 +106,18 @@ class ProfileScreen extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (firstNameController.text.isEmpty ||
+                            lastNameController.text.isEmpty ||
+                            emailController.text.isEmpty ||
+                            cityController.text.isEmpty ||
+                            addressController.text.isEmpty ||
+                            postalCodeController.text.isEmpty ||
+                            phoneController.text.isEmpty ||
+                            birthDateController.text.isEmpty) {
+                          showSnackBar(
+                              context, 'Please fill in all the fields!');
+                          return;
+                        }
                         try {
                           updateUserModel update = updateUserModel(
                             id: user.userId,

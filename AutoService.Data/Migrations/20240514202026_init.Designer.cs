@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoService.Data.Migrations
 {
     [DbContext(typeof(AutoServiceContext))]
-    [Migration("20240505172352_seed_fix")]
-    partial class seed_fix
+    [Migration("20240514202026_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,61 +23,6 @@ namespace AutoService.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("AutoService.Data.Entities.ClientData.ProfilePhoto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool?>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Extension")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileSystemPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Format")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Height")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResolutionUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("SizeInBytes")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("Width")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Xresolution")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Yresolution")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProfilePhotos");
-                });
 
             modelBuilder.Entity("AutoService.Data.Entities.ServiceData.Appointment", b =>
                 {
@@ -110,7 +55,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 5, 19, 23, 51, 669, DateTimeKind.Local).AddTicks(2076),
+                            Date = new DateTime(2024, 5, 20, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2709),
                             IsOccupied = true,
                             RequestId = 1
                         },
@@ -118,7 +63,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 5, 17, 23, 51, 669, DateTimeKind.Utc).AddTicks(2079),
+                            Date = new DateTime(2024, 5, 19, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2712),
                             IsOccupied = false,
                             RequestId = 2
                         },
@@ -126,7 +71,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 3,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 5, 19, 23, 51, 669, DateTimeKind.Local).AddTicks(2080),
+                            Date = new DateTime(2024, 5, 21, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2714),
                             IsOccupied = true,
                             RequestId = 3
                         },
@@ -134,7 +79,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 5, 19, 23, 51, 669, DateTimeKind.Local).AddTicks(2082),
+                            Date = new DateTime(2024, 5, 22, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2716),
                             IsOccupied = false,
                             RequestId = 4
                         });
@@ -197,13 +142,16 @@ namespace AutoService.Data.Migrations
                     b.Property<DateTime?>("DateRequested")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("VehicleId")
+                    b.Property<int>("VehicleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -222,23 +170,51 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            AppointmentId = 2,
+                            AppointmentId = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            CustomRequest = "Change window",
-                            DateCompleted = new DateTime(2024, 5, 5, 17, 23, 51, 669, DateTimeKind.Utc).AddTicks(2066),
-                            DateRequested = new DateTime(2024, 5, 5, 17, 23, 51, 669, DateTimeKind.Utc).AddTicks(2066),
-                            Status = 5,
-                            TotalCost = 400m,
+                            CustomRequest = "Change tires",
+                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693),
+                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693),
+                            Message = " ",
+                            Status = 2,
+                            TotalCost = 600m,
                             VehicleId = 1
                         },
                         new
                         {
                             Id = 2,
+                            AppointmentId = 2,
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            CustomRequest = "Change window",
+                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696),
+                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696),
+                            Message = " ",
+                            Status = 6,
+                            TotalCost = 450m,
+                            VehicleId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AppointmentId = 3,
+                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
+                            CustomRequest = "Change bumper",
+                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698),
+                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698),
+                            Message = " ",
+                            Status = 7,
+                            TotalCost = 400m,
+                            VehicleId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
                             AppointmentId = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change rims",
-                            DateCompleted = new DateTime(2024, 5, 5, 17, 23, 51, 669, DateTimeKind.Utc).AddTicks(2068),
-                            DateRequested = new DateTime(2024, 5, 5, 17, 23, 51, 669, DateTimeKind.Utc).AddTicks(2069),
+                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2699),
+                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2700),
+                            Message = " ",
                             Status = 4,
                             TotalCost = 700m,
                             VehicleId = 2
@@ -292,6 +268,38 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 3,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Change freon",
+                            Price = 80m
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Change lights",
+                            Price = 35m
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoryId = 1,
+                            IsActive = true,
+                            Name = "Check oil",
+                            Price = 5m
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CategoryId = 1,
+                            IsActive = true,
+                            Name = "Check brakes",
+                            Price = 60m
+                        },
+                        new
+                        {
+                            Id = 7,
                             CategoryId = 1,
                             IsActive = true,
                             Name = "Check lights",
@@ -299,7 +307,15 @@ namespace AutoService.Data.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 8,
+                            CategoryId = 1,
+                            IsActive = true,
+                            Name = "Check freon",
+                            Price = 10m
+                        },
+                        new
+                        {
+                            Id = 9,
                             CategoryId = 3,
                             IsActive = true,
                             Name = "ECU Tune",
@@ -332,49 +348,49 @@ namespace AutoService.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 8,
                             RequestId = 1,
                             ServiceId = 1
                         },
                         new
                         {
-                            Id = 2,
+                            Id = 7,
                             RequestId = 1,
                             ServiceId = 2
                         },
                         new
                         {
-                            Id = 3,
+                            Id = 6,
                             RequestId = 2,
                             ServiceId = 3
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 5,
                             RequestId = 2,
                             ServiceId = 4
                         },
                         new
                         {
-                            Id = 5,
+                            Id = 4,
                             RequestId = 3,
                             ServiceId = 1
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 3,
                             RequestId = 3,
                             ServiceId = 2
                         },
                         new
                         {
-                            Id = 7,
+                            Id = 2,
                             RequestId = 3,
                             ServiceId = 3
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 1,
                             RequestId = 4,
                             ServiceId = 1
                         });
@@ -877,7 +893,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             Cost = 1500m,
-                            Date = new DateTime(2024, 5, 5, 19, 23, 51, 669, DateTimeKind.Local).AddTicks(1993),
+                            Date = new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2617),
                             MileageAtTimeOfService = 185100,
                             Notes = "Found broken light",
                             VehicleId = 1
@@ -886,7 +902,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             Cost = 500m,
-                            Date = new DateTime(2024, 5, 5, 19, 23, 51, 669, DateTimeKind.Local).AddTicks(2014),
+                            Date = new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2638),
                             MileageAtTimeOfService = 17800,
                             Notes = "",
                             VehicleId = 2
@@ -1094,7 +1110,8 @@ namespace AutoService.Data.Migrations
                     b.HasOne("AutoService.Data.Entities.VehicleData.Vehicle", "Vehicle")
                         .WithMany("Requests")
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Appointment");
 

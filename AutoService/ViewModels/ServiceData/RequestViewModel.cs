@@ -19,9 +19,11 @@ namespace AutoService.ViewModels.ServiceData
             CustomRequest = dto.CustomRequest;
             ServiceIdList = dto.ServiceIdList;
             TotalCost = dto.TotalCost;
+            Message = dto.Message;
 
         }
         public int StatusId { get; set; }
+        public DateTime AppointmentDate { get; set; }
         public string Status { get; set; }
         public string VehicleName { get; set; }
         public string ClientName { get; set; }

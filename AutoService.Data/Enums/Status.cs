@@ -4,11 +4,11 @@
     {
         New = 1,
         AwaitingCar = 2,
-        Rejected = 3,
-        InService = 4,
-        PendingPayment = 5,
-        PickupReady = 6,
-        Completed = 7,
+        InService = 3,
+        PendingPayment = 4,
+        PickupReady = 5,
+        Completed = 6,
+        Rejected = 7,
         Canceled = 8,
         Idle = 9,
     }

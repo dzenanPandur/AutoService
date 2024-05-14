@@ -1,5 +1,6 @@
 ﻿using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -16,6 +17,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllTransmissionTypes()
         {
 
@@ -27,18 +29,10 @@ namespace AutoService.Controllers
             }
 
             return Ok(transmissionTypes);
-            //List<UserViewModel> userViewModels = new List<UserViewModel>();
-
-            //foreach (UserDto userDto in users)
-            //{
-            //    UserViewModel userViewModel = new UserViewModel(userDto);
-            //    userViewModels.Add(userViewModel);
-            //}
-
-            //return Ok(userViewModels);
         }
 
         [HttpGet("GetById")]
+        [Authorize]
 
         public async Task<IActionResult> GetTransmissionType(int id)
         {
@@ -58,7 +52,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateTransmissionType(TransmissionTypeDto dto)
         {
             int message = await _transmissionTypeManager.CreateTransmissionType(dto);
@@ -73,7 +67,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateTransmissionType(TransmissionTypeDto dto)
         {
             TransmissionTypeDto transmissionType = await _transmissionTypeManager.UpdateTransmissionType(dto);
@@ -87,7 +81,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteTransmissionType(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

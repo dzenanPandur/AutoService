@@ -8,28 +8,34 @@ class TabNavigator extends StatelessWidget {
   final TabItem tabItem;
   final String userId;
   const TabNavigator({
-    super.key,
+    Key? key,
     required this.navigatorKey,
     required this.tabItem,
     required this.userId,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      initialRoute: '/home',
       onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/home':
-            return MaterialPageRoute(
-              builder: (context) => tabItem == TabItem.home
-                  ? HomeScreen(userId: userId)
-                  : ProfileScreen(userId: userId),
-            );
-          default:
-            return null;
+        Widget screen;
+        switch (tabItem) {
+          case TabItem.home:
+            screen = HomeScreen(userId: userId);
+            break;
+          case TabItem.profile:
+            screen = ProfileScreen(userId: userId);
+            break;
         }
+        return MaterialPageRoute(
+          builder: (context) {
+            return KeyedSubtree(
+              key: UniqueKey(),
+              child: screen,
+            );
+          },
+        );
       },
     );
   }

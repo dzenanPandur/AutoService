@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:autoservice_mobile/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/models/vehicleModel.dart';
@@ -33,7 +35,7 @@ class _PastMaintenanceRecordScreenState
       _recordFuture = VehicleServiceRecordProvider()
           .getAllRecordsByVehicle(widget.vehicle.id);
     } catch (e) {
-      print('Error deleting record: $e');
+      showSnackBar(context, 'Error fetching record: $e', secondaryColor);
     }
   }
 
@@ -41,9 +43,21 @@ class _PastMaintenanceRecordScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 35,
+          ),
+        ),
         backgroundColor: secondaryColor,
         foregroundColor: fontColor,
-        title: const Text('Past Maintenance Records'),
+        title: const Text(
+          'Past Maintenance Records',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: FutureBuilder<List<VehicleServiceRecordModel>>(
         future: _recordFuture,
@@ -58,6 +72,16 @@ class _PastMaintenanceRecordScreenState
                   const Text('No maintenance records found'),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 20),
+                      backgroundColor: secondaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: Colors.white),
+                      ),
+                    ),
                     onPressed: () async {
                       await Navigator.push(
                         context,
@@ -121,6 +145,8 @@ class _PastMaintenanceRecordScreenState
                                     bool deleteConfirmed = await showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
+                                        elevation: 0,
+                                        backgroundColor: primaryBackgroundColor,
                                         title: const Text('Confirm Delete'),
                                         content: const Text(
                                             'Are you sure you want to delete this record?'),
@@ -128,12 +154,18 @@ class _PastMaintenanceRecordScreenState
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context, false),
-                                            child: const Text('Cancel'),
+                                            child: Text('Cancel',
+                                                style: TextStyle(
+                                                    color: secondaryColor)),
                                           ),
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context, true),
-                                            child: const Text('Delete'),
+                                            child: Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                  color: secondaryColor),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -160,6 +192,16 @@ class _PastMaintenanceRecordScreenState
                 Container(
                   margin: const EdgeInsets.all(10),
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 20),
+                      backgroundColor: secondaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: Colors.white),
+                      ),
+                    ),
                     onPressed: () async {
                       Navigator.push(
                         context,
@@ -190,7 +232,7 @@ class _PastMaintenanceRecordScreenState
     try {
       await VehicleServiceRecordProvider().delete(recordId);
     } catch (e) {
-      print('Error deleting record: $e');
+      showSnackBar(context, 'Error deleting record: $e', secondaryColor);
     }
   }
 }

@@ -43,7 +43,6 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetByUsername")]
-        //[AllowAnonymous]
         [Authorize]
         public async Task<IActionResult> GetByUsername(string username)
         {
@@ -83,7 +82,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             List<UserDto> users = await _manager.GetAllUsers();
@@ -105,7 +104,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAllEmployees")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetEmployees()
         {
             List<UserDto> users = await _manager.GetAllUsers();
@@ -183,7 +182,7 @@ namespace AutoService.Controllers
             }
         }
         [HttpPut("Update")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(UserDto userDto)
         {
 
@@ -226,7 +225,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("ChangeActiveStatusUser")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ChangeActiveStatusUser(Guid id, bool active)
         {
 
@@ -241,8 +240,8 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
-        public async Task<IActionResult> DeleteService(Guid id)
+        [Authorize]
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
             {

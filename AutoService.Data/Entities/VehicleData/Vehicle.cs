@@ -28,20 +28,6 @@ public class Vehicle
         VehicleTypeId = dto.VehicleTypeId;
         isArchived = dto.isArchived;
 
-        if (dto.FuelType is not null)
-        {
-            FuelType = new VehicleFuelType(dto.FuelType);
-        }
-
-        if (dto.TransmissionType is not null)
-        {
-            TransmissionType = new TransmissionType(dto.TransmissionType);
-        }
-
-        if (dto.VehicleType is not null)
-        {
-            VehicleType = new VehicleType(dto.VehicleType);
-        }
 
         if (dto.RecordIdList.Any())
         {

@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:autoservice_mobile/providers/AuthProvider.dart';
 import 'package:autoservice_mobile/screens/login_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import '.env';
 import 'navigation/bottom_navigation.dart';
 import 'navigation/tab_item.dart';
 import 'navigation/tab_navigator.dart';
 
 void main() async {
-  Stripe.publishableKey =
-      "pk_test_51N7gLcAQDwep3kcFybqnBC3Zki2l1qgsJxyZaSVLnTgqZXwe6DTCa2TTin7c1Y4uW3iJEYzCHV4pylfZmkhlUT8f002b5K8Gxa";
+  late String stripePk;
+  stripePk = const String.fromEnvironment("stripePublishableKey",
+      defaultValue: stripePublishableKey);
+  Stripe.publishableKey = stripePk;
   final AuthProvider authProvider = AuthProvider();
   const String userId = "";
   WidgetsFlutterBinding.ensureInitialized();

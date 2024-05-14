@@ -14,15 +14,6 @@ namespace AutoService.Services.Managers
         {
             _context = context;
         }
-        //public async Task<ClientDto> GetClient(Guid id)
-        //{
-        //    ClientDto client = await _context.Clients
-        //        .Where(a => a.Id == id)
-        //        .Select(a => new ClientDto(a))
-        //        .FirstOrDefaultAsync();
-
-        //    return client;
-        //}
 
         public async Task<UserDto> GetClient(Guid id)
         {
@@ -34,16 +25,7 @@ namespace AutoService.Services.Managers
             return client;
         }
 
-        //public async Task<IEnumerable<ClientDto>> GetAllClients()
-        //{
-        //    IEnumerable<ClientDto> clients = await _context.Clients
-        //        .Include(c => c.Role)
-        //        .Where(c => c.Role.Name == "Client")
-        //        .Select(a => new ClientDto(a))
-        //        .ToListAsync();
 
-        //    return clients;
-        //}
 
         public async Task<IEnumerable<UserDto>> GetAllClients()
         {
@@ -58,13 +40,28 @@ namespace AutoService.Services.Managers
         public async Task<IEnumerable<RequestDto>> GetAllRequestsByClient(Guid clientId)
         {
             IEnumerable<RequestDto> requests = await _context.Request
-                .Where(r => r.ClientId == clientId)
+                .Where(r => r.ClientId == clientId).Include(a => a.Appointment)
                 .Include(a => a.Services)
                 .Select(r => new RequestDto(r))
                 .ToListAsync();
 
             return requests;
         }
+
+        public async Task<IEnumerable<RequestDto>> GetAllMessagesByClient(Guid clientId)
+        {
+            var requests = await _context.Request
+                .Where(r => r.ClientId == clientId).OrderByDescending(a => a.DateCompleted)
+                .Select(r => new RequestDto
+                {
+                    Id = r.Id,
+                    Message = r.Message
+                })
+                .ToListAsync();
+
+            return requests;
+        }
+
 
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointmentsByClient(Guid clientId)
         {

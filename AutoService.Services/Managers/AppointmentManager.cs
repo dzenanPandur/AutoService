@@ -9,7 +9,8 @@ namespace AutoService.Services.Managers
     public class AppointmentManager : IAppointmentManager
     {
         private readonly AutoServiceContext _context;
-        public AppointmentManager(AutoServiceContext context) { 
+        public AppointmentManager(AutoServiceContext context)
+        {
             _context = context;
         }
 
@@ -44,6 +45,7 @@ namespace AutoService.Services.Managers
 
             appointmentDto.Date = dto.Date;
             appointmentDto.IsOccupied = dto.IsOccupied;
+            appointmentDto.RequestId = dto.RequestId;
 
             Appointment appointment = new Appointment(appointmentDto);
 

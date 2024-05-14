@@ -4,6 +4,7 @@ using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.ServiceData;
 using AutoService.ViewModels.VehicleData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -21,6 +22,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
+        [Authorize]
         public async Task<IActionResult> GetClient(Guid id)
         {
 
@@ -41,6 +43,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllClients()
         {
             IEnumerable<UserDto> clients = await _clientManager.GetAllClients();
@@ -51,18 +54,10 @@ namespace AutoService.Controllers
             }
 
             return Ok(clients);
-            //List<RequestViewModel> requestViewModels = new List<RequestViewModel>();
-
-            //foreach (RequestDto requestDto in requests)
-            //{
-            //    RequestViewModel requestViewModel = new RequestViewModel(requestDto);
-            //    requestViewModels.Add(requestViewModel);
-            //}
-
-            //return Ok(requestViewModels);
         }
 
         [HttpGet("GetAllRequestsByClient")]
+        [Authorize]
         public async Task<IActionResult> GetAllRequestsByClient(Guid id)
         {
 
@@ -73,7 +68,6 @@ namespace AutoService.Controllers
                 return NotFound("No Requests found.");
             }
 
-            //return Ok(requests);
             List<RequestViewModel> requestViewModels = new List<RequestViewModel>();
 
             foreach (RequestDto requestDto in requests)
@@ -84,13 +78,35 @@ namespace AutoService.Controllers
                 requestViewModel.VehicleName = vehicle.Make + " " + vehicle.Model;
                 requestViewModel.ClientName = client.FirstName + " " + client.LastName;
                 requestViewModel.VehicleId = requestDto.VehicleId;
+                requestViewModel.AppointmentDate = (DateTime)requestDto.Appointment.Date;
                 requestViewModels.Add(requestViewModel);
             }
 
             return Ok(requestViewModels);
         }
+        [HttpGet("GetAllMessagesByClient")]
+        [Authorize]
+        public async Task<IActionResult> GetAllMessagesByClient(Guid id)
+        {
+            IEnumerable<RequestDto> requests = await _clientManager.GetAllMessagesByClient(id);
+
+            if (requests == null || !requests.Any())
+            {
+                return NotFound("No Requests found.");
+            }
+
+            var requestDtos = requests.Where(r => !string.IsNullOrEmpty(r.Message))
+                               .Select(r => new RequestDto
+                               {
+                                   Id = r.Id,
+                                   Message = r.Message
+                               });
+
+            return Ok(requestDtos);
+        }
 
         [HttpGet("GetAllAppointmentsByClient")]
+        [Authorize]
         public async Task<IActionResult> GetAllAppointmentsByClient(Guid id)
         {
 
@@ -105,6 +121,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAllVehiclesByClient")]
+        [Authorize]
         public async Task<IActionResult> GetAllVehiclesByClient(Guid id)
         {
 
@@ -115,7 +132,6 @@ namespace AutoService.Controllers
                 return NotFound("No Vehicles found.");
             }
 
-            //return Ok(vehicles);
 
             List<VehicleViewModel> vehicleViewModels = new List<VehicleViewModel>();
 

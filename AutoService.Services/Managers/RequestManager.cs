@@ -34,7 +34,7 @@ namespace AutoService.Services.Managers
         {
 
             IEnumerable<RequestDto> Requests = await _context.Request
-                .Include(a => a.Services)
+                .Include(a => a.Services).Include(a => a.Appointment).OrderBy(r => (int)r.Status)
                 .Select(a => new RequestDto(a))
                 .ToListAsync();
 
@@ -44,7 +44,6 @@ namespace AutoService.Services.Managers
         public async Task<int> CreateRequest(RequestDto dto)
         {
             Request request = new Request(dto);
-
             _context.ChangeTracker.Clear();
             await _context.Request.AddAsync(request);
             await _context.SaveChangesAsync();
@@ -61,29 +60,14 @@ namespace AutoService.Services.Managers
             {
                 return null;
             }
-            /*
+            if (dto.Message != requestDto.Message)
+            {
+                requestDto.Message = dto.Message;
+            }
             if (dto.Status == Data.Enums.Status.Completed)
             {
-                var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
-
-                RecordDto record = new RecordDto()
-                {
-                    Cost = dto.TotalCost,
-                    ServiceIdList = dto.ServiceIdList,
-                    VehicleId = dto.VehicleId,
-                    Date = dto.DateCompleted,
-                    Notes = string.Empty,
-                    MileageAtTimeOfService = vehicle.Mileage,
-                };
-                await _vehicleRecordManager.CreateVehicleServiceRecord(record);
+                requestDto.DateCompleted = DateTime.Now;
             }
-            */
-            /*List<ServiceRequest> serviceRequests = await _context.ServiceRequest
-                .Where(sr => sr.RequestId == dto.Id)
-                .ToListAsync();
-            
-            _context.ServiceRequest.RemoveRange(serviceRequests);
-            */
             requestDto.Status = dto.Status;
             requestDto.TotalCost = dto.TotalCost;
 

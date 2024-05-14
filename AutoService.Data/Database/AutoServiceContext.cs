@@ -20,10 +20,8 @@ namespace AutoService.Data.Database
         {
         }
 
-        //public virtual DbSet<ApplicationUserProfilePhoto> ApplicationUserProfilePhotos { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Appointment> Appointments { get; set; }
-        public virtual DbSet<ProfilePhoto> ProfilePhotos { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Request> Request { get; set; }
@@ -45,7 +43,6 @@ namespace AutoService.Data.Database
             builder.Entity<User>().ToTable("User", "dbo");
             builder.Entity<Role>().ToTable("Role", "dbo");
 
-            //builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRole", "dbo");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaim", "dbo");
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogin", "dbo");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaim", "dbo");
@@ -65,7 +62,6 @@ namespace AutoService.Data.Database
             builder.Entity<Request>().HasData(DefaultServiceData.Requests);
             builder.Entity<Appointment>().HasData(DefaultServiceData.Appointments);
             builder.Entity<ServiceRequest>().HasData(DefaultServiceData.ServiceRequests);
-            //builder.Entity<IdentityUserRole<Guid>>().HasData(DefaultRoleData.UserRoles);
             #endregion
 
             //VehicleServiceRecord N : 1 Vehicle
@@ -119,16 +115,6 @@ namespace AutoService.Data.Database
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
-            //ApplicationUserProfilePhoto N : 1 ProfilePhoto
-
-            //builder.Entity<ProfilePhoto>(profilePhoto =>
-            //{
-            //    profilePhoto
-            //        .HasMany(a => a.ApplicationUserProfilePhotos)
-            //        .WithOne(p => p.ProfilePhoto)
-            //        .HasForeignKey(a => a.ProfilePhotoId)
-            //        .OnDelete(DeleteBehavior.NoAction);
-            //});
 
             //Client N : 1 Appointment
 

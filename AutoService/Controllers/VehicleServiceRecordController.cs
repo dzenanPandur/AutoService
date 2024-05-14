@@ -1,6 +1,7 @@
 ﻿using AutoService.Data.DTO.VehicleData;
 using AutoService.Services.Interfaces;
 using AutoService.ViewModels.VehicleData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoService.Controllers
@@ -16,6 +17,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAll")]
+        [Authorize]
         public async Task<IActionResult> GetAllRecords()
         {
 
@@ -26,7 +28,6 @@ namespace AutoService.Controllers
                 return NotFound("No Records found.");
             }
 
-            //return Ok(Records);
             List<RecordViewModel> recordViewModels = new List<RecordViewModel>();
 
             foreach (RecordDto recordDto in records)
@@ -39,6 +40,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetAllRecordsByVehicle")]
+        [Authorize]
         public async Task<IActionResult> GetAllRecordsByVehicle(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -53,7 +55,6 @@ namespace AutoService.Controllers
                 return NotFound("No Records found.");
             }
 
-            //return Ok(Records);
             List<RecordViewModel> recordViewModels = new List<RecordViewModel>();
 
             foreach (RecordDto recordDto in records)
@@ -66,7 +67,7 @@ namespace AutoService.Controllers
         }
 
         [HttpGet("GetById")]
-
+        [Authorize]
         public async Task<IActionResult> GetRecord(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))
@@ -85,19 +86,13 @@ namespace AutoService.Controllers
         }
 
         [HttpPost("Create")]
-
+        [Authorize]
         public async Task<IActionResult> CreateRecord(RecordDto dto)
         {
             try
             {
-                //dto.ClientId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
                 dto.Id = await _recordManager.CreateVehicleServiceRecord(dto);
-                //dto.Appointment.ClientId = dto.ClientId;
-                //dto.Appointment.RecordId = dto.Id;
-
-                //dto.AppointmentId = await _appointmentManager.CreateAppointment(dto.Appointment);
-                //await _recordManager.UpdateRecord(dto);
 
                 return Ok("Record created successfully.");
             }
@@ -108,7 +103,7 @@ namespace AutoService.Controllers
         }
 
         [HttpPut("Update")]
-
+        [Authorize]
         public async Task<IActionResult> UpdateRecord(RecordDto dto)
         {
             RecordDto record = await _recordManager.UpdateVehicleServiceRecord(dto);
@@ -122,7 +117,7 @@ namespace AutoService.Controllers
         }
 
         [HttpDelete("Delete")]
-
+        [Authorize]
         public async Task<IActionResult> DeleteRecord(int id)
         {
             if (string.IsNullOrEmpty(id.ToString()))

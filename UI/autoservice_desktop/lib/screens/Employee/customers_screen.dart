@@ -1,11 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:autoservice_desktop/models/Employee/vehicleModel.dart';
 import 'package:autoservice_desktop/models/userModel.dart';
 import 'package:autoservice_desktop/providers/ClientProvider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../globals.dart';
 import 'vehicle_details_screen.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({
@@ -26,10 +32,16 @@ class _CustomersScreenState extends State<CustomersScreen> {
   TextEditingController searchByLocationController = TextEditingController();
 
   List<userModel> filteredCustomers = [];
+  Future<void> _fetchCustomers() async {
+    customers = await clientProvider.getAll();
+    filteredCustomers = customers ?? [];
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+    _fetchCustomers();
   }
 
   @override
@@ -142,11 +154,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               ),
                               rowsPerPage: 5,
                               source: CustomerDataTableSource(
-                                displayedCustomers,
-                                clientProvider: clientProvider,
-                                context: context,
-                                refreshData: _refreshData,
-                              ),
+                                  displayedCustomers,
+                                  clientProvider: clientProvider,
+                                  context: context,
+                                  refreshData: _refreshData,
+                                  onVehicleUpdated: _fetchCustomers),
                             ),
                           ),
                         ],
@@ -157,6 +169,89 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
             ),
           ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () async {
+                  final pdf = pw.Document();
+
+                  List<userModel> reportCustomers = filteredCustomers.isNotEmpty
+                      ? filteredCustomers
+                      : customers ?? [];
+
+                  pdf.addPage(pw.Page(
+                    pageFormat: PdfPageFormat.a4,
+                    build: (pw.Context context) {
+                      return pw.Column(
+                        children: [
+                          pw.Center(
+                            child: pw.Text(
+                              'AutoService',
+                              style: pw.TextStyle(
+                                fontSize: 24,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.Text(
+                            'Customers report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
+                            style: const pw.TextStyle(fontSize: 16),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.TableHelper.fromTextArray(
+                            headers: [
+                              'Name',
+                              'Location',
+                              'Phone number',
+                            ],
+                            data: reportCustomers
+                                .map((customer) => [
+                                      '${customer.firstName} ${customer.lastName}',
+                                      '${customer.city}, ${customer.address}',
+                                      customer.phoneNumber,
+                                    ])
+                                .toList(),
+                            border: pw.TableBorder.all(),
+                            cellAlignment: pw.Alignment.centerLeft,
+                            headerStyle:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            cellStyle: const pw.TextStyle(fontSize: 12),
+                            cellPadding: const pw.EdgeInsets.all(8),
+                          ),
+                        ],
+                      );
+                    },
+                  ));
+
+                  final bytes = await pdf.save();
+
+                  final directory =
+                      await FilePicker.platform.getDirectoryPath();
+                  if (directory != null) {
+                    final file = File(
+                        '$directory/Customers_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
+                    await file.writeAsBytes(bytes);
+                    showSnackBar(
+                        context, 'PDF saved successfully at ${file.path}');
+                  }
+                },
+                child: const Text('Generate Report'),
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -202,10 +297,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
   }
 }
 
-void _showDetailsDialog(
-  userModel customer,
-  BuildContext context,
-) {
+void _showDetailsDialog(userModel customer, BuildContext context,
+    final VoidCallback onVehicleUpdated) {
   TextEditingController firstNameController =
       TextEditingController(text: customer.firstName);
   TextEditingController lastNameController =
@@ -219,7 +312,7 @@ void _showDetailsDialog(
   TextEditingController addressController =
       TextEditingController(text: customer.address);
   TextEditingController birthDateController = TextEditingController(
-      text: DateFormat('yyyy-MM-dd').format(customer.birthDate));
+      text: DateFormat('dd-MM-yyyy').format(customer.birthDate));
   TextEditingController usernameController =
       TextEditingController(text: customer.username);
   TextEditingController emailController =
@@ -248,7 +341,9 @@ void _showDetailsDialog(
           } else {
             List<VehicleModel> vehicles = [];
             if (snapshot.hasData) {
-              vehicles = snapshot.data!;
+              vehicles = snapshot.data!
+                  .where((vehicle) => vehicle.isArchived == false)
+                  .toList();
             }
 
             return AlertDialog(
@@ -328,23 +423,16 @@ void _showDetailsDialog(
                                 style: TextStyle(color: fontColor),
                               )),
                             ],
-                            header: Container(
-                              color: primaryBackgroundColor,
-                              child: const Center(
-                                child: Text(
-                                  'Customer Vehicles',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                            header: const Center(
+                              child: Text(
+                                'Customer Vehicles',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ),
                             rowsPerPage: 2,
-                            source: CustomerVehiclesDataTableSource(
-                              vehicles,
-                              clientProvider,
-                              context,
-                            ),
+                            source: CustomerVehiclesDataTableSource(vehicles,
+                                clientProvider, context, onVehicleUpdated),
                           ),
                         ),
                       ),
@@ -383,13 +471,12 @@ void _showDetailsDialog(
 class CustomerVehiclesDataTableSource extends DataTableSource {
   final List<VehicleModel> _vehicles;
   final ClientProvider clientProvider;
+
+  final VoidCallback onVehicleUpdated;
   final BuildContext context;
 
   CustomerVehiclesDataTableSource(
-    this._vehicles,
-    this.clientProvider,
-    this.context,
-  );
+      this._vehicles, this.clientProvider, this.context, this.onVehicleUpdated);
 
   @override
   DataRow getRow(int index) {
@@ -422,7 +509,8 @@ class CustomerVehiclesDataTableSource extends DataTableSource {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VehicleDetailsScreen(vehicle: vehicle),
+        builder: (context) => VehicleDetailsScreen(
+            vehicle: vehicle, onVehicleUpdated: onVehicleUpdated),
       ),
     );
   }
@@ -442,13 +530,13 @@ class CustomerDataTableSource extends DataTableSource {
   final ClientProvider clientProvider;
   final BuildContext context;
   final Function refreshData;
+  final VoidCallback onVehicleUpdated;
 
-  CustomerDataTableSource(
-    this._customers, {
-    required this.refreshData,
-    required this.clientProvider,
-    required this.context,
-  });
+  CustomerDataTableSource(this._customers,
+      {required this.refreshData,
+      required this.clientProvider,
+      required this.context,
+      required this.onVehicleUpdated});
   @override
   DataRow getRow(int index) {
     final userModel customer = _customers[index];
@@ -468,7 +556,7 @@ class CustomerDataTableSource extends DataTableSource {
             ),
           ),
           onPressed: () {
-            _showDetailsDialog(customer, context);
+            _showDetailsDialog(customer, context, onVehicleUpdated);
           },
           child: const Text('Details'),
         )),

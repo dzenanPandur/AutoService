@@ -24,6 +24,7 @@ public class Request
         ClientId = dto.ClientId;
         VehicleId = dto.VehicleId;
         TotalCost = dto.TotalCost;
+        Message = dto.Message;
 
 
         if (dto.ServiceIdList.Any())
@@ -45,6 +46,10 @@ public class Request
         {
             Vehicle = new Vehicle(dto.Vehicle);
         }
+        if (dto.Appointment is not null)
+        {
+            Appointment = new Appointment(dto.Appointment);
+        }
     }
 
     [Key]
@@ -53,6 +58,7 @@ public class Request
     public DateTime? DateRequested { get; set; }
     public DateTime? DateCompleted { get; set; }
     public string? CustomRequest { get; set; }
+    public string? Message { get; set; }
     public decimal? TotalCost { get; set; }
     public Appointment? Appointment { get; set; }
     public int? AppointmentId { get; set; }

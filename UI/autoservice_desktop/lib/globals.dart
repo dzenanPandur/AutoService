@@ -144,13 +144,12 @@ Widget buildDatePicker(
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
             context: context,
-            initialDate:
-                DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now())),
+            initialDate: DateTime.now(),
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
           );
           if (pickedDate != null) {
-            String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+            String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
 
             controller.text = formattedDate;
           }

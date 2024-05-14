@@ -17,8 +17,9 @@ import '../../providers/ServiceProvider.dart';
 
 class RequestDetailsScreen extends StatefulWidget {
   final RequestModel request;
-
-  const RequestDetailsScreen({Key? key, required this.request})
+  final VoidCallback onRequestUpdated;
+  const RequestDetailsScreen(
+      {Key? key, required this.request, required this.onRequestUpdated})
       : super(key: key);
 
   @override
@@ -34,6 +35,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   late int _selectedStatusIndex;
   final List<Status> _statuses = Status.values;
   TextEditingController priceController = TextEditingController();
+  TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
@@ -57,9 +59,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     TextEditingController dateRequestedController = TextEditingController(
-        text: DateFormat('yyyy-MM-dd').format(widget.request.dateRequested));
+        text: DateFormat('dd-MM-yyyy').format(widget.request.dateRequested));
     TextEditingController customRequestController =
         TextEditingController(text: widget.request.customRequest);
+    messageController = TextEditingController(text: widget.request.message);
     priceController =
         TextEditingController(text: widget.request.totalCost.toString());
     final List<Status> availableStatuses =
@@ -69,7 +72,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            widget.onRequestUpdated();
           },
           icon: const Icon(
             Icons.chevron_left,
@@ -158,6 +161,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                       border: const OutlineInputBorder(),
                     ),
                   ),
+                  _buildTextField(
+                      "Message to customer", messageController, false),
                   const Spacer(),
                   Align(
                     alignment: Alignment.bottomRight,
@@ -197,7 +202,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => VehicleDetailsScreen(vehicle: vehicle),
+            builder: (context) => VehicleDetailsScreen(
+              vehicle: vehicle,
+              onVehicleUpdated: widget.onRequestUpdated,
+            ),
           ),
         );
       } else {
@@ -226,6 +234,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       case Status.PickupReady:
         return [Status.PickupReady, Status.Completed];
       case Status.Rejected:
+      case Status.Canceled:
       case Status.Completed:
         return [status];
       default:
@@ -235,15 +244,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   void _saveChanges() async {
     UpdateRequestModel request = UpdateRequestModel(
-      status: _selectedStatusIndex + 1,
-      id: widget.request.id,
-      totalCost: double.parse(priceController.text),
-    );
+        status: _selectedStatusIndex + 1,
+        id: widget.request.id,
+        totalCost: double.parse(priceController.text),
+        vehicleId: widget.request.vehicleId,
+        message: messageController.text);
 
     try {
       await RequestProvider().updateRequest(request);
 
       showSnackBar(context, 'Changes saved succesfully');
+      widget.onRequestUpdated();
     } catch (error) {
       showSnackBar(context, 'Failed to save changes. $error');
     }

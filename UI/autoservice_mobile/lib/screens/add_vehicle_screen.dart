@@ -69,7 +69,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         _carTypes = vehicleTypes.map((type) => type.name).toList();
       });
     } catch (error) {
-      print('Error fetching data: $error');
+      showSnackBar(context, 'Error fetching data: $error', secondaryColor);
     }
   }
 
@@ -116,9 +116,21 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 35,
+            ),
+          ),
           backgroundColor: secondaryColor,
           foregroundColor: fontColor,
-          title: const Text('Add new vehicle'),
+          title: const Text(
+            'Add new vehicle',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -267,6 +279,16 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                         const SizedBox(height: 20),
                         Center(
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 20),
+                              backgroundColor: secondaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(color: Colors.white),
+                              ),
+                            ),
                             onPressed: _addVehicle,
                             child: const Text('Add new vehicle'),
                           ),

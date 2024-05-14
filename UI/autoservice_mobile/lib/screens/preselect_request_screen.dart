@@ -13,18 +13,22 @@ import '../models/vehicleModel.dart';
 import '../providers/CategoryProvider.dart';
 import '../providers/ServiceProvider.dart';
 
-class CreateRequestScreen extends StatefulWidget {
+class PreselectRequestScreen extends StatefulWidget {
   final List<VehicleModel> vehicles;
   final String userId;
-  const CreateRequestScreen(
-      {Key? key, required this.vehicles, required this.userId})
+  final List<int> selectedServiceIds;
+  const PreselectRequestScreen(
+      {Key? key,
+      required this.vehicles,
+      required this.userId,
+      required this.selectedServiceIds})
       : super(key: key);
 
   @override
-  _CreateRequestScreenState createState() => _CreateRequestScreenState();
+  _PreselectRequestScreenState createState() => _PreselectRequestScreenState();
 }
 
-class _CreateRequestScreenState extends State<CreateRequestScreen> {
+class _PreselectRequestScreenState extends State<PreselectRequestScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _customRequestController =
       TextEditingController();
@@ -35,7 +39,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   List<CategoryModel> categories = [];
   List<AppointmentModel> appointments = [];
   List<ServiceModel> services = [];
-  List<int> selectedServiceIds = [];
   late VehicleModel _selectedVehicle;
 
   late Future<void> _initializeDataFuture;
@@ -58,15 +61,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   double _calculateTotalCost() {
     double totalCost = 0;
-    for (var serviceId in selectedServiceIds) {
+    for (var serviceId in widget.selectedServiceIds) {
       final service = services.firstWhere((s) => s.id == serviceId);
       totalCost += service.price;
     }
-    return totalCost;
+
+    double discountedCost = totalCost * 0.85;
+    return discountedCost;
   }
 
   Widget _buildEstimatedCostSection() {
     double estimatedCost = _calculateTotalCost();
+    double originalCost = _calculateTotalCost() / 0.85;
+
     return Align(
       alignment: Alignment.centerRight,
       child: Column(
@@ -79,6 +86,22 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               fontSize: 20,
               color: secondaryColor,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'Original Cost: ${originalCost.toStringAsFixed(2)} KM',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+          Text(
+            'Discount: ${(originalCost - estimatedCost).toStringAsFixed(2)} KM (15%)',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.green,
             ),
           ),
           const SizedBox(height: 5),
@@ -184,10 +207,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   DateTime _findFirstAvailableDate(DateTime currentDate) {
-    if (appointments.isEmpty) {
-      return currentDate;
-    }
-
     while (true) {
       bool isOccupied = appointments.any((appointment) =>
           appointment.isOccupied &&
@@ -226,14 +245,17 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               firstDate: DateTime.now().add(const Duration(days: 1)),
               lastDate: DateTime(2100),
               selectableDayPredicate: (DateTime date) {
-                for (var appointment in appointments) {
-                  if (appointment.isOccupied &&
-                      date.day == appointment.date.day &&
-                      date.month == appointment.date.month &&
-                      date.year == appointment.date.year) {
-                    return false;
+                if (appointments.isNotEmpty) {
+                  for (var appointment in appointments) {
+                    if (appointment.isOccupied &&
+                        date.day == appointment.date.day &&
+                        date.month == appointment.date.month &&
+                        date.year == appointment.date.year) {
+                      return false;
+                    }
                   }
                 }
+
                 return true;
               },
               builder: (BuildContext context, Widget? child) {
@@ -353,15 +375,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                               return null;
                             },
                           ),
-                          value: selectedServiceIds.contains(service.id),
+                          value: widget.selectedServiceIds.contains(service.id),
                           onChanged: (value) {
-                            setState(() {
-                              if (value!) {
-                                selectedServiceIds.add(service.id);
-                              } else {
-                                selectedServiceIds.remove(service.id);
-                              }
-                            });
+                            null;
                           },
                         ),
                         Expanded(
@@ -383,14 +399,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       showSnackBar(
         context,
         "Please select a date for the service.",
-        secondaryColor,
-      );
-      return;
-    }
-    if (selectedServiceIds.isEmpty) {
-      showSnackBar(
-        context,
-        "Please select at least one service.",
         secondaryColor,
       );
       return;
@@ -419,7 +427,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       ),
       clientId: widget.userId,
       vehicleId: _selectedVehicle.id,
-      serviceIdList: selectedServiceIds,
+      serviceIdList: widget.selectedServiceIds,
     );
 
     try {

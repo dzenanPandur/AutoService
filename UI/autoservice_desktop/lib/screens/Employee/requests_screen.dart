@@ -1,14 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
 import 'package:autoservice_desktop/providers/RequestProvider.dart';
-import 'package:autoservice_desktop/screens/Employee/request_details_screen.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../enum.dart';
 import '../../globals.dart';
 import '../../models/Employee/requestModel.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({super.key});
+  final Function(RequestModel) onRequestSelected;
+
+  const RequestsScreen({Key? key, required this.onRequestSelected})
+      : super(key: key);
 
   @override
   _RequestsScreenState createState() => _RequestsScreenState();
@@ -26,9 +34,20 @@ class _RequestsScreenState extends State<RequestsScreen> {
   List<Status> selectedStatuses = [];
   List<RequestModel> filteredRequests = [];
 
+  Future<void> _fetchRequests() async {
+    requests = await requestProvider.getAll();
+    filteredRequests = requests ?? [];
+    setState(() {});
+  }
+
+  void _refreshRequests() {
+    _fetchRequests();
+  }
+
   @override
   void initState() {
     super.initState();
+    _fetchRequests();
   }
 
   @override
@@ -162,7 +181,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     return Text('Error: ${snapshot.error}');
                   } else {
                     requests = snapshot.data;
-
                     List<RequestModel> displayedRequests =
                         _getDisplayedRequests();
                     return SingleChildScrollView(
@@ -213,12 +231,12 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                 ),
                               ),
                               rowsPerPage: 5,
-                              source: RequestDataTableSource(
-                                displayedRequests,
-                                requestProvider: requestProvider,
-                                context: context,
-                                refreshData: _refreshData,
-                              ),
+                              source: RequestDataTableSource(displayedRequests,
+                                  requestProvider: requestProvider,
+                                  context: context,
+                                  refreshData: _refreshData,
+                                  onRequestUpdated: _refreshRequests,
+                                  onRequestSelected: widget.onRequestSelected),
                             ),
                           ),
                         ],
@@ -226,6 +244,95 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     );
                   }
                 },
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () async {
+                  final pdf = pw.Document();
+
+                  List<RequestModel> reportRequests =
+                      filteredRequests.isNotEmpty
+                          ? filteredRequests
+                          : requests ?? [];
+
+                  pdf.addPage(pw.Page(
+                    pageFormat: PdfPageFormat.a4,
+                    build: (pw.Context context) {
+                      return pw.Column(
+                        children: [
+                          pw.Center(
+                            child: pw.Text(
+                              'AutoService',
+                              style: pw.TextStyle(
+                                fontSize: 24,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.Text(
+                            'Request report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
+                            style: const pw.TextStyle(fontSize: 16),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.TableHelper.fromTextArray(
+                            headers: [
+                              'Id',
+                              'Status',
+                              'Request Date',
+                              'Client name',
+                              'Vehicle'
+                            ],
+                            data: reportRequests
+                                .map((request) => [
+                                      request.id.toString(),
+                                      request.status,
+                                      DateFormat('dd.MM.yyyy')
+                                          .format(request.dateRequested),
+                                      request.clientName,
+                                      request.vehicleName,
+                                    ])
+                                .toList(),
+                            border: pw.TableBorder.all(),
+                            cellAlignment: pw.Alignment.centerLeft,
+                            headerStyle:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            cellStyle: const pw.TextStyle(fontSize: 12),
+                            cellPadding: const pw.EdgeInsets.all(8),
+                          ),
+                        ],
+                      );
+                    },
+                  ));
+
+                  final bytes = await pdf.save();
+
+                  final directory =
+                      await FilePicker.platform.getDirectoryPath();
+                  if (directory != null) {
+                    final file = File(
+                        '$directory/Request_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
+                    await file.writeAsBytes(bytes);
+                    showSnackBar(
+                        context, 'PDF saved successfully at ${file.path}');
+                  }
+                },
+                child: const Text('Generate Report'),
               ),
             ),
           ),
@@ -257,7 +364,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
         ),
         child: Text(
           selectedDate != null
-              ? DateFormat('yyyy-MM-dd').format(selectedDate)
+              ? DateFormat('dd-MM-yyyy').format(selectedDate)
               : 'Select Date',
         ),
       ),
@@ -318,12 +425,17 @@ class RequestDataTableSource extends DataTableSource {
   final RequestProvider requestProvider;
   final BuildContext context;
   final Function refreshData;
+  final VoidCallback onRequestUpdated;
+  final Function(RequestModel) onRequestSelected;
 
-  RequestDataTableSource(this._requests,
-      {required this.refreshData,
-      required this.requestProvider,
-      required this.context});
-
+  RequestDataTableSource(
+    this._requests, {
+    required this.refreshData,
+    required this.requestProvider,
+    required this.context,
+    required this.onRequestUpdated,
+    required this.onRequestSelected,
+  });
   @override
   DataRow getRow(int index) {
     final RequestModel request = _requests[index];
@@ -332,7 +444,7 @@ class RequestDataTableSource extends DataTableSource {
       cells: [
         DataCell(Text(request.id.toString())),
         DataCell(Text(request.status)),
-        DataCell(Text(DateFormat('yyyy-MM-dd').format(request.dateRequested))),
+        DataCell(Text(DateFormat('dd-MM-yyyy').format(request.dateRequested))),
         DataCell(Text(request.clientName)),
         DataCell(Text(request.vehicleName)),
         DataCell(ElevatedButton(
@@ -353,12 +465,7 @@ class RequestDataTableSource extends DataTableSource {
   }
 
   void _openDetailsScreen(BuildContext context, RequestModel request) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RequestDetailsScreen(request: request),
-      ),
-    );
+    onRequestSelected(request);
   }
 
   @override

@@ -1,9 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:autoservice_mobile/globals.dart';
+import 'package:autoservice_mobile/main.dart';
+import 'package:autoservice_mobile/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/createUserModel.dart';
+import '../models/storageService.dart';
 import '../providers/UserProvider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -56,8 +59,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _registerUser() async {
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _userNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _addressController.text.isEmpty ||
+        _postalCodeController.text.isEmpty ||
+        _phoneNumberController.text.isEmpty ||
+        _birthDateController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _passwordConfirmController.text.isEmpty) {
+      showSnackBar(context, 'Please fill in all the fields!', secondaryColor);
+      return;
+    }
     if (_passwordController.text != _passwordConfirmController.text) {
-      showSnackBar(context, 'Passwords do not match', secondaryColor);
+      showSnackBar(context, 'Passwords do not match!', secondaryColor);
       return;
     }
 
@@ -81,7 +98,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       await UserProvider().create(user);
 
-      showSnackBar(context, 'User registered successfully', null);
+      showSnackBar(context, 'Account succesfully created. Welcome!', null);
+      StorageService? storageService = await authProvider.login(
+          _userNameController.text, _passwordController.text);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePage(
+              authProvider: authProvider, userId: storageService!.userId),
+        ),
+      );
     } catch (error) {
       showSnackBar(context, 'Failed to register user: $error', secondaryColor);
     }
@@ -91,7 +117,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 35,
+          ),
+        ),
+        backgroundColor: secondaryColor,
+        foregroundColor: fontColor,
+        title: const Text(
+          'Register',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -233,6 +273,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 50),
+                    backgroundColor: secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
                   onPressed: _registerUser,
                   child: const Text('Register'),
                 ),
