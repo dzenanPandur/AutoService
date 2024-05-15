@@ -124,4 +124,21 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+#region EnsureData
+
+Task.Run(() =>
+{
+    IServiceProvider provider = app.Services
+        .GetService<IServiceScopeFactory>()!
+        .CreateScope()
+        .ServiceProvider;
+
+    // Apply database migrations
+    AutoServiceContext context = provider.GetService<AutoServiceContext>()!;
+    context.Database.Migrate();
+})
+    .Wait();
+
+#endregion
+
 app.Run();
