@@ -117,10 +117,11 @@ namespace AutoService.Controllers
 
             var vehicle = await _vehicleManager.GetVehicle(id);
 
-            if (vehicle.Status != Data.Enums.Status.Idle
-                || vehicle.Status != Data.Enums.Status.Rejected
-                || vehicle.Status != Data.Enums.Status.Canceled
-                || vehicle.Status != Data.Enums.Status.Completed)
+            if (vehicle.Status == Data.Enums.Status.New
+                || vehicle.Status == Data.Enums.Status.InService
+                || vehicle.Status == Data.Enums.Status.PickupReady
+                || vehicle.Status == Data.Enums.Status.AwaitingCar
+                || vehicle.Status == Data.Enums.Status.PendingPayment)
             {
                 return BadRequest("Cannot delete vehicle while request is in progress!");
             }
