@@ -56,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return _activeVehicles;
     } catch (error) {
-      showSnackBar(context, 'Error loading vehicles: $error', secondaryColor);
       setState(() {
         _vehicleFuture = Future.value([]);
       });
@@ -88,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return messages;
     } catch (error) {
-      showSnackBar(context, 'Error loading messages: $error', secondaryColor);
       setState(() {
         _messages = [];
       });

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-var baseUrl = "https://localhost:7264/";
+var baseUrl = "http://localhost:7264/";
 Color primaryBackgroundColor = const Color(0xFFF9F5EB);
 Color fontColor = const Color(0xFFE4DCCF);
 Color secondaryColor = const Color(0xFFEA5455);
