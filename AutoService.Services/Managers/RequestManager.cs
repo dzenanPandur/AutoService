@@ -2,6 +2,7 @@
 using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.Entities.ServiceData;
 using AutoService.Services.Interfaces;
+using EasyNetQ;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutoService.Services.Managers
@@ -12,12 +13,14 @@ namespace AutoService.Services.Managers
         private readonly IVehicleServiceRecordManager _vehicleRecordManager;
         private readonly IVehicleManager _vehicleManager;
         private readonly IAppointmentManager _appointmentManager;
-        public RequestManager(AutoServiceContext context, IAppointmentManager appointmentManager, IVehicleServiceRecordManager vehicleRecordManager, IVehicleManager vehicleManager)
+        private readonly IUserManager _userManager;
+        public RequestManager(AutoServiceContext context, IAppointmentManager appointmentManager, IVehicleServiceRecordManager vehicleRecordManager, IVehicleManager vehicleManager, IUserManager userManager)
         {
             _context = context;
             _appointmentManager = appointmentManager;
             _vehicleRecordManager = vehicleRecordManager;
             _vehicleManager = vehicleManager;
+            _userManager = userManager;
         }
 
         public async Task<RequestDto> GetRequest(int id)
@@ -72,9 +75,20 @@ namespace AutoService.Services.Managers
             requestDto.TotalCost = dto.TotalCost;
 
             Request request = new Request(requestDto);
-
+            //// {
+            var user = await _userManager.GetUserById(requestDto.ClientId);
+            var emailMessage = new EmailMessage
+            {
+                To = user.Email,
+                Subject = $"Status update for request ID {requestDto.Id}",
+                Body = $"The request with ID {requestDto.Id} is now in status {requestDto.Status}."
+            };
+            await PublishEmailMessageAsync(emailMessage);
+            // }
             _context.Request.Update(request);
             await _context.SaveChangesAsync();
+
+
 
             return requestDto;
         }
@@ -90,6 +104,19 @@ namespace AutoService.Services.Managers
 
             _context.Request.Remove(request);
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task PublishEmailMessageAsync(EmailMessage emailMessage)
+        {
+            var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+            var virtualHost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/";
+            var username = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest";
+            var password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest";
+
+            using (var bus = RabbitHutch.CreateBus($"host={host};virtualHost={virtualHost};username={username};password={password};timeout=30"))
+            {
+                await bus.PubSub.PublishAsync(emailMessage, "email-queue");
+            }
         }
     }
 }

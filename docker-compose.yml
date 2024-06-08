@@ -1,6 +1,21 @@
 version: '3'
 services:
 #mssql docker
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    expose:
+      - 5672
+    networks:
+      - autoservicenet
+
   autoservice-sql:
     image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
     restart: unless-stopped
@@ -22,6 +37,10 @@ services:
     environment:
       - ConnectionStrings:DefaultConnection=Server=autoservice-sql,1433;Database=AutoService;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VIRTUALHOST=/
     ports:
       - 7264:7264
     networks:
@@ -47,7 +66,28 @@ services:
       - autoservice-sql
     depends_on:
       - autoservice-sql    
-  
+
+  mailing-service:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile.mailservice
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VIRTUALHOST=/
+    depends_on:
+      - rabbitmq
+      - autoservice-sql
+      - autoservice-api
+      - autoservice-identity-api
+    networks:
+      - autoservicenet
+    ports:
+      - "7101:80"
+
+
 networks:
   autoservicenet:
     driver: bridge      

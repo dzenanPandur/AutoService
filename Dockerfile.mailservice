@@ -1,0 +1,28 @@
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 7264
+ENV ASPNETCORE_URLS=http://+:7264
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+
+COPY ["./AutoService.MailSubscriber/AutoService.MailSubscriber.csproj", "AutoService.MailSubscriber/"]
+COPY ["AutoService.Data/AutoService.Data.csproj", "AutoService.Data/"]
+RUN dotnet restore "AutoService.MailSubscriber/AutoService.MailSubscriber.csproj"
+
+COPY . .
+WORKDIR "/src/AutoService.MailSubscriber"
+RUN dotnet build "AutoService.MailSubscriber.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "AutoService.MailSubscriber.csproj" -c Release -o /app
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app .
+
+ENTRYPOINT ["dotnet", "AutoService.MailSubscriber.dll"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
