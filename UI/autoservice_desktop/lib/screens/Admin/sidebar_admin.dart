@@ -64,7 +64,16 @@ class Sidebar extends StatelessWidget {
                     endIndent: 50,
                   ),
                   _createDrawerItem(
-                      icon: Icons.account_circle, text: 'Profile', index: 1),
+                      icon: Icons.directions_car,
+                      text: 'Vehicle Data',
+                      index: 1),
+                  Divider(
+                    color: primaryBackgroundColor,
+                    indent: 50,
+                    endIndent: 50,
+                  ),
+                  _createDrawerItem(
+                      icon: Icons.account_circle, text: 'Profile', index: 2),
                 ],
               ),
             ),

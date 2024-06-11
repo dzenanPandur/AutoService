@@ -13,9 +13,11 @@ namespace AutoService.Controllers
     public class ServiceController : ControllerBase
     {
         private readonly IServiceManager _serviceManager;
-        public ServiceController(IServiceManager serviceManager)
+        private readonly ICategoryManager _categoryManager;
+        public ServiceController(IServiceManager serviceManager, ICategoryManager categoryManager)
         {
             _serviceManager = serviceManager;
+            _categoryManager = categoryManager;
         }
 
         [HttpGet("GetAll")]
@@ -85,8 +87,15 @@ namespace AutoService.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateService(ServiceDto dto)
         {
-            ServiceDto service = await _serviceManager.UpdateService(dto);
 
+
+            CategoryDto categoryDto = await _categoryManager.GetCategory((int)dto.CategoryId);
+            if (!categoryDto.isActive)
+            {
+                return BadRequest("Cannot edit service under inactive category.");
+            }
+
+            ServiceDto service = await _serviceManager.UpdateService(dto);
             if (service == null)
             {
                 return NotFound("Service not found.");

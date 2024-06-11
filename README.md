@@ -2,17 +2,17 @@ Flutter desktop:
 ----------
 Administrator: <br />
 Username: admin <br />
-Password: admin <br />
+Password: test <br />
 
 Employee <br />
 Username: employee <br />
-Password: employee <br />
+Password: test <br />
 
 Flutter mobile:
 -----------
 Client: <br />
 Username: client <br />
-Password: client <br /> 
+Password: test <br /> 
 
 
 <br /> <br />

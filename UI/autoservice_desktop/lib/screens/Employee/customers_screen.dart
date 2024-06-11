@@ -244,8 +244,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     final file = File(
                         '$directory/Customers_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
                     await file.writeAsBytes(bytes);
-                    showSnackBar(
-                        context, 'PDF saved successfully at ${file.path}');
+                    showSnackBar(context,
+                        'PDF saved successfully at ${file.path}', accentColor);
                   }
                 },
                 child: const Text('Generate Report'),
@@ -278,7 +278,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         message = 'No customers found for selected filters';
       }
 
-      showSnackBar(context, message);
+      showSnackBar(context, message, accentColor);
 
       _refreshData();
     }
@@ -409,7 +409,7 @@ void _showDetailsDialog(userModel customer, BuildContext context,
                             columns: [
                               DataColumn(
                                   label: Text(
-                                'ID',
+                                '#',
                                 style: TextStyle(color: fontColor),
                               )),
                               DataColumn(
@@ -481,10 +481,12 @@ class CustomerVehiclesDataTableSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final VehicleModel vehicle = _vehicles[index];
-
+    var rowNumber = _vehicles.indexOf(
+            _vehicles.firstWhere((element) => element.id == vehicle.id)) +
+        1;
     return DataRow(
       cells: [
-        DataCell(Text(vehicle.id.toString())),
+        DataCell(Text(rowNumber.toString())),
         DataCell(Text("${vehicle.make} ${vehicle.model}")),
         DataCell(ElevatedButton(
           style: ElevatedButton.styleFrom(

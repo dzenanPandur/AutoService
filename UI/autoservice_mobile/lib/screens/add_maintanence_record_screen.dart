@@ -293,9 +293,8 @@ class _AddMaintenanceRecordScreenState
       );
 
       await recordProvider.create(newRecord);
-
-      showSnackBar(context, 'Record added successfully.', null);
       Navigator.pop(context);
+      showSnackBar(context, 'Record added successfully.', accentColor);
     } catch (e) {
       showSnackBar(context, 'Error: $e', secondaryColor);
     }

@@ -51,18 +51,21 @@ namespace AutoService.Data.Database
                 new Category
                 {
                     Id = 1,
-                    Name = "Checks"
+                    Name = "Checks",
+                    isActive = true,
                 },
 
                 new Category
                 {
                     Id = 2,
-                    Name = "Changes"
+                    Name = "Changes",
+                    isActive = true,
                 },
                 new Category
                 {
                     Id = 3,
-                    Name = "Tuning"
+                    Name = "Tuning",
+                    isActive = true,
                 }
             };
         }

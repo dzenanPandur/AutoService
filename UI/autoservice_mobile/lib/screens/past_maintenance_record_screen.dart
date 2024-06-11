@@ -159,8 +159,13 @@ class _PastMaintenanceRecordScreenState
                                                     color: secondaryColor)),
                                           ),
                                           TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context, true),
+                                            onPressed: () {
+                                              Navigator.pop(context, true);
+                                              showSnackBar(
+                                                  context,
+                                                  "Successfully deleted record.",
+                                                  accentColor);
+                                            },
                                             child: Text(
                                               'Delete',
                                               style: TextStyle(

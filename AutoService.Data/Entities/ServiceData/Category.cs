@@ -5,7 +5,8 @@ namespace AutoService.Data.Entities.ServiceData;
 
 public class Category
 {
-    public Category() { 
+    public Category()
+    {
 
     }
 
@@ -13,9 +14,11 @@ public class Category
     {
         Id = dto.Id;
         Name = dto.Name;
+        isActive = dto.isActive;
     }
 
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }
+    public bool isActive { get; set; }
 }

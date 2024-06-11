@@ -95,9 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await UserProvider().update(updatedClient);
 
-      showSnackBar(context, 'Profile updated successfully', null);
+      showSnackBar(context, 'Profile updated successfully', accentColor);
     } catch (error) {
-      showSnackBar(context, 'Failed to update profile: $error', null);
+      showSnackBar(context, 'Failed to update profile: $error', secondaryColor);
     }
   }
 

@@ -184,6 +184,9 @@ class _MaintenanceRecordDetailsScreenState
   }
 
   Widget _buildServiceSection() {
+    final activeOrSelectedServices = services.where((service) =>
+        widget.record.serviceIdList.contains(service.id) || service.isActive);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -199,15 +202,17 @@ class _MaintenanceRecordDetailsScreenState
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 3,
               mainAxisSpacing: 0,
               crossAxisSpacing: 8,
             ),
-            itemCount: services.length,
+            itemCount: activeOrSelectedServices.length,
             itemBuilder: (context, index) {
-              final service = services[index];
+              final service = activeOrSelectedServices.elementAt(index);
+              final bool isSelected =
+                  widget.record.serviceIdList.contains(service.id);
               return Row(
                 children: [
                   Checkbox(
@@ -220,7 +225,7 @@ class _MaintenanceRecordDetailsScreenState
                         return null;
                       },
                     ),
-                    value: widget.record.serviceIdList.contains(service.id),
+                    value: isSelected,
                     onChanged: (newValue) {
                       if (newValue != null) {
                         setState(() {
@@ -263,7 +268,7 @@ class _MaintenanceRecordDetailsScreenState
 
       await recordProvider.update(updatedRecord);
 
-      showSnackBar(context, 'Record updated successfully', null);
+      showSnackBar(context, 'Record updated successfully', accentColor);
     } catch (e) {
       showSnackBar(context, 'Error: $e', secondaryColor);
     }

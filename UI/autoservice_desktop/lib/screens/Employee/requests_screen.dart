@@ -195,7 +195,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                               columns: [
                                 DataColumn(
                                     label: Text(
-                                  'ID',
+                                  '#',
                                   style: TextStyle(color: fontColor),
                                 )),
                                 DataColumn(
@@ -292,21 +292,26 @@ class _RequestsScreenState extends State<RequestsScreen> {
                           pw.SizedBox(height: 20),
                           pw.TableHelper.fromTextArray(
                             headers: [
-                              'Id',
+                              '#',
                               'Status',
                               'Request Date',
                               'Client name',
                               'Vehicle'
                             ],
                             data: reportRequests
-                                .map((request) => [
-                                      request.id.toString(),
-                                      request.status,
-                                      DateFormat('dd.MM.yyyy')
-                                          .format(request.dateRequested),
-                                      request.clientName,
-                                      request.vehicleName,
-                                    ])
+                                .asMap()
+                                .map((index, request) => MapEntry(
+                                      index,
+                                      [
+                                        '${index + 1}',
+                                        request.status,
+                                        DateFormat('dd.MM.yyyy')
+                                            .format(request.dateRequested),
+                                        request.clientName,
+                                        request.vehicleName,
+                                      ],
+                                    ))
+                                .values
                                 .toList(),
                             border: pw.TableBorder.all(),
                             cellAlignment: pw.Alignment.centerLeft,
@@ -328,8 +333,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     final file = File(
                         '$directory/Request_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
                     await file.writeAsBytes(bytes);
-                    showSnackBar(
-                        context, 'PDF saved successfully at ${file.path}');
+                    showSnackBar(context,
+                        'PDF saved successfully at ${file.path}', accentColor);
                   }
                 },
                 child: const Text('Generate Report'),
@@ -401,7 +406,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
         message = 'No requests found for selected filters';
       }
 
-      showSnackBar(context, message);
+      showSnackBar(context, message, accentColor);
 
       _refreshData();
     }
@@ -439,10 +444,12 @@ class RequestDataTableSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final RequestModel request = _requests[index];
-
+    var rowNumber = _requests.indexOf(
+            _requests.firstWhere((element) => element.id == request.id)) +
+        1;
     return DataRow(
       cells: [
-        DataCell(Text(request.id.toString())),
+        DataCell(Text(rowNumber.toString())),
         DataCell(Text(request.status)),
         DataCell(Text(DateFormat('dd-MM-yyyy').format(request.dateRequested))),
         DataCell(Text(request.clientName)),

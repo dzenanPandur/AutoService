@@ -14,9 +14,11 @@ namespace AutoService.Data.DTO.VehicleData
         {
             Id = vehicleFuelType.Id;
             Name = vehicleFuelType.Name;
+            isActive = vehicleFuelType.isActive;
         }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
         public string Name { get; set; }
+        public bool isActive { get; set; }
     }
 }

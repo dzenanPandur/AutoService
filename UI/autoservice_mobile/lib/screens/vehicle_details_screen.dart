@@ -36,6 +36,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   List<String> _fuelTypes = [];
   List<String> _transmissionTypes = [];
   List<String> _carTypes = [];
+  List<FuelTypeModel> _activeFuelTypes = [];
+  List<TransmissionTypeModel> _activeTransmissionTypes = [];
+  List<VehicleTypeModel> _activeVehicleTypes = [];
 
   final FuelTypeProvider _fuelTypeProvider = FuelTypeProvider();
   final TransmissionTypeProvider _transmissionTypeProvider =
@@ -53,18 +56,23 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   Future<void> _initializeData() async {
     try {
       List<FuelTypeModel> fuelTypes = await _fuelTypeProvider.getAll();
+      _activeFuelTypes = fuelTypes.where((type) => type.isActive).toList();
       setState(() {
         _fuelTypes = fuelTypes.map((type) => type.name).toList();
       });
 
       List<TransmissionTypeModel> transmissionTypes =
           await _transmissionTypeProvider.getAll();
+      _activeTransmissionTypes =
+          transmissionTypes.where((type) => type.isActive).toList();
       setState(() {
         _transmissionTypes =
             transmissionTypes.map((type) => type.name).toList();
       });
 
       List<VehicleTypeModel> vehicleTypes = await _vehicleTypeProvider.getAll();
+      _activeVehicleTypes =
+          vehicleTypes.where((type) => type.isActive).toList();
       setState(() {
         _carTypes = vehicleTypes.map((type) => type.name).toList();
       });
@@ -100,10 +108,19 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
       widget.onVehicleUpdated();
 
-      showSnackBar(context, 'Vehicle updated successfully', null);
+      showSnackBar(context, 'Vehicle updated successfully', accentColor);
     } catch (error) {
       showSnackBar(context, 'Failed to update vehicle: $error', secondaryColor);
     }
+  }
+
+  List<T> getActiveAndSelectedTypes<T>(
+      List<T> types, T selectedType, bool Function(T) isActiveFunc) {
+    final activeTypes = types.where(isActiveFunc).toList();
+    if (!isActiveFunc(selectedType)) {
+      activeTypes.add(selectedType);
+    }
+    return activeTypes;
   }
 
   Future<void> _deleteVehicle() async {
@@ -111,9 +128,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       await VehicleProvider().delete(widget.vehicle.id);
 
       widget.onVehicleUpdated();
-
-      showSnackBar(context, 'Vehicle deleted successfully', null);
       Navigator.pop(context);
+      showSnackBar(context, 'Vehicle deleted successfully', accentColor);
     } catch (error) {
       showSnackBar(context, 'Failed to delete vehicle: $error', secondaryColor);
     }
@@ -259,10 +275,15 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             newValue!;
                                       });
                                     },
-                                    items: _fuelTypes.map((fuelType) {
+                                    items: getActiveAndSelectedTypes(
+                                      _fuelTypes,
+                                      widget.vehicle.vehicleFuelTypeName,
+                                      (fuelType) => _activeFuelTypes
+                                          .any((type) => type.name == fuelType),
+                                    ).map((fuelType) {
                                       return DropdownMenuItem<String>(
                                         value: fuelType,
-                                        child: Text(fuelType),
+                                        child: Text(fuelType!),
                                       );
                                     }).toList(),
                                   ),
@@ -292,11 +313,16 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             newValue!;
                                       });
                                     },
-                                    items: _transmissionTypes
-                                        .map((transmissionType) {
+                                    items: getActiveAndSelectedTypes(
+                                      _transmissionTypes,
+                                      widget.vehicle.transmissionTypeName,
+                                      (transmissionType) =>
+                                          _activeTransmissionTypes.any((type) =>
+                                              type.name == transmissionType),
+                                    ).map((transmissionType) {
                                       return DropdownMenuItem<String>(
                                         value: transmissionType,
-                                        child: Text(transmissionType),
+                                        child: Text(transmissionType!),
                                       );
                                     }).toList(),
                                   ),
@@ -346,10 +372,15 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             newValue!;
                                       });
                                     },
-                                    items: _carTypes.map((carType) {
+                                    items: getActiveAndSelectedTypes(
+                                      _carTypes,
+                                      widget.vehicle.vehicleTypeName,
+                                      (vehicleType) => _activeVehicleTypes.any(
+                                          (type) => type.name == vehicleType),
+                                    ).map((vehicleType) {
                                       return DropdownMenuItem<String>(
-                                        value: carType,
-                                        child: Text(carType),
+                                        value: vehicleType,
+                                        child: Text(vehicleType!),
                                       );
                                     }).toList(),
                                   ),

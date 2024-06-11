@@ -114,8 +114,8 @@ class ProfileScreen extends StatelessWidget {
                             postalCodeController.text.isEmpty ||
                             phoneController.text.isEmpty ||
                             birthDateController.text.isEmpty) {
-                          showSnackBar(
-                              context, 'Please fill in all the fields!');
+                          showSnackBar(context,
+                              'Please fill in all the fields!', secondaryColor);
                           return;
                         }
                         try {
@@ -133,9 +133,11 @@ class ProfileScreen extends StatelessWidget {
                           );
                           await userProvider.updateUser(update);
 
-                          showSnackBar(context, 'Changes saved successfully.');
+                          showSnackBar(context, 'Changes saved successfully.',
+                              accentColor);
                         } catch (e) {
-                          showSnackBar(context, 'Failed to save changes. $e');
+                          showSnackBar(context, 'Failed to save changes. $e',
+                              secondaryColor);
                         }
                       },
                       style: ElevatedButton.styleFrom(

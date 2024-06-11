@@ -167,11 +167,6 @@ class _PaymentsPendingScreenState extends State<PaymentsPendingScreen> {
                   horizontalMargin: 10,
                   columns: [
                     DataColumn(
-                        label: Text(
-                      'ID',
-                      style: TextStyle(color: secondaryColor),
-                    )),
-                    DataColumn(
                         label: Text('Date completed',
                             style: TextStyle(color: secondaryColor))),
                     DataColumn(
@@ -194,7 +189,6 @@ class _PaymentsPendingScreenState extends State<PaymentsPendingScreen> {
                             }));
                       },
                       cells: [
-                        DataCell(Text(request.id.toString())),
                         DataCell(Text(_formatDate(request.dateCompleted!))),
                         DataCell(
                           ElevatedButton(

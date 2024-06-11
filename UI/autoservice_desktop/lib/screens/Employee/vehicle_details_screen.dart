@@ -174,7 +174,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               columns: [
                 DataColumn(
                     label: Text(
-                  'Id',
+                  '#',
                   style: TextStyle(color: fontColor),
                 )),
                 DataColumn(
@@ -220,10 +220,12 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
       ]);
     }
     final VehicleServiceRecordModel record = _serviceRecords[index];
-
+    var rowNumber = _serviceRecords.indexOf(
+            _serviceRecords.firstWhere((element) => element.id == record.id)) +
+        1;
     return DataRow(
       cells: [
-        DataCell(Text(record.id.toString())),
+        DataCell(Text(rowNumber.toString())),
         DataCell(Text(DateFormat('dd-MM-yyyy').format(record.date))),
         DataCell(Text(record.mileageAtTimeOfService.toString())),
         DataCell(ElevatedButton(

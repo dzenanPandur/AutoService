@@ -1,6 +1,4 @@
 ﻿using AutoService.Data.DTO.ServiceData;
-using AutoService.Data.Entities.ServiceData;
-using System.Text.Json.Serialization;
 
 namespace AutoService.ViewModels.ServiceData
 {
@@ -18,6 +16,7 @@ namespace AutoService.ViewModels.ServiceData
             IsActive = dto.IsActive;
             Price = dto.Price;
             CategoryName = dto.Category.Name;
+            CategoryId = dto.Category.Id;
 
         }
 

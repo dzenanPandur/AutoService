@@ -53,7 +53,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 20, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2709),
+                            Date = new DateTime(2024, 6, 16, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6772),
                             IsOccupied = true,
                             RequestId = 1
                         },
@@ -61,7 +61,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 19, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2712),
+                            Date = new DateTime(2024, 6, 15, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6776),
                             IsOccupied = false,
                             RequestId = 2
                         },
@@ -69,7 +69,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 3,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 21, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2714),
+                            Date = new DateTime(2024, 6, 17, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6779),
                             IsOccupied = true,
                             RequestId = 3
                         },
@@ -77,7 +77,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 22, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2716),
+                            Date = new DateTime(2024, 6, 18, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6781),
                             IsOccupied = false,
                             RequestId = 4
                         });
@@ -95,6 +95,9 @@ namespace AutoService.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
@@ -103,17 +106,20 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Checks"
+                            Name = "Checks",
+                            isActive = true
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Changes"
+                            Name = "Changes",
+                            isActive = true
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Tuning"
+                            Name = "Tuning",
+                            isActive = true
                         });
                 });
 
@@ -171,8 +177,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change tires",
-                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693),
-                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2693),
+                            DateCompleted = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6754),
+                            DateRequested = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6754),
                             Message = " ",
                             Status = 2,
                             TotalCost = 600m,
@@ -184,8 +190,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 2,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change window",
-                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696),
-                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2696),
+                            DateCompleted = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6757),
+                            DateRequested = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6758),
                             Message = " ",
                             Status = 6,
                             TotalCost = 450m,
@@ -197,8 +203,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 3,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change bumper",
-                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698),
-                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2698),
+                            DateCompleted = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6760),
+                            DateRequested = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6760),
                             Message = " ",
                             Status = 7,
                             TotalCost = 400m,
@@ -210,8 +216,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change rims",
-                            DateCompleted = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2699),
-                            DateRequested = new DateTime(2024, 5, 14, 20, 20, 26, 405, DateTimeKind.Utc).AddTicks(2700),
+                            DateCompleted = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6762),
+                            DateRequested = new DateTime(2024, 6, 10, 11, 25, 22, 119, DateTimeKind.Utc).AddTicks(6763),
                             Message = " ",
                             Status = 4,
                             TotalCost = 700m,
@@ -633,7 +639,7 @@ namespace AutoService.Data.Migrations
                             ModifiedDate = new DateTime(2024, 2, 7, 17, 26, 40, 899, DateTimeKind.Unspecified).AddTicks(9930),
                             NormalizedEmail = "EMPLOYEE@EMPLOYEE.COM",
                             NormalizedUserName = "EMPLOYEE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEIHvjeCGSTaZfqUVK9IC/ONuj5fJj5vKIhHnJkXRWgMCEspYS9/+gr3DBICkveXKg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
                             PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88104,
@@ -661,7 +667,7 @@ namespace AutoService.Data.Migrations
                             ModifiedDate = new DateTime(2024, 2, 7, 17, 24, 53, 422, DateTimeKind.Unspecified).AddTicks(1765),
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEI9PHasKoFp5DwWoGI8pTvKMeEUkZzfCkdtjIVgv1IWGNUMP9gHa01RFqELzQq5isw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
                             PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88000,
@@ -689,7 +695,7 @@ namespace AutoService.Data.Migrations
                             ModifiedDate = new DateTime(2024, 2, 7, 17, 27, 27, 331, DateTimeKind.Unspecified).AddTicks(637),
                             NormalizedEmail = "CLIENT@CLIENT.COM",
                             NormalizedUserName = "CLIENT",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIPOmlsV57rPJlEsDCfu4rsP2GBDN7KXIcFymvHL2ZLzlyCbzIn+LGx6DSCe6BV2og==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
                             PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88104,
@@ -712,6 +718,9 @@ namespace AutoService.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("TransmissionTypes");
@@ -720,12 +729,14 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Manual"
+                            Name = "Manual",
+                            isActive = true
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Automatic"
+                            Name = "Automatic",
+                            isActive = true
                         });
                 });
 
@@ -830,6 +841,9 @@ namespace AutoService.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("VehicleFuelTypes");
@@ -838,22 +852,26 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Petrol"
+                            Name = "Petrol",
+                            isActive = true
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Diesel"
+                            Name = "Diesel",
+                            isActive = true
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Electric"
+                            Name = "Electric",
+                            isActive = true
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Hybrid"
+                            Name = "Hybrid",
+                            isActive = true
                         });
                 });
 
@@ -891,7 +909,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             Cost = 1500m,
-                            Date = new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2617),
+                            Date = new DateTime(2024, 6, 10, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6664),
                             MileageAtTimeOfService = 185100,
                             Notes = "Found broken light",
                             VehicleId = 1
@@ -900,7 +918,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             Cost = 500m,
-                            Date = new DateTime(2024, 5, 14, 22, 20, 26, 405, DateTimeKind.Local).AddTicks(2638),
+                            Date = new DateTime(2024, 6, 10, 13, 25, 22, 119, DateTimeKind.Local).AddTicks(6693),
                             MileageAtTimeOfService = 17800,
                             Notes = "",
                             VehicleId = 2
@@ -919,6 +937,9 @@ namespace AutoService.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("VehicleTypes");
@@ -927,47 +948,56 @@ namespace AutoService.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Sedan"
+                            Name = "Sedan",
+                            isActive = true
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Hatchback"
+                            Name = "Hatchback",
+                            isActive = true
                         },
                         new
                         {
                             Id = 3,
-                            Name = "SUV"
+                            Name = "SUV",
+                            isActive = true
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Coupe"
+                            Name = "Coupe",
+                            isActive = true
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Minivan"
+                            Name = "Minivan",
+                            isActive = true
                         },
                         new
                         {
                             Id = 6,
-                            Name = "Convertible"
+                            Name = "Convertible",
+                            isActive = true
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Station wagon"
+                            Name = "Station wagon",
+                            isActive = true
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Crossover"
+                            Name = "Crossover",
+                            isActive = true
                         },
                         new
                         {
                             Id = 9,
-                            Name = "Other"
+                            Name = "Other",
+                            isActive = true
                         });
                 });
 

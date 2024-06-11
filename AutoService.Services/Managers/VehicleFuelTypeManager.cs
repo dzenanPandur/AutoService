@@ -40,7 +40,11 @@ namespace AutoService.Services.Managers
         {
             VehicleFuelTypeDto vehicleFuelTypeDto = await GetVehicleFuelType(dto.Id);
             _context.ChangeTracker.Clear();
-            vehicleFuelTypeDto.Name = dto.Name;
+            if (dto.Name != null)
+            {
+                vehicleFuelTypeDto.Name = dto.Name;
+            }
+            vehicleFuelTypeDto.isActive = dto.isActive;
 
             VehicleFuelType vehicleFuelType = new VehicleFuelType(vehicleFuelTypeDto);
 

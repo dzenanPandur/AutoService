@@ -9,8 +9,9 @@ namespace AutoService.Services.Managers
     public class VehicleTypeManager : IVehicleTypeManager
     {
         private readonly AutoServiceContext _context;
-        public VehicleTypeManager(AutoServiceContext context) {
-            
+        public VehicleTypeManager(AutoServiceContext context)
+        {
+
             _context = context;
         }
 
@@ -41,7 +42,12 @@ namespace AutoService.Services.Managers
             VehicleTypeDto vehicleTypeDto = await GetVehicleType(dto.Id);
             _context.ChangeTracker.Clear();
 
-            vehicleTypeDto.Name = dto.Name;
+            if (dto.Name != null)
+            {
+                vehicleTypeDto.Name = dto.Name;
+            }
+
+            vehicleTypeDto.isActive = dto.isActive;
 
             VehicleType vehicleType = new VehicleType(vehicleTypeDto);
 

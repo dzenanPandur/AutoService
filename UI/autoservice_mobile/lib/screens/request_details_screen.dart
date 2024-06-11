@@ -110,7 +110,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //const SizedBox(height: 20),
                       Text('Appointment date:',
                           style: TextStyle(
                               color: secondaryColor,

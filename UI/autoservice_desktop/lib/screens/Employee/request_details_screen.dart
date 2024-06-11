@@ -209,10 +209,11 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           ),
         );
       } else {
-        showSnackBar(context, 'Error: Vehicle not found.');
+        showSnackBar(context, 'Error: Vehicle not found.', secondaryColor);
       }
     } catch (error) {
-      showSnackBar(context, 'Error loading vehicle details: $error');
+      showSnackBar(
+          context, 'Error loading vehicle details: $error', secondaryColor);
     }
   }
 
@@ -253,10 +254,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     try {
       await RequestProvider().updateRequest(request);
 
-      showSnackBar(context, 'Changes saved succesfully');
+      showSnackBar(context, 'Changes saved succesfully', accentColor);
       widget.onRequestUpdated();
     } catch (error) {
-      showSnackBar(context, 'Failed to save changes. $error');
+      showSnackBar(context, 'Failed to save changes. $error', secondaryColor);
     }
   }
 
@@ -290,6 +291,14 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           return Text('Error: ${snapshot.error}');
         } else {
           final List<ServiceModel> services = snapshot.data!;
+          // Get distinct categories from the services list
+          final categoriesWithActiveServices = services
+              .where((service) =>
+                  service.isActive ||
+                  widget.request.serviceIdList.contains(service.id))
+              .map((service) => service.categoryName)
+              .toSet();
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -299,71 +308,78 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
               const SizedBox(height: 8),
               for (var category in categories)
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        category.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                if (categoriesWithActiveServices.contains(category.name))
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          category.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Wrap(
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            children: services
-                                .where((s) => s.categoryName == category.name)
-                                .map((service) => SizedBox(
-                                      width: (constraints.maxWidth - 32) / 3,
-                                      child: Row(
-                                        children: [
-                                          Checkbox(
-                                            checkColor: primaryBackgroundColor,
-                                            fillColor: MaterialStateProperty
-                                                .resolveWith(
-                                              (states) {
-                                                if (states.contains(
-                                                    MaterialState.selected)) {
-                                                  return secondaryColor;
-                                                }
-                                                return null;
-                                              },
+                        const SizedBox(height: 8),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: services
+                                  .where((s) =>
+                                      s.categoryName == category.name &&
+                                      (s.isActive ||
+                                          widget.request.serviceIdList
+                                              .contains(s.id)))
+                                  .map((service) => SizedBox(
+                                        width: (constraints.maxWidth - 32) / 3,
+                                        child: Row(
+                                          children: [
+                                            Checkbox(
+                                              checkColor:
+                                                  primaryBackgroundColor,
+                                              fillColor: MaterialStateProperty
+                                                  .resolveWith(
+                                                (states) {
+                                                  if (states.contains(
+                                                      MaterialState.selected)) {
+                                                    return secondaryColor;
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              value: widget
+                                                  .request.serviceIdList
+                                                  .contains(service.id),
+                                              onChanged: null,
                                             ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
+                                            Flexible(
+                                              child: Text(service.name),
                                             ),
-                                            value: widget.request.serviceIdList
-                                                .contains(service.id),
-                                            onChanged: null,
-                                          ),
-                                          Flexible(
-                                            child: Text(service.name),
-                                          ),
-                                        ],
-                                      ),
-                                    ))
-                                .toList(),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
-                ),
             ],
           );
         }

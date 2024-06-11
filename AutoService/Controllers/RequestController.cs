@@ -94,8 +94,21 @@ namespace AutoService.Controllers
 
                 dto.Appointment.Id = (int)requestDto.AppointmentId!;
                 dto.Appointment.RequestId = requestDto.Id;
-
                 await _appointmentManager.UpdateAppointment(dto.Appointment);
+                VehicleDto vehicleDto = new VehicleDto
+                {
+                    Id = dto.VehicleId,
+                    Status = Data.Enums.Status.New,
+                    Make = vehicle.Make,
+                    ManufactureYear = vehicle.ManufactureYear,
+                    Mileage = vehicle.Mileage,
+                    Model = vehicle.Model,
+                    Vin = vehicle.Vin,
+                    TransmissionTypeId = vehicle.TransmissionTypeId,
+                    FuelTypeId = vehicle.FuelTypeId,
+                    VehicleTypeId = vehicle.VehicleTypeId,
+                };
+                await _vehicleManager.UpdateVehicle(vehicleDto);
                 return Ok("Request created successfully.");
             }
             catch (Exception e)
@@ -108,12 +121,11 @@ namespace AutoService.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateRequest(RequestDto dto)
         {
-            var vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
+            VehicleDto vehicle = await _vehicleManager.GetVehicle(dto.VehicleId);
+            RequestDto requestDto = await _requestManager.GetRequest(dto.Id);
+
             if (dto.Status == Data.Enums.Status.Completed)
             {
-
-                RequestDto requestDto = await _requestManager.GetRequest(dto.Id);
-
                 RecordDto record = new RecordDto()
                 {
                     Cost = dto.TotalCost,
@@ -123,11 +135,19 @@ namespace AutoService.Controllers
                     Notes = requestDto.CustomRequest,
                     MileageAtTimeOfService = vehicle.Mileage,
                 };
+
                 await _vehicleRecordManager.CreateVehicleServiceRecord(record);
             }
 
 
             Data.Enums.Status newStatus;
+
+            if (dto.Status == Data.Enums.Status.Canceled)
+            {
+
+                requestDto.Appointment.IsOccupied = false;
+                await _appointmentManager.UpdateAppointment(requestDto.Appointment);
+            }
 
             if (dto.Status == Data.Enums.Status.Canceled
                 || dto.Status == Data.Enums.Status.Rejected

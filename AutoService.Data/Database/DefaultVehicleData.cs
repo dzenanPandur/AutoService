@@ -11,23 +11,27 @@ namespace AutoService.Data.Database
                 new VehicleFuelType
                 {
                     Id = 1,
-                    Name = "Petrol"
+                    Name = "Petrol",
+                    isActive = true,
                 },
 
                 new VehicleFuelType
                 {
                     Id = 2,
-                    Name = "Diesel"
+                    Name = "Diesel",
+                    isActive = true,
                 },
                 new VehicleFuelType
                 {
                     Id = 3,
-                    Name = "Electric"
+                    Name = "Electric",
+                    isActive = true,
                 },
                 new VehicleFuelType
                 {
                     Id = 4,
-                    Name = "Hybrid"
+                    Name = "Hybrid",
+                    isActive = true,
                 },
             };
         }
@@ -37,48 +41,57 @@ namespace AutoService.Data.Database
                 new VehicleType
                 {
                     Id = 1,
-                    Name = "Sedan"
+                    Name = "Sedan",
+                    isActive = true,
                 },
 
                 new VehicleType
                 {
                     Id = 2,
-                    Name = "Hatchback"
+                    Name = "Hatchback",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 3,
-                    Name = "SUV"
+                    Name = "SUV",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 4,
-                    Name = "Coupe"
+                    Name = "Coupe",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 5,
-                    Name = "Minivan"
+                    Name = "Minivan",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 6,
-                    Name = "Convertible"
+                    Name = "Convertible",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 7,
-                    Name = "Station wagon"
+                    Name = "Station wagon",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 8,
-                    Name = "Crossover"
+                    Name = "Crossover",
+                    isActive = true,
                 },
                 new VehicleType
                 {
                     Id = 9,
-                    Name = "Other"
+                    Name = "Other",
+                    isActive = true,
                 },
             };
         }
@@ -88,13 +101,15 @@ namespace AutoService.Data.Database
                 new TransmissionType
                 {
                     Id = 1,
-                    Name = "Manual"
+                    Name = "Manual",
+                    isActive = true,
                 },
 
                 new TransmissionType
                 {
                     Id = 2,
-                    Name = "Automatic"
+                    Name = "Automatic",
+                    isActive = true,
                 }
             };
         }

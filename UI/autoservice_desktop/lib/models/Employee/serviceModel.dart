@@ -1,10 +1,10 @@
 class ServiceModel {
   final int id;
-  final String name;
-  final String? categoryName;
+  String name;
+  String? categoryName;
   bool isActive;
-  final double price;
-  final int categoryId;
+  double price;
+  int categoryId;
 
   ServiceModel({
     required this.id,

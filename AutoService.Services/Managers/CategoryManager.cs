@@ -9,9 +9,12 @@ namespace AutoService.Services.Managers
     public class CategoryManager : ICategoryManager
     {
         private readonly AutoServiceContext _context;
-        public CategoryManager(AutoServiceContext context)
+
+        private readonly IServiceManager _serviceManager;
+        public CategoryManager(AutoServiceContext context, IServiceManager serviceManager)
         {
             _context = context;
+            _serviceManager = serviceManager;
         }
 
         public async Task<CategoryDto> GetCategory(int id)
@@ -40,9 +43,33 @@ namespace AutoService.Services.Managers
         {
             CategoryDto categoryDto = await GetCategory(dto.Id);
             _context.ChangeTracker.Clear();
-            categoryDto.Name = dto.Name;
 
+            if (categoryDto is null)
+            {
+                return null;
+            }
+            if (dto.Name != null)
+            {
+                categoryDto.Name = dto.Name;
+            }
+            categoryDto.isActive = dto.isActive;
             Category category = new Category(categoryDto);
+
+            if (!dto.isActive)
+            {
+                var services = await _context.Services
+                    .Where(s => s.CategoryId == dto.Id)
+                    .ToListAsync();
+
+                foreach (var service in services)
+                {
+                    ServiceDto serviceDto = new ServiceDto(service)
+                    {
+                        IsActive = false
+                    };
+                    await _serviceManager.UpdateService(serviceDto);
+                }
+            }
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();

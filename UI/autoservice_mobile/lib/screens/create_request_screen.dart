@@ -424,8 +424,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
     try {
       await requestProvider.create(request);
-      showSnackBar(context, "Successfully created request", null);
       Navigator.pop(context);
+      showSnackBar(context, "Successfully created request", accentColor);
     } catch (e) {
       showSnackBar(context, "Failed creating request: $e", secondaryColor);
     }

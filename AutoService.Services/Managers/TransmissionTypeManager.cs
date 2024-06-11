@@ -1,15 +1,8 @@
 ﻿using AutoService.Data.Database;
-using AutoService.Data.DTO.ServiceData;
 using AutoService.Data.DTO.VehicleData;
-using AutoService.Data.Entities.ServiceData;
 using AutoService.Data.Entities.VehicleData;
 using AutoService.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoService.Services.Managers
 {
@@ -52,7 +45,11 @@ namespace AutoService.Services.Managers
         {
             TransmissionTypeDto transmissionTypeDto = await GetTransmissionType(dto.Id);
             _context.ChangeTracker.Clear();
-            transmissionTypeDto.Name = dto.Name;
+            if (dto.Name != null)
+            {
+                transmissionTypeDto.Name = dto.Name;
+            }
+            transmissionTypeDto.isActive = dto.isActive;
 
             TransmissionType transmissionType = new TransmissionType(transmissionTypeDto);
 

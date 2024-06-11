@@ -98,7 +98,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       await UserProvider().create(user);
 
-      showSnackBar(context, 'Account succesfully created. Welcome!', null);
       StorageService? storageService = await authProvider.login(
           _userNameController.text, _passwordController.text);
       Navigator.pushReplacement(
@@ -108,6 +107,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               authProvider: authProvider, userId: storageService!.userId),
         ),
       );
+      showSnackBar(
+          context, 'Account succesfully created. Welcome!', accentColor);
     } catch (error) {
       showSnackBar(context, 'Failed to register user: $error', secondaryColor);
     }

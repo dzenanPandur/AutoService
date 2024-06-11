@@ -319,15 +319,19 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                       .text.isEmpty ||
                                                   usernameControllerAdd
                                                       .text.isEmpty) {
-                                                showSnackBar(context,
-                                                    'Please fill in all the fields!');
+                                                showSnackBar(
+                                                    context,
+                                                    'Please fill in all the fields!',
+                                                    secondaryColor);
                                                 return;
                                               }
                                               if (passwordControllerAdd.text !=
                                                   passwordConfirmControllerAdd
                                                       .text) {
-                                                showSnackBar(context,
-                                                    'Passwords do not match!');
+                                                showSnackBar(
+                                                    context,
+                                                    'Passwords do not match!',
+                                                    secondaryColor);
                                                 return;
                                               }
                                               String pickedDateString =
@@ -395,11 +399,15 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
                                                 Navigator.pop(context);
                                                 _refreshData();
-                                                showSnackBar(context,
-                                                    'Successfully created employee.');
+                                                showSnackBar(
+                                                    context,
+                                                    'Successfully created employee.',
+                                                    accentColor);
                                               } catch (error) {
-                                                showSnackBar(context,
-                                                    'Failed to add employee. $error');
+                                                showSnackBar(
+                                                    context,
+                                                    'Failed to add employee. $error',
+                                                    secondaryColor);
                                               }
                                             },
                                             child: const Text(
@@ -487,7 +495,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         message = 'No employees found for selected filters';
       }
 
-      showSnackBar(context, message);
+      showSnackBar(context, message, accentColor);
 
       _refreshData();
     }
@@ -593,7 +601,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                       phoneController.text.isEmpty ||
                       birthDateController.text.isEmpty ||
                       usernameController.text.isEmpty) {
-                    showSnackBar(context, 'Please fill in all the fields!');
+                    showSnackBar(context, 'Please fill in all the fields!',
+                        secondaryColor);
                     return;
                   }
                   updateUserModel update = updateUserModel(
@@ -610,9 +619,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   );
                   await userProvider.updateUser(update);
                   Navigator.pop(context);
-                  showSnackBar(context, 'Successfully saved changes.');
+                  showSnackBar(
+                      context, 'Successfully saved changes.', accentColor);
                 } catch (e) {
-                  showSnackBar(context, 'Failed to save changes. $e');
+                  showSnackBar(
+                      context, 'Failed to save changes. $e', secondaryColor);
                 }
                 _refreshData();
               },
@@ -673,7 +684,8 @@ class EmployeeDataTableSource extends DataTableSource {
 
             refreshData();
 
-            showSnackBar(context, 'Employee status updated successfully!');
+            showSnackBar(
+                context, 'Employee status updated successfully!', accentColor);
           },
         )),
         DataCell(ElevatedButton(

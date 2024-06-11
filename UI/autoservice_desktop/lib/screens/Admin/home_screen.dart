@@ -1,5 +1,6 @@
 import 'package:autoservice_desktop/models/storageService.dart';
 import 'package:autoservice_desktop/screens/Admin/employee_screen.dart';
+import 'package:autoservice_desktop/screens/Admin/vehicle_data_screen.dart';
 import 'package:autoservice_desktop/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import '../../providers/AuthProvider.dart';
@@ -25,6 +26,8 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
       case 0:
         return const EmployeeScreen();
       case 1:
+        return VehicleDataScreen();
+      case 2:
         return ProfileScreen(
           storageService: widget.storageService,
         );

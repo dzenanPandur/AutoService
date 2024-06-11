@@ -165,11 +165,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   horizontalMargin: 10,
                   columns: [
                     DataColumn(
-                        label: Text(
-                      'ID',
-                      style: TextStyle(color: secondaryColor),
-                    )),
-                    DataColumn(
                         label: Text('Vehicle',
                             style: TextStyle(color: secondaryColor))),
                     DataColumn(
@@ -195,7 +190,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
                             }));
                       },
                       cells: [
-                        DataCell(Text(request.id.toString())),
                         DataCell(Text(request.vehicleName)),
                         DataCell(Text(request.status)),
                         if (headerText == 'New service requests')
@@ -241,18 +235,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                             try {
                                               await RequestProvider()
                                                   .updateRequest(updateRequest);
-
+                                              Navigator.of(context).pop();
                                               showSnackBar(
                                                   context,
-                                                  'Successfully cancelled reqeust.',
-                                                  null);
+                                                  'Successfully cancelled request.',
+                                                  accentColor);
                                             } catch (error) {
                                               showSnackBar(
                                                   context,
                                                   'Failed to save changes. $error',
                                                   secondaryColor);
                                             }
-                                            Navigator.of(context).pop();
+
                                             setState(() {
                                               _fetchRequests();
                                             });

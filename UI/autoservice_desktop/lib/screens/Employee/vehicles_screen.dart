@@ -171,7 +171,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                               columns: [
                                 DataColumn(
                                     label: Text(
-                                  'ID',
+                                  '#',
                                   style: TextStyle(color: fontColor),
                                 )),
                                 DataColumn(
@@ -265,18 +265,23 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                           pw.SizedBox(height: 20),
                           pw.TableHelper.fromTextArray(
                             headers: [
-                              'Id',
+                              '#',
                               'Status',
                               'Client name',
                               'Vehicle name',
                             ],
                             data: reportVehicles
-                                .map((vehicle) => [
-                                      vehicle.id.toString(),
-                                      vehicle.status,
-                                      vehicle.clientName,
-                                      '${vehicle.make} ${vehicle.model}',
-                                    ])
+                                .asMap()
+                                .map((index, vehicle) => MapEntry(
+                                      index,
+                                      [
+                                        '${index + 1}',
+                                        vehicle.status,
+                                        vehicle.clientName,
+                                        '${vehicle.make} ${vehicle.model}',
+                                      ],
+                                    ))
+                                .values
                                 .toList(),
                             border: pw.TableBorder.all(),
                             cellAlignment: pw.Alignment.centerLeft,
@@ -298,8 +303,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                     final file = File(
                         '$directory/Vehicles_Report_${DateFormat('dd-MM-yyyy_HH-mm-ss').format(DateTime.now())}.pdf');
                     await file.writeAsBytes(bytes);
-                    showSnackBar(
-                        context, 'PDF saved successfully at ${file.path}');
+                    showSnackBar(context,
+                        'PDF saved successfully at ${file.path}', accentColor);
                   }
                 },
                 child: const Text('Generate Report'),
@@ -335,7 +340,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
         message = 'No requests found for selected filters';
       }
 
-      showSnackBar(context, message);
+      showSnackBar(context, message, accentColor);
 
       _refreshData();
     }
@@ -372,10 +377,12 @@ class VehicleDataTableSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final VehicleModel vehicle = _vehicles[index];
-
+    var rowNumber = _vehicles.indexOf(
+            _vehicles.firstWhere((element) => element.id == vehicle.id)) +
+        1;
     return DataRow(
       cells: [
-        DataCell(Text(vehicle.id.toString())),
+        DataCell(Text(rowNumber.toString())),
         DataCell(Text(vehicle.status)),
         DataCell(Text(vehicle.clientName)),
         DataCell(Text("${vehicle.make} ${vehicle.model}")),

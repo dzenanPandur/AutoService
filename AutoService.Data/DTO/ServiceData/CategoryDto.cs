@@ -14,10 +14,12 @@ namespace AutoService.Data.DTO.ServiceData
         {
             Id = category.Id;
             Name = category.Name;
+            isActive = category.isActive;
         }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Id { get; set; }
         public string Name { get; set; }
+        public bool isActive { get; set; }
     }
 }

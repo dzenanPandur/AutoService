@@ -54,19 +54,27 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     try {
       List<FuelTypeModel> fuelTypes = await _fuelTypeProvider.getAll();
       setState(() {
-        _fuelTypes = fuelTypes.map((type) => type.name).toList();
+        _fuelTypes = fuelTypes
+            .where((type) => type.isActive)
+            .map((type) => type.name)
+            .toList();
       });
 
       List<TransmissionTypeModel> transmissionTypes =
           await _transmissionTypeProvider.getAll();
       setState(() {
-        _transmissionTypes =
-            transmissionTypes.map((type) => type.name).toList();
+        _transmissionTypes = transmissionTypes
+            .where((type) => type.isActive)
+            .map((type) => type.name)
+            .toList();
       });
 
       List<VehicleTypeModel> vehicleTypes = await _vehicleTypeProvider.getAll();
       setState(() {
-        _carTypes = vehicleTypes.map((type) => type.name).toList();
+        _carTypes = vehicleTypes
+            .where((type) => type.isActive)
+            .map((type) => type.name)
+            .toList();
       });
     } catch (error) {
       showSnackBar(context, 'Error fetching data: $error', secondaryColor);
@@ -104,9 +112,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     try {
       await VehicleProvider().create(newVehicle);
 
-      showSnackBar(context, 'Vehicle added successfully', null);
-      widget.onVehicleAdded();
       Navigator.pop(context);
+      showSnackBar(context, 'Vehicle added successfully', accentColor);
+      widget.onVehicleAdded();
     } catch (error) {
       showSnackBar(context, 'Failed to add vehicle: $error', secondaryColor);
     }
