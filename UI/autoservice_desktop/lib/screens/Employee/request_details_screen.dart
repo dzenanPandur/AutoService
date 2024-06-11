@@ -164,30 +164,37 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   _buildTextField(
                       "Message to customer", messageController, false),
                   const Spacer(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _saveChanges();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 25, horizontal: 30),
-                        backgroundColor: secondaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      child: const Text('Save Changes',
-                          style: TextStyle(fontSize: 18.0)),
-                    ),
-                  )
+                  _buildSaveChangesButton()
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveChangesButton() {
+    bool isStatusDisabled = widget.request.status == "Completed" ||
+        widget.request.status == "Rejected" ||
+        widget.request.status == "Canceled";
+
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: ElevatedButton(
+        onPressed: isStatusDisabled ? null : _saveChanges,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 30),
+          backgroundColor: secondaryColor,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.white),
+          ),
+        ),
+        child: const Text(
+          'Save Changes',
+          style: TextStyle(fontSize: 18.0),
         ),
       ),
     );

@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .where((request) => request.message != Characters.empty.toString())
           .where((request) => request.message != " ")
           .map((request) =>
-              'Request for vehicle ${request.id}: ${request.message}')
+              'Request for ${request.vehicleName}: ${request.message}')
           .toList();
 
       setState(() {

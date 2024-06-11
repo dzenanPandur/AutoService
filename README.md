@@ -32,4 +32,12 @@ flutter run --dart-define stripePublishableKey=yourStripePublishableKey --dart-d
 <br />
 Stripe test card number: <br />
 4242 4242 4242 4242
+<br />
+-----------
+<br />
 
+Additional info:<br /><br />
+
+RabbitMQ sends an email on status change, to test using Your own email, update the client email on the mobile app.
+Report generating is based on the data currently shown in the table (including filters).
+Appointments can be cancelled by the client while their vehicle has not been brought to service yet.

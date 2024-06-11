@@ -269,10 +269,25 @@ class _RequestsScreenState extends State<RequestsScreen> {
                       filteredRequests.isNotEmpty
                           ? filteredRequests
                           : requests ?? [];
+                  Map<String, int> statusCounts = {};
+                  for (var request in reportRequests) {
+                    statusCounts[request.status] =
+                        (statusCounts[request.status] ?? 0) + 1;
+                  }
 
                   pdf.addPage(pw.Page(
                     pageFormat: PdfPageFormat.a4,
                     build: (pw.Context context) {
+                      const chartColors = [
+                        PdfColors.blue300,
+                        PdfColors.green300,
+                        PdfColors.amber300,
+                        PdfColors.pink300,
+                        PdfColors.cyan300,
+                        PdfColors.purple300,
+                        PdfColors.lime300,
+                      ];
+
                       return pw.Column(
                         children: [
                           pw.Center(
@@ -319,6 +334,39 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                 pw.TextStyle(fontWeight: pw.FontWeight.bold),
                             cellStyle: const pw.TextStyle(fontSize: 12),
                             cellPadding: const pw.EdgeInsets.all(8),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.Flexible(
+                            child: pw.Chart(
+                              title: pw.Text(
+                                'Request Breakdown',
+                                style: const pw.TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              grid: pw.PieGrid(),
+                              datasets: List<pw.Dataset>.generate(
+                                statusCounts.length,
+                                (index) {
+                                  final entry =
+                                      statusCounts.entries.toList()[index];
+                                  final color =
+                                      chartColors[index % chartColors.length];
+                                  final value = entry.value;
+                                  final pct =
+                                      (value / reportRequests.length * 100)
+                                          .round();
+                                  return pw.PieDataSet(
+                                    legend:
+                                        '${entry.key.toString().split('.').last}: $value ($pct%)',
+                                    value: value.toDouble(),
+                                    color: color,
+                                    legendStyle:
+                                        const pw.TextStyle(fontSize: 10),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       );
@@ -423,6 +471,13 @@ class _RequestsScreenState extends State<RequestsScreen> {
   void _refreshData() {
     _refreshIndicatorKey.currentState?.show();
   }
+}
+
+class StatusData {
+  final String status;
+  final int count;
+
+  StatusData(this.status, this.count);
 }
 
 class RequestDataTableSource extends DataTableSource {

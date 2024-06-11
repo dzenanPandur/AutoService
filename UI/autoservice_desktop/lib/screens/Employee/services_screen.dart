@@ -937,6 +937,8 @@ class CategoryDataTableSource extends DataTableSource {
                 final bool confirmDeactivation = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
+                        elevation: 0,
+                        backgroundColor: primaryBackgroundColor,
                         title: const Text('Confirm Deactivation'),
                         content: const Text(
                           'Are you sure you want to deactivate this category? This will also deactivate its services.',
@@ -944,11 +946,17 @@ class CategoryDataTableSource extends DataTableSource {
                         actions: [
                           TextButton(
                             onPressed: () => {Navigator.pop(context, true)},
-                            child: const Text('Yes'),
+                            child: Text(
+                              'Yes',
+                              style: TextStyle(color: secondaryColor),
+                            ),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('No'),
+                            child: Text(
+                              'No',
+                              style: TextStyle(color: secondaryColor),
+                            ),
                           ),
                         ],
                       ),
@@ -1003,10 +1011,10 @@ class CategoryDataTableSource extends DataTableSource {
                             category.name = updatedName;
                             await modifyCategory(category);
                             Navigator.pop(context);
+                            Navigator.pop(context);
                             refreshData();
                             showSnackBar(context,
                                 'Category updated successfully!', accentColor);
-                            Navigator.pop(context);
                           } else {
                             showSnackBar(
                                 context,

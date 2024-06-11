@@ -55,7 +55,8 @@ namespace AutoService.Services.Managers
                 .Select(r => new RequestDto
                 {
                     Id = r.Id,
-                    Message = r.Message
+                    Message = r.Message,
+                    VehicleId = r.VehicleId
                 })
                 .ToListAsync();
 

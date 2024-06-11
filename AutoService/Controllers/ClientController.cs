@@ -99,10 +99,22 @@ namespace AutoService.Controllers
                                .Select(r => new RequestDto
                                {
                                    Id = r.Id,
-                                   Message = r.Message
+                                   Message = r.Message,
+                                   VehicleId = r.VehicleId
                                });
 
-            return Ok(requestDtos);
+            List<RequestViewModel> requestViewModels = new List<RequestViewModel>();
+
+            foreach (RequestDto requestDto in requests)
+            {
+                var vehicle = await _vehicleManager.GetVehicle((int)requestDto.VehicleId);
+                RequestViewModel requestViewModel = new RequestViewModel(requestDto);
+                requestViewModel.VehicleName = vehicle.Make + " " + vehicle.Model;
+
+                requestViewModels.Add(requestViewModel);
+            }
+
+            return Ok(requestViewModels);
         }
 
         [HttpGet("GetAllAppointmentsByClient")]

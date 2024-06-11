@@ -142,7 +142,7 @@ namespace AutoService.Controllers
 
             Data.Enums.Status newStatus;
 
-            if (dto.Status == Data.Enums.Status.Canceled)
+            if (dto.Status == Data.Enums.Status.Canceled || dto.Status == Data.Enums.Status.Rejected)
             {
 
                 requestDto.Appointment.IsOccupied = false;
