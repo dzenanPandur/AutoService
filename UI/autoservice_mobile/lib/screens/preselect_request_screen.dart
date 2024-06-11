@@ -419,7 +419,7 @@ class _PreselectRequestScreenState extends State<PreselectRequestScreen> {
       dateCompleted: DateTime.now(),
       totalCost: _calculateTotalCost(),
       customRequest: _customRequestController.text,
-      message: '',
+      message: ' ',
       appointment: AppointmentModel(
         id: 0,
         isOccupied: true,
