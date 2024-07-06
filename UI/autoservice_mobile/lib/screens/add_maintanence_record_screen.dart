@@ -269,6 +269,8 @@ class _AddMaintenanceRecordScreenState
   }
 
   Widget _buildServiceSection() {
+    final activeServices =
+        services.where((service) => service.isActive).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -290,9 +292,9 @@ class _AddMaintenanceRecordScreenState
               mainAxisSpacing: 0,
               crossAxisSpacing: 8,
             ),
-            itemCount: services.length,
+            itemCount: activeServices.length,
             itemBuilder: (context, index) {
-              final service = services[index];
+              final service = activeServices[index];
               return Row(
                 children: [
                   Checkbox(

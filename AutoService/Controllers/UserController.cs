@@ -5,6 +5,7 @@ using AutoService.ViewModels.UserData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutoService.Controllers
 {
@@ -139,7 +140,10 @@ namespace AutoService.Controllers
             {
                 return Ok(new { exists = false });
             }
-            var user = await _userManager.FindByNameAsync(username);
+
+            var user = await _userManager.Users
+                .Where(u => u.UserName.ToLower() == username.ToLower())
+                .FirstOrDefaultAsync();
 
             if (user != null && user.Id != currentUserId)
             {
@@ -157,7 +161,10 @@ namespace AutoService.Controllers
             {
                 return Ok(new { exists = false });
             }
-            var user = await _userManager.FindByEmailAsync(email);
+
+            var user = await _userManager.Users
+                .Where(u => u.Email.ToLower() == email.ToLower())
+                .FirstOrDefaultAsync();
 
             if (user != null && user.Id != currentUserId)
             {
@@ -166,6 +173,7 @@ namespace AutoService.Controllers
 
             return Ok(new { exists = false });
         }
+
 
 
         [HttpPost("Create")]
@@ -195,10 +203,10 @@ namespace AutoService.Controllers
             if (userDto.Password.Length < 6)
                 return BadRequest("Password minimum length is 6 characters!");
 
-            if (_userManager.FindByNameAsync(userDto.UserName).Result != null)
+            if (!string.Equals(userDto.UserName, userDto.UserName, StringComparison.OrdinalIgnoreCase))
                 return BadRequest("Username already taken!");
 
-            if (_userManager.FindByEmailAsync(userDto.Email).Result != null)
+            if (!string.Equals(userDto.Email, userDto.Email, StringComparison.OrdinalIgnoreCase))
                 return BadRequest("Account with that email already exists!");
 
             if (userDto.Password != userDto.PasswordConfirm)
@@ -239,12 +247,12 @@ namespace AutoService.Controllers
             if (userDto.UserName.Length < 5)
                 return BadRequest("Username minimum length is 5 characters!");
 
-            if (userDto.UserName != _user.Result.UserName)
+            if (!string.Equals(userDto.UserName, _user.Result.UserName, StringComparison.OrdinalIgnoreCase))
             {
                 if (_userManager.FindByNameAsync(userDto.UserName).Result != null)
                     return BadRequest("Username already taken!");
             }
-            if (userDto.Email != _user.Result.Email)
+            if (!string.Equals(userDto.Email, _user.Result.Email, StringComparison.OrdinalIgnoreCase))
             {
                 if (_userManager.FindByEmailAsync(userDto.Email).Result != null)
                     return BadRequest("Account with that email already exists!");

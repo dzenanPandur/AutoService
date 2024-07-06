@@ -37,6 +37,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   final List<Status> _statuses = Status.values;
   TextEditingController priceController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+  TextEditingController dateRequestedController = TextEditingController();
+  TextEditingController customRequestController = TextEditingController();
   bool get isPickupReady => widget.request.status == "PickupReady";
 
   @override
@@ -44,8 +46,11 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     super.initState();
     loadCategories();
     loadServices();
-    priceController =
-        TextEditingController(text: widget.request.totalCost.toString());
+    priceController.text = widget.request.totalCost.toString();
+    messageController.text = widget.request.message!;
+    dateRequestedController.text =
+        DateFormat('dd-MM-yyyy').format(widget.request.dateRequested);
+    customRequestController.text = widget.request.customRequest!;
     _selectedStatusIndex = widget.request.statusId - 1;
   }
 
@@ -60,13 +65,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController dateRequestedController = TextEditingController(
-        text: DateFormat('dd-MM-yyyy').format(widget.request.dateRequested));
-    TextEditingController customRequestController =
-        TextEditingController(text: widget.request.customRequest);
-    messageController = TextEditingController(text: widget.request.message);
-    priceController =
-        TextEditingController(text: widget.request.totalCost.toString());
     final List<Status> availableStatuses =
         _getAvailableStatuses(widget.request.status);
 

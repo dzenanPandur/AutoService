@@ -332,9 +332,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Container(
-                                  width: MediaQuery.sizeOf(context).width * 0.9,
+                                  width:
+                                      MediaQuery.sizeOf(context).width * 0.95,
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 15),
+                                      horizontal: 10),
                                   child: DataTable(
                                     showCheckboxColumn: false,
                                     columnSpacing: 30,
