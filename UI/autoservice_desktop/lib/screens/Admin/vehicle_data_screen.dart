@@ -17,6 +17,7 @@ class VehicleDataScreen extends StatefulWidget {
 }
 
 class _VehicleDataScreenState extends State<VehicleDataScreen> {
+  final _formKey = GlobalKey<FormState>();
   final VehicleTypeProvider _vehicleTypeProvider = VehicleTypeProvider();
   final FuelTypeProvider _fuelTypeProvider = FuelTypeProvider();
   final TransmissionTypeProvider _transmissionTypeProvider =
@@ -144,6 +145,15 @@ class _VehicleDataScreenState extends State<VehicleDataScreen> {
             ],
           ),
         ));
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name cannot be empty';
+    } else if (!RegExp(r'^[a-zA-ZšđčćžŠĐČĆŽ]+$').hasMatch(value)) {
+      return 'Name can only contain letters';
+    }
+    return null;
   }
 
   Widget createButtonDialog(
@@ -299,63 +309,67 @@ class _VehicleDataScreenState extends State<VehicleDataScreen> {
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          elevation: 0,
-          backgroundColor: primaryBackgroundColor,
-          title: Text(dialogTitle),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: textFieldLabel,
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                backgroundColor: secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.white),
-                ),
+        return Form(
+          key: _formKey,
+          child: AlertDialog(
+            elevation: 0,
+            backgroundColor: primaryBackgroundColor,
+            title: Text(dialogTitle),
+            content: TextFormField(
+              controller: controller,
+              validator: _validateName,
+              maxLength: 20,
+              decoration: InputDecoration(
+                labelText: textFieldLabel,
               ),
-              onPressed: () async {
-                if (controller.text.isNotEmpty) {
-                  try {
-                    await createFunction(controller.text);
-                    setState(() {});
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    showSnackBar(
-                        context, "Successfully created item!", accentColor);
-                  } catch (e) {
-                    showSnackBar(context, "$e", secondaryColor);
+            ),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    try {
+                      await createFunction(controller.text);
+                      setState(() {});
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      showSnackBar(
+                          context, "Successfully created item!", accentColor);
+                    } catch (e) {
+                      showSnackBar(context, "$e", secondaryColor);
+                    }
                   }
-                } else {
-                  showSnackBar(context, 'Please enter a name.', secondaryColor);
-                }
-              },
-              child: const Text('Add'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                backgroundColor: secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.white),
-                ),
+                },
+                child: const Text('Add'),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  controller.text = "";
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -371,62 +385,65 @@ class _VehicleDataScreenState extends State<VehicleDataScreen> {
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          elevation: 0,
-          backgroundColor: primaryBackgroundColor,
-          title: Text(dialogTitle),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: textFieldLabel,
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                backgroundColor: secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.white),
-                ),
+        return Form(
+          key: _formKey,
+          child: AlertDialog(
+            elevation: 0,
+            backgroundColor: primaryBackgroundColor,
+            title: Text(dialogTitle),
+            content: TextFormField(
+              validator: _validateName,
+              maxLength: 20,
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: textFieldLabel,
               ),
-              onPressed: () async {
-                if (controller.text.isNotEmpty) {
-                  try {
-                    await updateFunction(controller.text);
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    showSnackBar(
-                        context, "Name successfully updated!", accentColor);
-                  } catch (e) {
-                    showSnackBar(context, "$e", secondaryColor);
+            ),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    try {
+                      await updateFunction(controller.text);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      showSnackBar(
+                          context, "Name successfully updated!", accentColor);
+                    } catch (e) {
+                      showSnackBar(context, "$e", secondaryColor);
+                    }
                   }
-                } else {
-                  showSnackBar(context, 'Please enter a name.', secondaryColor);
-                }
-              },
-              child: const Text('Save'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                backgroundColor: secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.white),
-                ),
+                },
+                child: const Text('Save'),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  backgroundColor: secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          ),
         );
       },
     );
