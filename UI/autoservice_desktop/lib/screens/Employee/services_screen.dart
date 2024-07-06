@@ -16,6 +16,7 @@ class ServiceScreen extends StatefulWidget {
 }
 
 class _ServiceScreenState extends State<ServiceScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ServiceProvider serviceProvider = ServiceProvider();
   final CategoryProvider categoryProvider = CategoryProvider();
   List<ServiceModel>? services;
@@ -175,11 +176,6 @@ class _ServiceScreenState extends State<ServiceScreen> {
                               columns: [
                                 DataColumn(
                                     label: Text(
-                                  '#',
-                                  style: TextStyle(color: fontColor),
-                                )),
-                                DataColumn(
-                                    label: Text(
                                   'Service Name',
                                   style: TextStyle(color: fontColor),
                                 )),
@@ -211,13 +207,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                 ),
                               ),
                               rowsPerPage: 5,
-                              source: ServiceDataTableSource(
-                                displayedServices,
-                                categories: categories,
-                                serviceProvider: serviceProvider,
-                                context: context,
-                                refreshData: _refreshData,
-                              ),
+                              source: ServiceDataTableSource(displayedServices,
+                                  categories: categories,
+                                  serviceProvider: serviceProvider,
+                                  context: context,
+                                  refreshData: _refreshData,
+                                  formKey: _formKey),
                             ),
                           ),
                         ],
@@ -253,9 +248,23 @@ class _ServiceScreenState extends State<ServiceScreen> {
                           return AlertDialog(
                             elevation: 0,
                             backgroundColor: primaryBackgroundColor,
-                            title: const Text(
-                              'Manage Categories',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Manage Categories",
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.close,
+                                      color: secondaryColor, size: 45),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
                             ),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -289,12 +298,6 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                             columns: [
                                               DataColumn(
                                                   label: Text(
-                                                '#',
-                                                style:
-                                                    TextStyle(color: fontColor),
-                                              )),
-                                              DataColumn(
-                                                  label: Text(
                                                 'Name',
                                                 style:
                                                     TextStyle(color: fontColor),
@@ -313,13 +316,13 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                               )),
                                             ],
                                             source: CategoryDataTableSource(
-                                              categories,
-                                              categoryProvider:
-                                                  categoryProvider,
-                                              modifyCategory: _modifyCategory,
-                                              context: context,
-                                              refreshData: _refreshData,
-                                            ),
+                                                categories,
+                                                categoryProvider:
+                                                    categoryProvider,
+                                                modifyCategory: _modifyCategory,
+                                                context: context,
+                                                refreshData: _refreshData,
+                                                formKey: _formKey),
                                             rowsPerPage: 3,
                                           ),
                                         ),
@@ -344,109 +347,112 @@ class _ServiceScreenState extends State<ServiceScreen> {
                                     showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return AlertDialog(
-                                          elevation: 0,
-                                          backgroundColor:
-                                              primaryBackgroundColor,
-                                          title: const Text(
-                                            'Add Category',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          content: TextFormField(
-                                            controller:
-                                                categoryNameControllerAdd,
-                                            decoration: InputDecoration(
-                                              labelText: 'Category Name',
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                              floatingLabelStyle: TextStyle(
-                                                  color: secondaryColor),
+                                        return Form(
+                                          key: _formKey,
+                                          child: AlertDialog(
+                                            elevation: 0,
+                                            backgroundColor:
+                                                primaryBackgroundColor,
+                                            title: const Text(
+                                              'Add Category',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                          ),
-                                          actions: [
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 15,
-                                                        horizontal: 20),
-                                                backgroundColor: secondaryColor,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  side: const BorderSide(
-                                                      color: Colors.white),
-                                                ),
+                                            content: TextFormField(
+                                              controller:
+                                                  categoryNameControllerAdd,
+                                              maxLength: 15,
+                                              decoration: InputDecoration(
+                                                labelText: 'Category Name',
+                                                filled: true,
+                                                fillColor: Colors.white,
+                                                floatingLabelStyle: TextStyle(
+                                                    color: secondaryColor),
                                               ),
-                                              onPressed: () async {
-                                                if (categoryNameControllerAdd
-                                                    .text.isEmpty) {
-                                                  showSnackBar(
-                                                      context,
-                                                      "Please input the category name.",
-                                                      secondaryColor);
+                                              validator: _validateName,
+                                            ),
+                                            actions: [
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 15,
+                                                      horizontal: 20),
+                                                  backgroundColor:
+                                                      secondaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    side: const BorderSide(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                onPressed: () async {
+                                                  if (_formKey.currentState!
+                                                      .validate()) {
+                                                    try {
+                                                      CategoryModel request =
+                                                          CategoryModel(
+                                                        id: 0,
+                                                        name:
+                                                            categoryNameControllerAdd
+                                                                .text,
+                                                        isActive: true,
+                                                      );
 
-                                                  return;
-                                                }
-                                                try {
-                                                  CategoryModel request =
-                                                      CategoryModel(
-                                                    id: 0,
-                                                    name:
-                                                        categoryNameControllerAdd
-                                                            .text,
-                                                    isActive: true,
-                                                  );
+                                                      await categoryProvider
+                                                          .create(request);
+                                                      await loadCategories();
+                                                      setState(() {});
+                                                      categoryNameControllerAdd
+                                                          .text = '';
 
-                                                  await categoryProvider
-                                                      .create(request);
-                                                  await loadCategories();
-                                                  setState(() {});
+                                                      Navigator.pop(context);
+                                                      _refreshData();
+
+                                                      Navigator.pop(context);
+                                                      showSnackBar(
+                                                          context,
+                                                          'Category successfully created.',
+                                                          accentColor);
+                                                    } catch (e) {
+                                                      showSnackBar(
+                                                          context,
+                                                          'Failed to create category. $e',
+                                                          secondaryColor);
+                                                    }
+                                                  }
+                                                },
+                                                child: const Text('Add'),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 15,
+                                                      horizontal: 20),
+                                                  backgroundColor:
+                                                      secondaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    side: const BorderSide(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
                                                   categoryNameControllerAdd
                                                       .text = '';
-
-                                                  Navigator.pop(context);
-                                                  _refreshData();
-
-                                                  Navigator.pop(context);
-                                                  showSnackBar(
-                                                      context,
-                                                      'Category successfully created.',
-                                                      accentColor);
-                                                } catch (e) {
-                                                  showSnackBar(
-                                                      context,
-                                                      'Failed to create category. $e',
-                                                      secondaryColor);
-                                                }
-                                              },
-                                              child: const Text('Add'),
-                                            ),
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 15,
-                                                        horizontal: 20),
-                                                backgroundColor: secondaryColor,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  side: const BorderSide(
-                                                      color: Colors.white),
-                                                ),
+                                                },
+                                                child: const Text('Cancel'),
                                               ),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                categoryNameControllerAdd.text =
-                                                    '';
-                                              },
-                                              child: const Text('Cancel'),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         );
                                       },
                                     );
@@ -477,152 +483,141 @@ class _ServiceScreenState extends State<ServiceScreen> {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return AlertDialog(
-                            elevation: 0,
-                            backgroundColor: primaryBackgroundColor,
-                            title: const Text(
-                              'Add Service',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  buildRow(
-                                      "Service Name",
-                                      serviceNameControllerAdd,
-                                      false,
-                                      TextInputType.text,
-                                      20),
-                                  DropdownButtonFormField<CategoryModel>(
-                                    value: null,
-                                    items: categories
-                                        .where((category) => category.isActive)
-                                        .map((CategoryModel category) {
-                                      return DropdownMenuItem<CategoryModel>(
-                                        value: category,
-                                        child: Text(category.name),
-                                      );
-                                    }).toList(),
-                                    onChanged: (CategoryModel? value) {
-                                      setState(() {
-                                        if (value != null) {
-                                          serviceCategoryControllerAdd.text =
-                                              (value.id).toString();
-                                        } else {
-                                          serviceCategoryControllerAdd.text =
-                                              '';
-                                        }
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      floatingLabelStyle:
-                                          TextStyle(color: secondaryColor),
-                                      labelText: 'Service Category',
+                          return Form(
+                            key: _formKey,
+                            child: AlertDialog(
+                              elevation: 0,
+                              backgroundColor: primaryBackgroundColor,
+                              title: const Text(
+                                'Add Service',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    buildRow(
+                                        "Service Name",
+                                        serviceNameControllerAdd,
+                                        false,
+                                        TextInputType.text,
+                                        20,
+                                        validator: _validateName),
+                                    DropdownButtonFormField<CategoryModel>(
+                                      value: null,
+                                      items: categories
+                                          .where(
+                                              (category) => category.isActive)
+                                          .map((CategoryModel category) {
+                                        return DropdownMenuItem<CategoryModel>(
+                                          value: category,
+                                          child: Text(category.name),
+                                        );
+                                      }).toList(),
+                                      onChanged: (CategoryModel? value) {
+                                        setState(() {
+                                          if (value != null) {
+                                            serviceCategoryControllerAdd.text =
+                                                (value.id).toString();
+                                          } else {
+                                            serviceCategoryControllerAdd.text =
+                                                '';
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        floatingLabelStyle:
+                                            TextStyle(color: secondaryColor),
+                                        labelText: 'Service Category',
+                                      ),
+                                      validator: _validateCategory,
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    buildRow("Price", priceControllerAdd, false,
+                                        TextInputType.number, 10,
+                                        validator: _validatePrice),
+                                  ],
+                                ),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
+                                    backgroundColor: secondaryColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side:
+                                          const BorderSide(color: Colors.white),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  buildRow("Price", priceControllerAdd, false,
-                                      TextInputType.number, 10),
-                                ],
-                              ),
-                            ),
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 20),
-                            actions: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 20),
-                                  backgroundColor: secondaryColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    side: const BorderSide(color: Colors.white),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  if (serviceNameControllerAdd.text.isEmpty) {
-                                    showSnackBar(
-                                        context,
-                                        "Please input the service name.",
-                                        secondaryColor);
-                                    return;
-                                  }
-                                  if (serviceCategoryControllerAdd
-                                      .text.isEmpty) {
-                                    showSnackBar(
-                                        context,
-                                        "Please choose a category.",
-                                        secondaryColor);
-                                    return;
-                                  }
-                                  if (priceControllerAdd.text.isEmpty) {
-                                    showSnackBar(
-                                        context,
-                                        "Please input the price.",
-                                        secondaryColor);
-                                    return;
-                                  }
-                                  try {
-                                    ServiceModel request = ServiceModel(
-                                      id: 0,
-                                      name: serviceNameControllerAdd.text,
-                                      isActive: true,
-                                      price: double.tryParse(
-                                              priceControllerAdd.text) ??
-                                          0.0,
-                                      categoryId: int.tryParse(
-                                              serviceCategoryControllerAdd
-                                                  .text) ??
-                                          0,
-                                    );
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      try {
+                                        ServiceModel request = ServiceModel(
+                                          id: 0,
+                                          name: serviceNameControllerAdd.text,
+                                          isActive: true,
+                                          price: double.tryParse(
+                                                  priceControllerAdd.text) ??
+                                              0.0,
+                                          categoryId: int.tryParse(
+                                                  serviceCategoryControllerAdd
+                                                      .text) ??
+                                              0,
+                                        );
 
-                                    await serviceProvider.create(request);
+                                        await serviceProvider.create(request);
+                                        serviceNameControllerAdd.text = '';
+                                        serviceCategoryControllerAdd.text = '';
+                                        priceControllerAdd.text = '';
+
+                                        Navigator.pop(context);
+                                        _refreshData();
+
+                                        showSnackBar(
+                                            context,
+                                            'Service successfully created.',
+                                            accentColor);
+                                      } catch (e) {
+                                        showSnackBar(
+                                            context,
+                                            'Failed to create service. $e',
+                                            secondaryColor);
+                                      }
+                                    }
+                                  },
+                                  child: const Text('Add'),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
+                                    backgroundColor: secondaryColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side:
+                                          const BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
                                     serviceNameControllerAdd.text = '';
                                     serviceCategoryControllerAdd.text = '';
                                     priceControllerAdd.text = '';
-
-                                    Navigator.pop(context);
-                                    _refreshData();
-
-                                    showSnackBar(
-                                        context,
-                                        'Service successfully created.',
-                                        accentColor);
-                                  } catch (e) {
-                                    showSnackBar(
-                                        context,
-                                        'Failed to create service. $e',
-                                        secondaryColor);
-                                  }
-                                },
-                                child: const Text('Add'),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 20),
-                                  backgroundColor: secondaryColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    side: const BorderSide(color: Colors.white),
-                                  ),
+                                  },
+                                  child: const Text('Cancel'),
                                 ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  serviceNameControllerAdd.text = '';
-                                  serviceCategoryControllerAdd.text = '';
-                                  priceControllerAdd.text = '';
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                            ],
+                              ],
+                            ),
                           );
                         },
                       );
@@ -679,7 +674,8 @@ class _ServiceScreenState extends State<ServiceScreen> {
   }
 
   Widget buildRow(String label, TextEditingController controller, bool obscure,
-      TextInputType keyboardType, int maxLength) {
+      TextInputType keyboardType, int maxLength,
+      {String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextFormField(
@@ -693,9 +689,35 @@ class _ServiceScreenState extends State<ServiceScreen> {
           fillColor: Colors.white,
           floatingLabelStyle: TextStyle(color: secondaryColor),
         ),
+        validator: validator,
       ),
     );
   }
+}
+
+String? _validateName(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Name cannot be empty';
+  }
+  return null;
+}
+
+String? _validateCategory(CategoryModel? value) {
+  if (value == null) {
+    return 'Category cannot be empty';
+  }
+
+  return null;
+}
+
+String? _validatePrice(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Price cannot be empty';
+  }
+  if (double.tryParse(value) == null) {
+    return 'Invalid price';
+  }
+  return null;
 }
 
 class ServiceDataTableSource extends DataTableSource {
@@ -704,23 +726,21 @@ class ServiceDataTableSource extends DataTableSource {
   final BuildContext context;
   final Function refreshData;
   final List<CategoryModel> categories;
+  final GlobalKey<FormState> formKey;
 
   ServiceDataTableSource(this._services,
       {required this.refreshData,
       required this.serviceProvider,
       required this.context,
-      required this.categories});
+      required this.categories,
+      required this.formKey});
 
   @override
   DataRow getRow(int index) {
     final ServiceModel service = _services[index];
-    var rowNumber = _services.indexOf(
-            _services.firstWhere((element) => element.id == service.id)) +
-        1;
 
     return DataRow(
       cells: [
-        DataCell(Text(rowNumber.toString())),
         DataCell(Text(service.name)),
         DataCell(Text(service.categoryName ?? 'N/A')),
         DataCell(Checkbox(
@@ -763,118 +783,121 @@ class ServiceDataTableSource extends DataTableSource {
 
                     return StatefulBuilder(
                       builder: (context, setState) {
-                        return AlertDialog(
-                          elevation: 0,
-                          backgroundColor: primaryBackgroundColor,
-                          title: const Text('Edit Service'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextFormField(
-                                controller: serviceNameControllerEdit,
-                                decoration: InputDecoration(
-                                  labelText: 'Service Name',
-                                  labelStyle: TextStyle(color: secondaryColor),
-                                  filled: true,
-                                  fillColor: Colors.white,
+                        return Form(
+                          key: formKey,
+                          child: AlertDialog(
+                            elevation: 0,
+                            backgroundColor: primaryBackgroundColor,
+                            title: const Text('Edit Service'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  controller: serviceNameControllerEdit,
+                                  decoration: InputDecoration(
+                                    labelText: 'Service Name',
+                                    labelStyle:
+                                        TextStyle(color: secondaryColor),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  validator: _validateName,
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              DropdownButtonFormField<CategoryModel>(
-                                value: selectedCategory,
-                                items: categories
-                                    .where((category) => category.isActive)
-                                    .map((CategoryModel category) {
-                                  return DropdownMenuItem<CategoryModel>(
-                                    value: category,
-                                    child: Text(category.name),
-                                  );
-                                }).toList(),
-                                onChanged: (CategoryModel? value) {
-                                  setState(() {
-                                    selectedCategory = value;
-                                  });
+                                const SizedBox(height: 16),
+                                DropdownButtonFormField<CategoryModel>(
+                                  value: selectedCategory,
+                                  items: categories
+                                      .where((category) => category.isActive)
+                                      .map((CategoryModel category) {
+                                    return DropdownMenuItem<CategoryModel>(
+                                      value: category,
+                                      child: Text(category.name),
+                                    );
+                                  }).toList(),
+                                  onChanged: (CategoryModel? value) {
+                                    setState(() {
+                                      selectedCategory = value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    floatingLabelStyle:
+                                        TextStyle(color: secondaryColor),
+                                    labelText: 'Service Category',
+                                  ),
+                                  validator: _validateCategory,
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: servicePriceControllerEdit,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Price',
+                                    labelStyle:
+                                        TextStyle(color: secondaryColor),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                  validator: _validatePrice,
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final String updatedName =
+                                      serviceNameControllerEdit.text;
+                                  final String updatedPrice =
+                                      servicePriceControllerEdit.text;
+
+                                  if (formKey.currentState!.validate()) {
+                                    try {
+                                      service.name = updatedName;
+                                      service.price =
+                                          double.parse(updatedPrice);
+                                      service.categoryId = selectedCategory!.id;
+                                      await serviceProvider.update2(service);
+                                      Navigator.pop(context);
+                                      refreshData();
+                                      showSnackBar(
+                                          context,
+                                          'Service updated successfully!',
+                                          accentColor);
+                                    } catch (e) {
+                                      showSnackBar(
+                                          context, "$e", secondaryColor);
+                                    }
+                                  }
                                 },
-                                decoration: InputDecoration(
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  floatingLabelStyle:
-                                      TextStyle(color: secondaryColor),
-                                  labelText: 'Service Category',
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 50),
+                                  backgroundColor: secondaryColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(color: Colors.white),
+                                  ),
                                 ),
+                                child: const Text('Save'),
                               ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: servicePriceControllerEdit,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Price',
-                                  labelStyle: TextStyle(color: secondaryColor),
-                                  filled: true,
-                                  fillColor: Colors.white,
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 50),
+                                  backgroundColor: secondaryColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(color: Colors.white),
+                                  ),
                                 ),
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
                               ),
                             ],
                           ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () async {
-                                final String updatedName =
-                                    serviceNameControllerEdit.text;
-                                final String updatedPrice =
-                                    servicePriceControllerEdit.text;
-
-                                if (updatedName.isNotEmpty &&
-                                    updatedPrice.isNotEmpty &&
-                                    selectedCategory != null) {
-                                  try {
-                                    service.name = updatedName;
-                                    service.price = double.parse(updatedPrice);
-                                    service.categoryId = selectedCategory!.id;
-                                    await serviceProvider.update2(service);
-                                    Navigator.pop(context);
-                                    refreshData();
-                                    showSnackBar(
-                                        context,
-                                        'Service updated successfully!',
-                                        accentColor);
-                                  } catch (e) {
-                                    showSnackBar(context, "$e", secondaryColor);
-                                  }
-                                } else {
-                                  showSnackBar(
-                                      context,
-                                      'Service name, price, and category cannot be empty.',
-                                      secondaryColor);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 20, horizontal: 50),
-                                backgroundColor: secondaryColor,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: const BorderSide(color: Colors.white),
-                                ),
-                              ),
-                              child: const Text('Save'),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 20, horizontal: 50),
-                                backgroundColor: secondaryColor,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: const BorderSide(color: Colors.white),
-                                ),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
-                            ),
-                          ],
                         );
                       },
                     );
@@ -909,6 +932,7 @@ class CategoryDataTableSource extends DataTableSource {
   final Function(CategoryModel) modifyCategory;
   final BuildContext context;
   final Function refreshData;
+  final GlobalKey<FormState> formKey;
 
   CategoryDataTableSource(
     this._categories, {
@@ -916,17 +940,15 @@ class CategoryDataTableSource extends DataTableSource {
     required this.modifyCategory,
     required this.categoryProvider,
     required this.context,
+    required this.formKey,
   });
 
   @override
   DataRow getRow(int index) {
     final CategoryModel category = _categories[index];
-    var rowNumber = _categories.indexOf(
-            _categories.firstWhere((element) => element.id == category.id)) +
-        1;
+
     return DataRow(
       cells: [
-        DataCell(Text(rowNumber.toString())),
         DataCell(Text(category.name)),
         DataCell(
           Checkbox(
@@ -989,66 +1011,68 @@ class CategoryDataTableSource extends DataTableSource {
               showDialog(
                 context: context,
                 builder: (context) {
-                  return AlertDialog(
-                    elevation: 0,
-                    backgroundColor: primaryBackgroundColor,
-                    title: const Text('Edit Category'),
-                    content: TextFormField(
-                      controller: categoryNameControllerEdit,
-                      decoration: InputDecoration(
-                        labelText: 'Category Name',
-                        labelStyle: TextStyle(color: secondaryColor),
-                        filled: true,
-                        fillColor: Colors.white,
+                  return Form(
+                    key: formKey,
+                    child: AlertDialog(
+                      elevation: 0,
+                      backgroundColor: primaryBackgroundColor,
+                      title: const Text('Edit Category'),
+                      content: TextFormField(
+                        controller: categoryNameControllerEdit,
+                        maxLength: 15,
+                        decoration: InputDecoration(
+                          labelText: 'Category Name',
+                          labelStyle: TextStyle(color: secondaryColor),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        validator: _validateName,
                       ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            final String updatedName =
+                                categoryNameControllerEdit.text;
+                            if (formKey.currentState!.validate()) {
+                              category.name = updatedName;
+                              await modifyCategory(category);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              refreshData();
+                              showSnackBar(
+                                  context,
+                                  'Category updated successfully!',
+                                  accentColor);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 50),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          child: const Text('Save'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 50),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                      ],
                     ),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          final String updatedName =
-                              categoryNameControllerEdit.text;
-                          if (updatedName.isNotEmpty) {
-                            category.name = updatedName;
-                            await modifyCategory(category);
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            refreshData();
-                            showSnackBar(context,
-                                'Category updated successfully!', accentColor);
-                          } else {
-                            showSnackBar(
-                                context,
-                                'Category name cannot be empty.',
-                                secondaryColor);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 50),
-                          backgroundColor: secondaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.white),
-                          ),
-                        ),
-                        child: const Text('Save'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 50),
-                          backgroundColor: secondaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.white),
-                          ),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Cancel'),
-                      ),
-                    ],
                   );
                 },
               );

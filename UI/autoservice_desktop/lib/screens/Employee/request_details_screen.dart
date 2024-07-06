@@ -27,6 +27,7 @@ class RequestDetailsScreen extends StatefulWidget {
 }
 
 class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ServiceProvider serviceProvider = ServiceProvider();
   final CategoryProvider categoryProvider = CategoryProvider();
   final VehicleProvider vehicleProvider = VehicleProvider();
@@ -36,6 +37,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   final List<Status> _statuses = Status.values;
   TextEditingController priceController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+  bool get isPickupReady => widget.request.status == "PickupReady";
 
   @override
   void initState() {
@@ -68,6 +70,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     final List<Status> availableStatuses =
         _getAvailableStatuses(widget.request.status);
 
+    bool isStatusDisabled = widget.request.status == "Completed" ||
+        widget.request.status == "Rejected" ||
+        widget.request.status == "Canceled";
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -86,99 +92,104 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Align(
-                alignment: AlignmentDirectional.topCenter,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildServiceSection(),
-                      const SizedBox(height: 16),
-                    ],
+        child: Form(
+          key: _formKey,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Align(
+                  alignment: AlignmentDirectional.topCenter,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _buildServiceSection(),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                            'Request Date', dateRequestedController, true),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 25, horizontal: 30),
-                          backgroundColor: secondaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.white),
-                          ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTextField(
+                              'Request Date', dateRequestedController, true),
                         ),
-                        onPressed: () {
-                          _openDetailsScreen(context);
-                        },
-                        child: const Text('Vehicle Details'),
-                      ),
-                    ],
-                  ),
-                  _buildTextField(
-                      'Custom request', customRequestController, true),
-                  _buildTextField('Final price', priceController, false),
-                  DropdownButtonFormField<int>(
-                    value: _selectedStatusIndex,
-                    items: availableStatuses.asMap().entries.map((entry) {
-                      final status = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: _statuses.indexOf(status),
-                        child: Text(status.toString().split('.').last),
-                      );
-                    }).toList(),
-                    onChanged: (int? value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedStatusIndex = value;
-                        });
-                      }
-                    },
-                    decoration: InputDecoration(
-                      floatingLabelStyle: TextStyle(color: secondaryColor),
-                      fillColor: Colors.white,
-                      filled: true,
-                      labelText: 'Status',
-                      border: const OutlineInputBorder(),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 30),
+                            backgroundColor: secondaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          onPressed: () {
+                            _openDetailsScreen(context);
+                          },
+                          child: const Text('Vehicle Details'),
+                        ),
+                      ],
                     ),
-                  ),
-                  _buildTextField(
-                      "Message to customer", messageController, false),
-                  const Spacer(),
-                  _buildSaveChangesButton()
-                ],
+                    _buildTextField(
+                        'Custom request', customRequestController, true,
+                        maxLines: 3),
+                    _buildTextField2('Final price', priceController, 15,
+                        validator: _validatePrice,
+                        enabled: !isStatusDisabled && !isPickupReady),
+                    DropdownButtonFormField<int>(
+                      value: _selectedStatusIndex,
+                      items: availableStatuses.asMap().entries.map((entry) {
+                        final status = entry.value;
+                        return DropdownMenuItem<int>(
+                          value: _statuses.indexOf(status),
+                          child: Text(status.toString().split('.').last),
+                        );
+                      }).toList(),
+                      onChanged: isStatusDisabled
+                          ? null
+                          : (int? value) {
+                              if (value != null) {
+                                setState(() {
+                                  _selectedStatusIndex = value;
+                                });
+                              }
+                            },
+                      decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(color: secondaryColor),
+                        fillColor: Colors.white,
+                        filled: true,
+                        labelText: 'Status',
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    _buildTextField2(
+                        "Message to customer", messageController, 60,
+                        enabled: !isStatusDisabled && !isPickupReady),
+                    const Spacer(),
+                    _buildSaveChangesButton(isStatusDisabled)
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSaveChangesButton() {
-    bool isStatusDisabled = widget.request.status == "Completed" ||
-        widget.request.status == "Rejected" ||
-        widget.request.status == "Canceled";
-
+  Widget _buildSaveChangesButton(bool isStatusDisabled) {
     return Align(
       alignment: Alignment.bottomRight,
       child: ElevatedButton(
@@ -251,30 +262,34 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   }
 
   void _saveChanges() async {
-    UpdateRequestModel request = UpdateRequestModel(
-        status: _selectedStatusIndex + 1,
-        id: widget.request.id,
-        totalCost: double.parse(priceController.text),
-        vehicleId: widget.request.vehicleId,
-        message: messageController.text);
+    if (_formKey.currentState!.validate()) {
+      UpdateRequestModel request = UpdateRequestModel(
+          status: _selectedStatusIndex + 1,
+          id: widget.request.id,
+          totalCost: double.parse(priceController.text),
+          vehicleId: widget.request.vehicleId,
+          message: messageController.text);
 
-    try {
-      await RequestProvider().updateRequest(request);
+      try {
+        await RequestProvider().updateRequest(request);
 
-      showSnackBar(context, 'Changes saved succesfully', accentColor);
-      widget.onRequestUpdated();
-    } catch (error) {
-      showSnackBar(context, 'Failed to save changes. $error', secondaryColor);
+        showSnackBar(context, 'Changes saved succesfully', accentColor);
+        widget.onRequestUpdated();
+      } catch (error) {
+        showSnackBar(context, 'Failed to save changes. $error', secondaryColor);
+      }
     }
   }
 
   Widget _buildTextField(
-      String label, TextEditingController controller, bool editable) {
+      String label, TextEditingController controller, bool editable,
+      {String? Function(String?)? validator, int? maxLines}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
+      child: TextFormField(
         readOnly: editable,
         controller: controller,
+        maxLines: maxLines,
         decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,
@@ -282,8 +297,40 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           labelText: label,
           border: const OutlineInputBorder(),
         ),
+        validator: validator,
       ),
     );
+  }
+
+  Widget _buildTextField2(
+      String label, TextEditingController controller, int maxLength,
+      {bool enabled = true, String? Function(String?)? validator}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        readOnly: !enabled,
+        controller: controller,
+        maxLength: maxLength,
+        decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          floatingLabelStyle: TextStyle(color: secondaryColor),
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        validator: validator,
+      ),
+    );
+  }
+
+  String? _validatePrice(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Price cannot be empty';
+    }
+    if (double.tryParse(value) == null) {
+      return 'Invalid price';
+    }
+    return null;
   }
 
   Widget _buildServiceSection() {
@@ -298,7 +345,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           return Text('Error: ${snapshot.error}');
         } else {
           final List<ServiceModel> services = snapshot.data!;
-          // Get distinct categories from the services list
           final categoriesWithActiveServices = services
               .where((service) =>
                   service.isActive ||

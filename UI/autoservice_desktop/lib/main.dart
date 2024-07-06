@@ -3,7 +3,7 @@ import 'package:autoservice_desktop/models/storageService.dart';
 import 'package:autoservice_desktop/screens/Admin/home_screen.dart';
 import 'package:autoservice_desktop/screens/Employee/home_screen.dart';
 import 'package:autoservice_desktop/screens/login_screen.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'providers/AuthProvider.dart';
@@ -21,6 +21,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'GB'),
+      ],
       onGenerateRoute: (settings) {
         if (settings.name == '/home') {
           final storageService = settings.arguments as StorageService;

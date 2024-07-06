@@ -82,4 +82,39 @@ class UserProvider extends BaseProvider<userModel> {
       throw Exception("Failed to update user data");
     }
   }
+
+  Future<bool> checkUsernameExists(
+      String username, String currentUserId) async {
+    var url =
+        "$baseUrl$_endpoint/CheckUsernameExists?username=$username&currentUserId=$currentUserId";
+    var uri = Uri.parse(url);
+
+    Map<String, String> headers = createHeaders();
+
+    var response = await http!.get(uri, headers: headers);
+
+    if (isValidResponseCode(response)) {
+      var data = jsonDecode(response.body);
+      return data['exists'];
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> checkEmailExists(String email, String currentUserId) async {
+    var url =
+        "$baseUrl$_endpoint/CheckEmailExists?email=$email&currentUserId=$currentUserId";
+    var uri = Uri.parse(url);
+
+    Map<String, String> headers = createHeaders();
+
+    var response = await http!.get(uri, headers: headers);
+
+    if (isValidResponseCode(response)) {
+      var data = jsonDecode(response.body);
+      return data['exists'];
+    } else {
+      return false;
+    }
+  }
 }

@@ -25,6 +25,11 @@ class CreateRequestScreen extends StatefulWidget {
 }
 
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  String? _serviceError;
+  String? _dateError;
+  final List<GlobalKey<FormFieldState>> _fieldKeys = [];
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _customRequestController =
       TextEditingController();
@@ -36,7 +41,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   List<AppointmentModel> appointments = [];
   List<ServiceModel> services = [];
   List<int> selectedServiceIds = [];
-  late VehicleModel _selectedVehicle;
+  VehicleModel? _selectedVehicle;
 
   late Future<void> _initializeDataFuture;
 
@@ -44,9 +49,48 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   void initState() {
     super.initState();
     _initializeDataFuture = loadData();
-    if (widget.vehicles.isNotEmpty) {
-      _selectedVehicle = widget.vehicles.first;
+    _initializeSelectedVehicle();
+  }
+
+  void _initializeSelectedVehicle() {
+    List<VehicleModel> idleVehicles =
+        widget.vehicles.where((vehicle) => vehicle.status == "Idle").toList();
+    if (idleVehicles.isNotEmpty) {
+      _selectedVehicle = idleVehicles.first;
+    } else {
+      _selectedVehicle = null;
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  GlobalKey<FormFieldState> _addFieldKey() {
+    final key = GlobalKey<FormFieldState>();
+    _fieldKeys.add(key);
+    return key;
+  }
+
+  String? _validateDate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select a date for the service';
+    }
+    try {
+      DateFormat('dd-MM-yyyy').parse(value);
+    } catch (e) {
+      return 'Invalid date format';
+    }
+    return null;
+  }
+
+  String? _validateServices() {
+    if (selectedServiceIds.isEmpty) {
+      return "Please select at least one service.";
+    }
+    return null;
   }
 
   Future<void> loadData() async {
@@ -96,91 +140,125 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool areVehiclesAvailable =
+        widget.vehicles.any((vehicle) => vehicle.status == "Idle");
+
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 35,
-            ),
-          ),
-          backgroundColor: secondaryColor,
-          foregroundColor: fontColor,
-          title: const Text(
-            'Create request',
-            style: TextStyle(fontWeight: FontWeight.bold),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 35,
           ),
         ),
-        body: SingleChildScrollView(
-            child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder<void>(
+        backgroundColor: secondaryColor,
+        foregroundColor: fontColor,
+        title: const Text(
+          'Create request',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: Scrollbar(
+        controller: _scrollController,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FutureBuilder<void>(
               future: _initializeDataFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildDatePicker(
-                          'Date of Service', context, _dateController),
-                      const SizedBox(height: 20),
-                      Text('Select Vehicle:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      _buildVehicleDropdown(),
-                      const SizedBox(height: 20),
-                      Text('Services Available:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      _buildServiceSection(),
-                      const SizedBox(height: 20),
-                      Text('Custom Request:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      TextFormField(
-                        maxLength: 100,
-                        controller: _customRequestController,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildEstimatedCostSection(),
-                      const SizedBox(height: 20),
-                      Center(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 20),
-                            backgroundColor: secondaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Colors.white),
+                  return Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildDatePicker(
+                            'Date of Service', context, _dateController),
+                        const SizedBox(height: 20),
+                        Text('Select Vehicle:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
+                        _buildVehicleDropdown(),
+                        const SizedBox(height: 20),
+                        Text('Services Available:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
+                        _buildServiceSection(),
+                        if (_serviceError != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              _serviceError!,
+                              style: TextStyle(color: secondaryColor),
                             ),
                           ),
-                          onPressed: _createRequest,
-                          child: const Padding(
-                            padding: EdgeInsets.all(12.0),
+                        const SizedBox(height: 20),
+                        Text('Custom Request:',
+                            style: TextStyle(
+                                color: secondaryColor,
+                                fontWeight: FontWeight.bold)),
+                        TextFormField(
+                          maxLength: 100,
+                          controller: _customRequestController,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildEstimatedCostSection(),
+                        const SizedBox(height: 20),
+                        if (!areVehiclesAvailable)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
                             child: Text(
-                              'Create request',
+                              'No vehicles are currently available. You cannot create a request at this time.',
                               style: TextStyle(
-                                fontSize: 20,
+                                  color: secondaryColor,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 20),
+                              backgroundColor: areVehiclesAvailable
+                                  ? secondaryColor
+                                  : Colors.grey,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(color: Colors.white),
+                              ),
+                            ),
+                            onPressed:
+                                areVehiclesAvailable ? _createRequest : null,
+                            child: const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Text(
+                                'Create request',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 }
-              }),
-        )));
+              },
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   DateTime _findFirstAvailableDate(DateTime currentDate) {
@@ -209,11 +287,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: SizedBox(
         width: 230,
-        child: TextField(
+        child: TextFormField(
           controller: dateController,
           readOnly: true,
+          validator: _validateDate,
+          key: _addFieldKey(),
           decoration: InputDecoration(
             labelText: label,
+            errorText: _dateError,
             labelStyle:
                 TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
             border: const OutlineInputBorder(),
@@ -221,6 +302,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           onTap: () async {
             DateTime? pickedDate = await showDatePicker(
               context: context,
+              fieldHintText: "dd/mm/yyyy",
+              locale: const Locale("en", "GB"),
               initialDate: _findFirstAvailableDate(
                   DateTime.now().add(const Duration(days: 1))),
               firstDate: DateTime.now().add(const Duration(days: 1)),
@@ -268,28 +351,49 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   Widget _buildVehicleDropdown() {
+    List<VehicleModel> idleVehicles =
+        widget.vehicles.where((vehicle) => vehicle.status == "Idle").toList();
+
     return Center(
       child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
-        child: DropdownButton<VehicleModel>(
+        child: DropdownButtonFormField<VehicleModel>(
           isExpanded: true,
           value: _selectedVehicle,
-          onChanged: (newValue) {
-            setState(() {
-              _selectedVehicle = newValue!;
-            });
-          },
+          onChanged: idleVehicles.isNotEmpty
+              ? (newValue) {
+                  setState(() {
+                    _selectedVehicle = newValue;
+                  });
+                }
+              : null,
           icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+          hint: Text(idleVehicles.isEmpty
+              ? "No vehicles currently available"
+              : "Select a vehicle"),
+          disabledHint: const Text("No vehicles currently available"),
           items: widget.vehicles
               .map<DropdownMenuItem<VehicleModel>>((VehicleModel vehicle) {
+            bool isIdle = vehicle.status == "Idle";
             return DropdownMenuItem<VehicleModel>(
               value: vehicle,
+              enabled: isIdle,
               child: Text(
-                '${vehicle.make} ${vehicle.model}',
-                textAlign: TextAlign.left,
+                '${vehicle.make} ${vehicle.model}${isIdle ? "" : " (Busy)"}',
+                style: TextStyle(
+                  color: isIdle ? Colors.black : Colors.grey,
+                ),
               ),
             );
           }).toList(),
+          selectedItemBuilder: (BuildContext context) {
+            return widget.vehicles.map<Widget>((VehicleModel vehicle) {
+              return Text(
+                '${vehicle.make} ${vehicle.model}',
+                style: const TextStyle(color: Colors.black),
+              );
+            }).toList();
+          },
         ),
       ),
     );
@@ -379,55 +483,63 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   void _createRequest() async {
-    if (_dateController.text.isEmpty) {
-      showSnackBar(
-        context,
-        "Please select a date for the service.",
-        secondaryColor,
-      );
-      return;
-    }
-    if (selectedServiceIds.isEmpty) {
-      showSnackBar(
-        context,
-        "Please select at least one service.",
-        secondaryColor,
-      );
-      return;
-    }
+    setState(() {
+      _serviceError = _validateServices();
+      _dateError = _validateDate(_dateController.text);
+    });
 
-    DateTime appointmentDate;
-    try {
-      appointmentDate = DateFormat('dd-MM-yyyy').parse(_dateController.text);
-    } catch (e) {
-      showSnackBar(context, "Invalid date format", secondaryColor);
-      return;
+    if (_formKey.currentState!.validate() &&
+        _serviceError == null &&
+        _dateError == null) {
+      try {
+        DateTime appointmentDate;
+        try {
+          appointmentDate =
+              DateFormat('dd-MM-yyyy').parse(_dateController.text);
+        } catch (e) {
+          showSnackBar(context, "Invalid date format", secondaryColor);
+          return;
+        }
+
+        final request = CreateRequestModel(
+          id: 0,
+          status: 1,
+          dateRequested: DateTime.now(),
+          dateCompleted: DateTime.now(),
+          totalCost: _calculateTotalCost(),
+          customRequest: _customRequestController.text,
+          message: ' ',
+          appointment: AppointmentModel(
+            id: 0,
+            isOccupied: true,
+            date: appointmentDate,
+          ),
+          clientId: widget.userId,
+          vehicleId: _selectedVehicle!.id,
+          serviceIdList: selectedServiceIds,
+        );
+
+        await requestProvider.create(request);
+        Navigator.pop(context);
+        showSnackBar(context, "Successfully created request", accentColor);
+      } catch (e) {
+        showSnackBar(context, "Failed creating request: $e", secondaryColor);
+      }
+    } else {
+      _scrollToFirstError();
     }
+  }
 
-    final request = CreateRequestModel(
-      id: 0,
-      status: 1,
-      dateRequested: DateTime.now(),
-      dateCompleted: DateTime.now(),
-      totalCost: _calculateTotalCost(),
-      customRequest: _customRequestController.text,
-      message: ' ',
-      appointment: AppointmentModel(
-        id: 0,
-        isOccupied: true,
-        date: appointmentDate,
-      ),
-      clientId: widget.userId,
-      vehicleId: _selectedVehicle.id,
-      serviceIdList: selectedServiceIds,
-    );
-
-    try {
-      await requestProvider.create(request);
-      Navigator.pop(context);
-      showSnackBar(context, "Successfully created request", accentColor);
-    } catch (e) {
-      showSnackBar(context, "Failed creating request: $e", secondaryColor);
+  void _scrollToFirstError() {
+    for (final key in _fieldKeys) {
+      if (key.currentState?.hasError ?? false) {
+        Scrollable.ensureVisible(
+          key.currentContext!,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 500),
+        );
+        break;
+      }
     }
   }
 }

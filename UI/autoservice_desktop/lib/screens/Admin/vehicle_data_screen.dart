@@ -176,10 +176,21 @@ class _VehicleDataScreenState extends State<VehicleDataScreen> {
               return AlertDialog(
                 elevation: 0,
                 backgroundColor: primaryBackgroundColor,
-                title: Text(
-                  dialogTitle,
-                  style: const TextStyle(
-                      fontSize: 30, fontWeight: FontWeight.bold),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      dialogTitle,
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: secondaryColor, size: 45),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ),
                 content: SizedBox(
                   child: SingleChildScrollView(

@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
           await clientProvider.getAllMessagesByClient(widget.userId);
       List<String> messages = requests
           .where((request) => request.message != Characters.empty.toString())
-          .where((request) => request.message != " ")
+          .where((request) => request.message.trim().isNotEmpty)
           .map((request) =>
               'Request for ${request.vehicleName}: ${request.message}')
           .toList();
@@ -312,114 +312,152 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'No vehicles found.',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                      } else {
+                        List<VehicleModel> vehicles = snapshot.data ?? [];
+                        int activeVehicleCount = vehicles.length;
+
+                        return Column(
+                          children: [
+                            if (vehicles.isEmpty)
+                              const Center(
+                                child: Text(
+                                  'No vehicles found.',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                            else
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                  width: MediaQuery.sizeOf(context).width * 0.9,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: DataTable(
+                                    showCheckboxColumn: false,
+                                    columnSpacing: 30,
+                                    columns: [
+                                      DataColumn(
+                                        label: Text('Vehicle Name',
+                                            style: TextStyle(
+                                                color: secondaryColor)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Mileage',
+                                            style: TextStyle(
+                                                color: secondaryColor)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Status',
+                                            style: TextStyle(
+                                                color: secondaryColor)),
+                                      ),
+                                    ],
+                                    rows: vehicles.map((vehicle) {
+                                      return DataRow(
+                                        onSelectChanged: (_) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  VehicleDetailsScreen(
+                                                vehicle: vehicle,
+                                                onVehicleUpdated: _loadVehicles,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        cells: [
+                                          DataCell(
+                                            ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                maxWidth: 150,
+                                              ),
+                                              child: Text(
+                                                '${vehicle.make} ${vehicle.model}',
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  maxWidth: 80),
+                                              child: Text(
+                                                vehicle.mileage.toString(),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  maxWidth: 85),
+                                              child: Text(
+                                                vehicle.status!,
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        List<VehicleModel> vehicles = snapshot.data!;
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            showCheckboxColumn: false,
-                            columns: [
-                              DataColumn(
-                                  label: Text('Vehicle Name',
-                                      style: TextStyle(color: secondaryColor))),
-                              DataColumn(
-                                  label: Text('Mileage',
-                                      style: TextStyle(color: secondaryColor))),
-                              DataColumn(
-                                  label: Text('Status',
-                                      style: TextStyle(color: secondaryColor))),
-                            ],
-                            rows: vehicles.map((vehicle) {
-                              return DataRow(
-                                onSelectChanged: (_) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          VehicleDetailsScreen(
-                                        vehicle: vehicle,
-                                        onVehicleUpdated: _loadVehicles,
-                                      ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    'Vehicle count: $activeVehicleCount/3',
+                                    style: TextStyle(
+                                      color: secondaryColor,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  );
-                                },
-                                cells: [
-                                  DataCell(
-                                      Text('${vehicle.make} ${vehicle.model}')),
-                                  DataCell(Text(vehicle.mileage.toString())),
-                                  DataCell(Text(vehicle.status!)),
-                                ],
-                              );
-                            }).toList(),
-                          ),
+                                  ),
+                                ),
+                                if (activeVehicleCount < 3)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 16.0),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 20),
+                                        backgroundColor: secondaryColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          side: const BorderSide(
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddVehicleScreen(
+                                                    onVehicleAdded:
+                                                        _loadVehicles),
+                                          ),
+                                        ).then((_) => _loadVehicles());
+                                      },
+                                      child: const Text('Add New Vehicle'),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         );
                       }
                     },
                   ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                backgroundColor: secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.white),
-                ),
-              ),
-              onPressed: () async {
-                if (_activeVehicles.length >= 3) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        elevation: 0,
-                        backgroundColor: primaryBackgroundColor,
-                        title: const Text('Cannot Add New Vehicle'),
-                        content: const Text(
-                            'You already have 3 active vehicles. Please delete a vehicle to add a new one.'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              'OK',
-                              style: TextStyle(color: secondaryColor),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AddVehicleScreen(onVehicleAdded: _loadVehicles),
-                    ),
-                  ).then((_) => _loadVehicles());
-                }
-              },
-              child: const Text('Add New Vehicle'),
-            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -432,10 +470,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return ElevatedButton(
       onPressed: () {
         if (value) {
-          if (_activeVehicles.isEmpty) {
+          /*if (_activeVehicles.isEmpty) {
             showSnackBar(context, "Cannot create request without a vehicle",
                 secondaryColor);
-          } else if (_activeVehicles.isNotEmpty) {
+          } else */ //if (_activeVehicles.isNotEmpty) {
+          if (true) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => screen),

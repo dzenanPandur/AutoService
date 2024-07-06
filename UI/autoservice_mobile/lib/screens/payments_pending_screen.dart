@@ -166,8 +166,12 @@ class _PaymentsPendingScreenState extends State<PaymentsPendingScreen> {
                   showCheckboxColumn: false,
                   horizontalMargin: 10,
                   columns: [
-                    DataColumn(
+                    /* DataColumn(
                         label: Text('Date completed',
+                            style: TextStyle(color: secondaryColor))),
+                            */
+                    DataColumn(
+                        label: Text('Amount to pay',
                             style: TextStyle(color: secondaryColor))),
                     DataColumn(
                       label: Text('Action',
@@ -189,7 +193,8 @@ class _PaymentsPendingScreenState extends State<PaymentsPendingScreen> {
                             }));
                       },
                       cells: [
-                        DataCell(Text(_formatDate(request.dateCompleted!))),
+                        //DataCell(Text(_formatDate(request.dateCompleted!))),
+                        DataCell(Text(request.totalCost.toString())),
                         DataCell(
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -231,10 +236,6 @@ class _PaymentsPendingScreenState extends State<PaymentsPendingScreen> {
         const SizedBox(height: 20),
       ],
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
   }
 
   Future<void> _startPaymentProcess(RequestModel request) async {

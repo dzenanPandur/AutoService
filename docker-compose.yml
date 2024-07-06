@@ -35,7 +35,7 @@ services:
     build:
       context: .
     environment:
-      - ConnectionStrings:DefaultConnection=Server=autoservice-sql,1433;Database=IB190004;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
+      - ConnectionStrings:DefaultConnection=Server=autoservice-sql,1433;Database=190004;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_USERNAME=user
@@ -56,7 +56,7 @@ services:
       context: .
       dockerfile: ./AutoService.IdentityServer/Dockerfile  
     environment:
-      - ConnectionStrings:AutoService=Server=autoservice-sql,1433;Database=IB190004;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
+      - ConnectionStrings:AutoService=Server=autoservice-sql,1433;Database=190004;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - 7179:7179

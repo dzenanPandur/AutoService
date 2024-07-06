@@ -47,6 +47,13 @@ namespace AutoService.Data.Database
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogin", "dbo");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaim", "dbo");
             builder.Entity<IdentityUserToken<Guid>>().ToTable("UserToken", "dbo");
+            builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRole", "dbo");
+
+            builder.Ignore<IdentityUserClaim<Guid>>();
+            builder.Ignore<IdentityUserLogin<Guid>>();
+            builder.Ignore<IdentityRoleClaim<Guid>>();
+            builder.Ignore<IdentityUserToken<Guid>>();
+            builder.Ignore<IdentityUserRole<Guid>>();
 
             #region SEED 
             builder.Entity<User>().HasData(DefaultUserData.Users);

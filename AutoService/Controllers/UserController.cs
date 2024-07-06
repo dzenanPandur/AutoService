@@ -131,6 +131,41 @@ namespace AutoService.Controllers
 
             return Ok(employeeViewModels);
         }
+        [HttpGet("CheckUsernameExists")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckUsernameExists(string username, Guid currentUserId)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return Ok(new { exists = false });
+            }
+            var user = await _userManager.FindByNameAsync(username);
+
+            if (user != null && user.Id != currentUserId)
+            {
+                return Ok(new { exists = true });
+            }
+
+            return Ok(new { exists = false });
+        }
+
+        [HttpGet("CheckEmailExists")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckEmailExists(string email, Guid currentUserId)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return Ok(new { exists = false });
+            }
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user != null && user.Id != currentUserId)
+            {
+                return Ok(new { exists = true });
+            }
+
+            return Ok(new { exists = false });
+        }
 
 
         [HttpPost("Create")]

@@ -12,8 +12,8 @@ namespace AutoService.MailSubscriber
         private readonly GmailSMTP gmailSMTPSettings;
 
         private readonly string _host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-        private readonly string _username = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest";
-        private readonly string _password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest";
+        private readonly string _username = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "user";
+        private readonly string _password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "test";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/";
 
         public MailSubscriberManager(ILogger<MailSubscriberManager> logger, IOptions<GmailSMTP> gmailSMTPSettings, IConfiguration configuration)

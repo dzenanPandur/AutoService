@@ -4,6 +4,7 @@ using AutoService.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoService.Data.Migrations
 {
     [DbContext(typeof(AutoServiceContext))]
-    partial class AutoServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20240629114336_identity-fix")]
+    partial class identityfix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +55,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 7, 11, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4853),
+                            Date = new DateTime(2024, 7, 5, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2506),
                             IsOccupied = true,
                             RequestId = 1
                         },
@@ -61,7 +63,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 7, 10, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4858),
+                            Date = new DateTime(2024, 7, 4, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2514),
                             IsOccupied = false,
                             RequestId = 2
                         },
@@ -69,7 +71,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 3,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 7, 12, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4860),
+                            Date = new DateTime(2024, 7, 6, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2516),
                             IsOccupied = true,
                             RequestId = 3
                         },
@@ -77,41 +79,9 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 7, 13, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4862),
+                            Date = new DateTime(2024, 7, 7, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2518),
                             IsOccupied = false,
                             RequestId = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 5, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4863),
-                            IsOccupied = false,
-                            RequestId = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 4, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4865),
-                            IsOccupied = false,
-                            RequestId = 6
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 3, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4867),
-                            IsOccupied = false,
-                            RequestId = 7
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            Date = new DateTime(2024, 1, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4869),
-                            IsOccupied = false,
-                            RequestId = 8
                         });
                 });
 
@@ -209,8 +179,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 1,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change tires",
-                            DateCompleted = new DateTime(2024, 7, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4821),
-                            DateRequested = new DateTime(2024, 7, 11, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4822),
+                            DateCompleted = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2485),
+                            DateRequested = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2486),
                             Message = " ",
                             Status = 2,
                             TotalCost = 600m,
@@ -222,8 +192,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 2,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change window",
-                            DateCompleted = new DateTime(2024, 7, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4825),
-                            DateRequested = new DateTime(2024, 7, 10, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4825),
+                            DateCompleted = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2489),
+                            DateRequested = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2489),
                             Message = " ",
                             Status = 6,
                             TotalCost = 450m,
@@ -235,8 +205,8 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 3,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change bumper",
-                            DateCompleted = new DateTime(2024, 7, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4827),
-                            DateRequested = new DateTime(2024, 7, 12, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4827),
+                            DateCompleted = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2491),
+                            DateRequested = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2491),
                             Message = " ",
                             Status = 7,
                             TotalCost = 400m,
@@ -248,64 +218,12 @@ namespace AutoService.Data.Migrations
                             AppointmentId = 4,
                             ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
                             CustomRequest = "Change rims",
-                            DateCompleted = new DateTime(2024, 7, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4828),
-                            DateRequested = new DateTime(2024, 7, 13, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4828),
+                            DateCompleted = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2492),
+                            DateRequested = new DateTime(2024, 6, 29, 11, 43, 36, 365, DateTimeKind.Utc).AddTicks(2493),
                             Message = " ",
                             Status = 4,
                             TotalCost = 700m,
                             VehicleId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AppointmentId = 5,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            CustomRequest = "Change window",
-                            DateCompleted = new DateTime(2024, 6, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4831),
-                            DateRequested = new DateTime(2024, 5, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4832),
-                            Message = " ",
-                            Status = 6,
-                            TotalCost = 1000m,
-                            VehicleId = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AppointmentId = 6,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            CustomRequest = "Change engine cover",
-                            DateCompleted = new DateTime(2024, 5, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4835),
-                            DateRequested = new DateTime(2024, 4, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4835),
-                            Message = " ",
-                            Status = 6,
-                            TotalCost = 200m,
-                            VehicleId = 2
-                        },
-                        new
-                        {
-                            Id = 7,
-                            AppointmentId = 7,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            CustomRequest = "Change mirrors",
-                            DateCompleted = new DateTime(2024, 4, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4839),
-                            DateRequested = new DateTime(2024, 3, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4840),
-                            Message = " ",
-                            Status = 6,
-                            TotalCost = 600m,
-                            VehicleId = 2
-                        },
-                        new
-                        {
-                            Id = 8,
-                            AppointmentId = 8,
-                            ClientId = new Guid("813a46d4-a59a-47ed-a88f-3143456e6f13"),
-                            CustomRequest = "Check alignment",
-                            DateCompleted = new DateTime(2024, 2, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4842),
-                            DateRequested = new DateTime(2024, 1, 5, 0, 10, 32, 32, DateTimeKind.Utc).AddTicks(4842),
-                            Message = " ",
-                            Status = 6,
-                            TotalCost = 1200m,
-                            VehicleId = 1
                         });
                 });
 
@@ -434,54 +352,6 @@ namespace AutoService.Data.Migrations
                     b.ToTable("ServiceRequest");
 
                     b.HasData(
-                        new
-                        {
-                            Id = 16,
-                            RequestId = 8,
-                            ServiceId = 5
-                        },
-                        new
-                        {
-                            Id = 15,
-                            RequestId = 8,
-                            ServiceId = 8
-                        },
-                        new
-                        {
-                            Id = 14,
-                            RequestId = 7,
-                            ServiceId = 8
-                        },
-                        new
-                        {
-                            Id = 13,
-                            RequestId = 7,
-                            ServiceId = 7
-                        },
-                        new
-                        {
-                            Id = 12,
-                            RequestId = 6,
-                            ServiceId = 4
-                        },
-                        new
-                        {
-                            Id = 11,
-                            RequestId = 6,
-                            ServiceId = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            RequestId = 5,
-                            ServiceId = 3
-                        },
-                        new
-                        {
-                            Id = 9,
-                            RequestId = 5,
-                            ServiceId = 2
-                        },
                         new
                         {
                             Id = 8,
@@ -772,7 +642,7 @@ namespace AutoService.Data.Migrations
                             NormalizedEmail = "EMPLOYEE@EMPLOYEE.COM",
                             NormalizedUserName = "EMPLOYEE",
                             PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
-                            PhoneNumber = "061234567",
+                            PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88104,
                             RoleId = new Guid("9f4392a8-80bc-4c4f-9a6a-8d2c6c875f84"),
@@ -800,7 +670,7 @@ namespace AutoService.Data.Migrations
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN",
                             PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
-                            PhoneNumber = "061234567",
+                            PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88000,
                             RoleId = new Guid("b907ae86-1b23-4a25-85c7-0c651f5e1d3d"),
@@ -828,7 +698,7 @@ namespace AutoService.Data.Migrations
                             NormalizedEmail = "CLIENT@CLIENT.COM",
                             NormalizedUserName = "CLIENT",
                             PasswordHash = "AQAAAAIAAYagAAAAEGQ74H878UZXZ2qrO3PGUCmbDkeR0pVC/YQ0BJQHFv50ks5DsM3WDpIZiB85F9hpRg==",
-                            PhoneNumber = "061234567",
+                            PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
                             PostalCode = 88104,
                             RoleId = new Guid("c6c0e6d5-1a11-4b25-96a2-1989e24a2d6d"),
@@ -1041,7 +911,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 1,
                             Cost = 1500m,
-                            Date = new DateTime(2024, 7, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4700),
+                            Date = new DateTime(2024, 6, 29, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2106),
                             MileageAtTimeOfService = 185100,
                             Notes = "Found broken light",
                             VehicleId = 1
@@ -1050,7 +920,7 @@ namespace AutoService.Data.Migrations
                         {
                             Id = 2,
                             Cost = 500m,
-                            Date = new DateTime(2024, 7, 5, 2, 10, 32, 32, DateTimeKind.Local).AddTicks(4727),
+                            Date = new DateTime(2024, 6, 29, 13, 43, 36, 365, DateTimeKind.Local).AddTicks(2131),
                             MileageAtTimeOfService = 17800,
                             Notes = "",
                             VehicleId = 2

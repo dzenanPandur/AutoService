@@ -111,8 +111,8 @@ namespace AutoService.Services.Managers
         {
             var host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
             var virtualHost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/";
-            var username = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest";
-            var password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest";
+            var username = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "user";
+            var password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "test";
 
             using (var bus = RabbitHutch.CreateBus($"host={host};virtualHost={virtualHost};username={username};password={password};timeout=30"))
             {

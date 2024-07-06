@@ -230,7 +230,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                                         request.totalCost,
                                                     vehicleId:
                                                         request.vehicleId,
-                                                    message: null);
+                                                    message: " ");
 
                                             try {
                                               await RequestProvider()

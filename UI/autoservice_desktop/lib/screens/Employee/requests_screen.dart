@@ -12,6 +12,8 @@ import '../../models/Employee/requestModel.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../providers/ServiceProvider.dart';
+
 class RequestsScreen extends StatefulWidget {
   final Function(RequestModel) onRequestSelected;
 
@@ -195,11 +197,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
                               columns: [
                                 DataColumn(
                                     label: Text(
-                                  '#',
-                                  style: TextStyle(color: fontColor),
-                                )),
-                                DataColumn(
-                                    label: Text(
                                   'Status',
                                   style: TextStyle(color: fontColor),
                                 )),
@@ -265,113 +262,345 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 onPressed: () async {
                   final pdf = pw.Document();
 
-                  List<RequestModel> reportRequests =
-                      filteredRequests.isNotEmpty
-                          ? filteredRequests
-                          : requests ?? [];
+                  int totalRequests = requests!.length;
+
+                  DateTime now = DateTime.now();
+                  DateTime firstRequestDate = requests!
+                      .map((r) => r.dateRequested)
+                      .reduce((a, b) => a.isBefore(b) ? a : b);
+
+                  double averageRequestsPerDay = totalRequests /
+                      (now.difference(firstRequestDate).inDays + 1);
+                  double averageRequestsPerMonth = totalRequests /
+                      ((now.year - firstRequestDate.year) * 12 +
+                          now.month -
+                          firstRequestDate.month +
+                          1);
+                  double averageRequestsPerYear =
+                      totalRequests / (now.year - firstRequestDate.year + 1);
+
+                  int cancelledRequests = requests!
+                      .where((request) => request.status == 'Canceled')
+                      .length;
+                  double cancellationRate =
+                      cancelledRequests / totalRequests * 100;
+
+                  Map<int, int> serviceFrequency = {};
+                  for (var request in requests!) {
+                    for (var serviceId in request.serviceIdList) {
+                      serviceFrequency[serviceId] =
+                          (serviceFrequency[serviceId] ?? 0) + 1;
+                    }
+                  }
+                  var mostRequestedService = serviceFrequency.entries
+                      .reduce((a, b) => a.value > b.value ? a : b);
+
+                  Duration totalFulfillmentTime = Duration.zero;
+                  int completedRequestsNum = 0;
+                  for (var request in requests!) {
+                    if (request.status == 'Completed') {
+                      totalFulfillmentTime += request.dateCompleted
+                          .difference(request.dateRequested);
+                      completedRequestsNum++;
+                    }
+                  }
+                  Duration averageFulfillmentTime = completedRequestsNum > 0
+                      ? totalFulfillmentTime ~/ completedRequestsNum
+                      : Duration.zero;
+
+                  List<RequestModel> completedRequests = requests!
+                      .where((request) => request.status == 'Completed')
+                      .toList();
+
+                  DateTime lastCompletedDate = completedRequests.isNotEmpty
+                      ? completedRequests
+                          .map((request) => request.dateCompleted)
+                          .reduce((a, b) => a.isAfter(b) ? a : b)
+                      : now;
+                  final endMonth = DateTime(
+                      lastCompletedDate.year, lastCompletedDate.month + 1, 1);
+                  final currentYear = lastCompletedDate.year;
+
+                  final List<String> allMonths = [];
+                  for (var month = DateTime(now.year, 1, 1);
+                      month.isBefore(endMonth);
+                      month = DateTime(month.year, month.month + 1, 1)) {
+                    allMonths.add(DateFormat('MM-yyyy').format(month));
+                  }
+
+                  Map<String, double> monthlyCosts = {
+                    for (var month in allMonths) month: 0.0
+                  };
+
+                  for (var request in completedRequests) {
+                    String month =
+                        DateFormat('MM-yyyy').format(request.dateCompleted);
+                    monthlyCosts[month] =
+                        (monthlyCosts[month] ?? 0) + (request.totalCost ?? 0);
+                  }
+
+                  final List<MapEntry<String, double>> sortedData =
+                      monthlyCosts.entries.toList()
+                        ..sort((a, b) => a.key.compareTo(b.key));
+
+                  final List<String> monthNames =
+                      sortedData.map((e) => e.key).toList();
+                  final List<double> costs =
+                      sortedData.map((e) => e.value).toList();
+
+                  if (costs.isEmpty) {
+                    monthNames.add('No Data');
+                    costs.add(0);
+                  }
+
+                  final double maxCost =
+                      costs.isEmpty ? 0 : costs.reduce((a, b) => a > b ? a : b);
+                  final int yAxisMax = (maxCost * 1.2).ceil();
                   Map<String, int> statusCounts = {};
-                  for (var request in reportRequests) {
+                  for (var request in requests!) {
                     statusCounts[request.status] =
                         (statusCounts[request.status] ?? 0) + 1;
                   }
+                  Map<int, String> serviceNames = {};
+                  for (var serviceId in serviceFrequency.keys) {
+                    var service = await ServiceProvider().getById(serviceId);
+                    serviceNames[serviceId] =
+                        service?.name ?? 'Unknown Service';
+                  }
+                  Map<String, int> calculateSeasonalDemand(
+                      List<RequestModel>? requests) {
+                    Map<String, int> seasonalDemand = {};
+                    for (var request in requests!) {
+                      String month =
+                          DateFormat('MMMM').format(request.dateRequested);
+                      seasonalDemand[month] = (seasonalDemand[month] ?? 0) + 1;
+                    }
+                    return seasonalDemand;
+                  }
 
-                  pdf.addPage(pw.Page(
-                    pageFormat: PdfPageFormat.a4,
-                    build: (pw.Context context) {
-                      const chartColors = [
-                        PdfColors.blue300,
-                        PdfColors.green300,
-                        PdfColors.amber300,
-                        PdfColors.pink300,
-                        PdfColors.cyan300,
-                        PdfColors.purple300,
-                        PdfColors.lime300,
-                      ];
+                  Map<String, int> seasonalDemand =
+                      calculateSeasonalDemand(requests);
+                  String mostRequestedServiceName =
+                      serviceNames[mostRequestedService.key] ??
+                          'Unknown Service';
+                  final chart2 = pw.Chart(
+                    title: pw.Text(
+                      'Profit Breakdown for $currentYear',
+                      style: const pw.TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    right: pw.ChartLegend(),
+                    grid: pw.CartesianGrid(
+                      xAxis: pw.FixedAxis(
+                        List.generate(
+                            monthNames.length, (index) => index.toDouble()),
+                        buildLabel: (value) {
+                          int index = value.toInt();
+                          if (index >= 0 && index < monthNames.length) {
+                            return pw.Text(monthNames[index],
+                                style: const pw.TextStyle(fontSize: 8));
+                          }
+                          return pw.SizedBox();
+                        },
+                        margin: 10,
+                        angle: -45,
+                      ),
+                      yAxis: pw.FixedAxis(
+                        [0, yAxisMax / 2, yAxisMax],
+                        divisions: true,
+                        format: (value) => '${value.toStringAsFixed(0)} KM',
+                      ),
+                    ),
+                    datasets: [
+                      pw.LineDataSet(
+                        legend: 'Total Profit',
+                        drawSurface: true,
+                        isCurved: true,
+                        drawPoints: true,
+                        color: PdfColors.blue300,
+                        data: List<pw.PointChartValue>.generate(
+                          costs.length,
+                          (i) => pw.PointChartValue(i.toDouble(), costs[i]),
+                        ),
+                      ),
+                    ],
+                  );
 
-                      return pw.Column(
-                        children: [
-                          pw.Center(
-                            child: pw.Text(
-                              'AutoService',
-                              style: pw.TextStyle(
-                                fontSize: 24,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          pw.SizedBox(height: 20),
-                          pw.Text(
-                            'Request report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
-                            style: const pw.TextStyle(fontSize: 16),
-                          ),
-                          pw.SizedBox(height: 20),
-                          pw.TableHelper.fromTextArray(
-                            headers: [
-                              '#',
-                              'Status',
-                              'Request Date',
-                              'Client name',
-                              'Vehicle'
-                            ],
-                            data: reportRequests
-                                .asMap()
-                                .map((index, request) => MapEntry(
-                                      index,
-                                      [
-                                        '${index + 1}',
-                                        request.status,
-                                        DateFormat('dd.MM.yyyy')
-                                            .format(request.dateRequested),
-                                        request.clientName,
-                                        request.vehicleName,
-                                      ],
-                                    ))
-                                .values
-                                .toList(),
-                            border: pw.TableBorder.all(),
-                            cellAlignment: pw.Alignment.centerLeft,
-                            headerStyle:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                            cellStyle: const pw.TextStyle(fontSize: 12),
-                            cellPadding: const pw.EdgeInsets.all(8),
-                          ),
-                          pw.SizedBox(height: 20),
-                          pw.Flexible(
-                            child: pw.Chart(
-                              title: pw.Text(
-                                'Request Breakdown',
-                                style: const pw.TextStyle(
-                                  fontSize: 20,
+                  pdf.addPage(
+                    pw.Page(
+                      pageFormat: PdfPageFormat.a4,
+                      build: (pw.Context context) {
+                        return pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Center(
+                              child: pw.Text(
+                                'AutoService',
+                                style: pw.TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: pw.FontWeight.bold,
                                 ),
                               ),
-                              grid: pw.PieGrid(),
-                              datasets: List<pw.Dataset>.generate(
-                                statusCounts.length,
-                                (index) {
-                                  final entry =
-                                      statusCounts.entries.toList()[index];
-                                  final color =
-                                      chartColors[index % chartColors.length];
-                                  final value = entry.value;
-                                  final pct =
-                                      (value / reportRequests.length * 100)
-                                          .round();
-                                  return pw.PieDataSet(
-                                    legend:
-                                        '${entry.key.toString().split('.').last}: $value ($pct%)',
-                                    value: value.toDouble(),
-                                    color: color,
-                                    legendStyle:
-                                        const pw.TextStyle(fontSize: 10),
-                                  );
-                                },
+                            ),
+                            pw.SizedBox(height: 20),
+                            pw.Text(
+                              'Request report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
+                              style: const pw.TextStyle(fontSize: 16),
+                            ),
+                            pw.SizedBox(height: 20),
+                            pw.Text('Total Requests: $totalRequests'),
+                            pw.Text(
+                                'Average Requests per Day: ${averageRequestsPerDay.toStringAsFixed(2)}'),
+                            pw.Text(
+                                'Average Requests per Month: ${averageRequestsPerMonth.toStringAsFixed(2)}'),
+                            pw.Text(
+                                'Average Requests per Year: ${averageRequestsPerYear.toStringAsFixed(2)}'),
+                            pw.Text(
+                                'Cancellation Rate: ${cancellationRate.toStringAsFixed(2)}%'),
+                            pw.Text(
+                                'Most Requested Service: $mostRequestedServiceName (${mostRequestedService.value} times)'),
+                            pw.Text(
+                                'Average Fulfillment Time: ${averageFulfillmentTime.inDays} days, ${averageFulfillmentTime.inHours % 24} hours'),
+                            pw.SizedBox(height: 20),
+                            pw.Divider(),
+                            pw.Expanded(flex: 2, child: chart2),
+                            pw.SizedBox(height: 10),
+                            pw.SizedBox(height: 20),
+                            pw.Text('Seasonal Demand:',
+                                style: pw.TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                                textAlign: pw.TextAlign.center),
+                            pw.Container(
+                              height: 200,
+                              child: pw.Chart(
+                                title: pw.Text('Monthly Service Requests'),
+                                grid: pw.CartesianGrid(
+                                  xAxis: pw.FixedAxis.fromStrings(
+                                    List.generate(
+                                        12,
+                                        (index) => DateFormat('MMM')
+                                            .format(DateTime(2023, index + 1))),
+                                    marginStart: 30,
+                                    marginEnd: 30,
+                                  ),
+                                  yAxis: pw.FixedAxis(
+                                    [0, 5, 10, 15, 20, 25, 30],
+                                    format: (v) => v.toInt().toString(),
+                                  ),
+                                ),
+                                datasets: [
+                                  pw.BarDataSet(
+                                    color: PdfColors.blue,
+                                    legend: 'Service Requests',
+                                    width: 15,
+                                    data: List.generate(12, (index) {
+                                      String month = DateFormat('MMMM')
+                                          .format(DateTime(2023, index + 1));
+                                      return pw.PointChartValue(
+                                          index.toDouble(),
+                                          seasonalDemand[month]?.toDouble() ??
+                                              0);
+                                    }),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  ));
+                          ],
+                        );
+                      },
+                    ),
+                  );
+
+                  pdf.addPage(
+                    pw.Page(
+                      pageFormat: PdfPageFormat.a4,
+                      build: (pw.Context context) {
+                        const chartColors = [
+                          PdfColors.blue300,
+                          PdfColors.green300,
+                          PdfColors.amber300,
+                          PdfColors.pink300,
+                          PdfColors.cyan300,
+                          PdfColors.purple300,
+                          PdfColors.lime300,
+                        ];
+
+                        return pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Flexible(
+                              child: pw.Chart(
+                                title: pw.Text(
+                                  'Most Requested Services',
+                                  style: const pw.TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                grid: pw.PieGrid(),
+                                datasets: List<pw.Dataset>.generate(
+                                  serviceFrequency.length,
+                                  (index) {
+                                    final entry = serviceFrequency.entries
+                                        .toList()[index];
+                                    final color =
+                                        chartColors[index % chartColors.length];
+                                    final value = entry.value;
+                                    final pct =
+                                        (value / totalRequests * 100).round();
+                                    final serviceName =
+                                        serviceNames[entry.key] ??
+                                            'Unknown Service';
+                                    return pw.PieDataSet(
+                                      legend: '$serviceName: $value ($pct%)',
+                                      value: value.toDouble(),
+                                      color: color,
+                                      legendStyle: const pw.TextStyle(
+                                          fontSize: 10, color: PdfColors.black),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            pw.SizedBox(height: 20),
+                            pw.Flexible(
+                              child: pw.Chart(
+                                title: pw.Text(
+                                  'Request Breakdown',
+                                  style: const pw.TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                grid: pw.PieGrid(),
+                                datasets: List<pw.Dataset>.generate(
+                                  statusCounts.length,
+                                  (index) {
+                                    final entry =
+                                        statusCounts.entries.toList()[index];
+                                    final color =
+                                        chartColors[index % chartColors.length];
+                                    final value = entry.value;
+                                    final pct = (value / requests!.length * 100)
+                                        .round();
+                                    return pw.PieDataSet(
+                                      legend: '${entry.key}: $value ($pct%)',
+                                      value: value.toDouble(),
+                                      color: color,
+                                      legendStyle:
+                                          const pw.TextStyle(fontSize: 10),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            pw.SizedBox(height: 20),
+                          ],
+                        );
+                      },
+                    ),
+                  );
 
                   final bytes = await pdf.save();
 
@@ -403,6 +632,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
+          fieldHintText: "dd/mm/yyyy",
           initialDate: selectedDate ?? DateTime.now(),
           firstDate: DateTime(2000),
           lastDate: DateTime(2101),
@@ -499,12 +729,8 @@ class RequestDataTableSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final RequestModel request = _requests[index];
-    var rowNumber = _requests.indexOf(
-            _requests.firstWhere((element) => element.id == request.id)) +
-        1;
     return DataRow(
       cells: [
-        DataCell(Text(rowNumber.toString())),
         DataCell(Text(request.status)),
         DataCell(Text(DateFormat('dd-MM-yyyy').format(request.dateRequested))),
         DataCell(Text(request.clientName)),

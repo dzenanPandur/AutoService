@@ -23,6 +23,13 @@ class AddMaintenanceRecordScreen extends StatefulWidget {
 
 class _AddMaintenanceRecordScreenState
     extends State<AddMaintenanceRecordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  String? _serviceError;
+  String? _dateError;
+  String? _mileageError;
+  String? _costError;
+  final List<GlobalKey<FormFieldState>> _fieldKeys = [];
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _mileageController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
@@ -43,9 +50,60 @@ class _AddMaintenanceRecordScreenState
     _initializeDataFuture = loadServices();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  GlobalKey<FormFieldState> _addFieldKey() {
+    final key = GlobalKey<FormFieldState>();
+    _fieldKeys.add(key);
+    return key;
+  }
+
   Future<void> loadServices() async {
     services = await serviceProvider.getAll();
     setState(() {});
+  }
+
+  String? _validateDate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select a date for the service';
+    }
+    try {
+      DateFormat('dd-MM-yyyy').parse(value);
+    } catch (e) {
+      return 'Invalid date format';
+    }
+    return null;
+  }
+
+  String? _validateCost(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Cost cannot be empty';
+    }
+    if (double.tryParse(value) == null) {
+      return 'Invalid cost';
+    }
+    return null;
+  }
+
+  String? _validateMileage(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Mileage cannot be empty';
+    }
+    if (double.tryParse(value) == null) {
+      return 'Invalid Mileage';
+    }
+    return null;
+  }
+
+  String? _validateServices() {
+    if (selectedServiceIds.isEmpty) {
+      return "Please select at least one service.";
+    }
+    return null;
   }
 
   @override
@@ -68,86 +126,107 @@ class _AddMaintenanceRecordScreenState
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
-        body: SingleChildScrollView(
-            child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder<void>(
-              future: _initializeDataFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildDatePicker(
-                          'Date of Service', context, _dateController),
-                      const SizedBox(height: 20),
-                      Text('Mileage at Time of Service (in kilometers):',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      TextFormField(
-                        maxLength: 7,
-                        controller: _mileageController,
-                        keyboardType: TextInputType.number,
-                      ),
-                      Text('Services Done:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      _buildServiceSection(),
-                      const SizedBox(height: 20),
-                      Text('Notes:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      TextFormField(
-                        maxLength: 100,
-                        controller: _notesController,
-                      ),
-                      const SizedBox(height: 20),
-                      Text('Cost:',
-                          style: TextStyle(
-                              color: secondaryColor,
-                              fontWeight: FontWeight.bold)),
-                      TextFormField(
-                        maxLength: 15,
-                        controller: _costController,
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 20),
-                      Center(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 20),
-                            backgroundColor: secondaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          onPressed: _addRecord,
-                          child: const Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Text(
-                              'Add record',
+        body: Scrollbar(
+          controller: _scrollController,
+          child: SingleChildScrollView(
+              child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FutureBuilder<void>(
+                future: _initializeDataFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    return Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildDatePicker(
+                              'Date of Service', context, _dateController),
+                          const SizedBox(height: 20),
+                          Text('Mileage at Time of Service (in kilometers):',
                               style: TextStyle(
-                                fontSize: 20,
+                                  color: secondaryColor,
+                                  fontWeight: FontWeight.bold)),
+                          TextFormField(
+                            maxLength: 9,
+                            controller: _mileageController,
+                            keyboardType: TextInputType.number,
+                            key: _addFieldKey(),
+                            validator: _validateMileage,
+                            decoration:
+                                InputDecoration(errorText: _mileageError),
+                          ),
+                          Text('Services Done:',
+                              style: TextStyle(
+                                  color: secondaryColor,
+                                  fontWeight: FontWeight.bold)),
+                          _buildServiceSection(),
+                          if (_serviceError != null)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                _serviceError!,
+                                style: TextStyle(color: secondaryColor),
+                              ),
+                            ),
+                          const SizedBox(height: 20),
+                          Text('Notes:',
+                              style: TextStyle(
+                                  color: secondaryColor,
+                                  fontWeight: FontWeight.bold)),
+                          TextFormField(
+                            maxLength: 100,
+                            controller: _notesController,
+                          ),
+                          const SizedBox(height: 20),
+                          Text('Cost:',
+                              style: TextStyle(
+                                  color: secondaryColor,
+                                  fontWeight: FontWeight.bold)),
+                          TextFormField(
+                            maxLength: 15,
+                            controller: _costController,
+                            validator: _validateCost,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(errorText: _costError),
+                            key: _addFieldKey(),
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 20),
+                                backgroundColor: secondaryColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: const BorderSide(color: Colors.white),
+                                ),
+                              ),
+                              onPressed: _addRecord,
+                              child: const Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child: Text(
+                                  'Add record',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  );
-                }
-              }),
-        )));
+                    );
+                  }
+                }),
+          )),
+        ));
   }
 
   Widget buildDatePicker(String label, BuildContext context,
@@ -156,11 +235,14 @@ class _AddMaintenanceRecordScreenState
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: SizedBox(
         width: 230,
-        child: TextField(
+        child: TextFormField(
           controller: dateController,
           readOnly: true,
+          validator: _validateDate,
+          key: _addFieldKey(),
           decoration: InputDecoration(
             labelText: label,
+            errorText: _dateError,
             labelStyle:
                 TextStyle(color: secondaryColor, fontWeight: FontWeight.bold),
             border: const OutlineInputBorder(),
@@ -168,6 +250,8 @@ class _AddMaintenanceRecordScreenState
           onTap: () async {
             DateTime? pickedDate = await showDatePicker(
               context: context,
+              fieldHintText: "dd/mm/yyyy",
+              locale: const Locale("en", "GB"),
               initialDate: DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
@@ -175,7 +259,7 @@ class _AddMaintenanceRecordScreenState
             if (pickedDate != null) {
               setState(() {
                 dateController.text =
-                    DateFormat('yyyy-MM-dd').format(pickedDate);
+                    DateFormat('dd-MM-yyyy').format(pickedDate);
               });
             }
           },
@@ -245,58 +329,54 @@ class _AddMaintenanceRecordScreenState
   }
 
   void _addRecord() async {
-    if (_dateController.text.isEmpty) {
-      showSnackBar(
-        context,
-        "Please select a date for the service.",
-        secondaryColor,
-      );
-      return;
-    }
-    if (_mileageController.text.isEmpty) {
-      showSnackBar(
-        context,
-        "Please input mileage at time of service.",
-        secondaryColor,
-      );
-      return;
-    }
-    if (selectedServiceIds.isEmpty) {
-      showSnackBar(
-        context,
-        "Please select at least one service.",
-        secondaryColor,
-      );
-      return;
-    }
-    if (_costController.text.isEmpty) {
-      showSnackBar(
-        context,
-        "Please input the cost.",
-        secondaryColor,
-      );
-      return;
-    }
-    try {
-      DateTime date = DateFormat('yyyy-MM-dd').parse(_dateController.text);
-      int mileage = int.parse(_mileageController.text);
-      String notes = _notesController.text;
+    setState(() {
+      _serviceError = _validateServices();
+      _dateError = _validateDate(_dateController.text);
+      _costError = _validateCost(_costController.text);
+      _mileageError = _validateMileage(_mileageController.text);
+    });
 
-      VehicleServiceRecordModel newRecord = VehicleServiceRecordModel(
-        id: 0,
-        date: date,
-        mileageAtTimeOfService: mileage,
-        cost: double.parse(_costController.text),
-        notes: notes,
-        vehicleId: widget.vehicle.id,
-        serviceIdList: selectedServiceIds,
-      );
+    if (_formKey.currentState!.validate() &&
+        _serviceError == null &&
+        _dateError == null &&
+        _costError == null &&
+        _mileageError == null) {
+      try {
+        DateTime date = DateFormat('dd-MM-yyyy').parse(_dateController.text);
+        int mileage = int.parse(_mileageController.text);
+        String notes = _notesController.text;
 
-      await recordProvider.create(newRecord);
-      Navigator.pop(context);
-      showSnackBar(context, 'Record added successfully.', accentColor);
-    } catch (e) {
-      showSnackBar(context, 'Error: $e', secondaryColor);
+        VehicleServiceRecordModel newRecord = VehicleServiceRecordModel(
+          id: 0,
+          date: date,
+          mileageAtTimeOfService: mileage,
+          cost: double.parse(_costController.text),
+          notes: notes,
+          vehicleId: widget.vehicle.id,
+          serviceIdList: selectedServiceIds,
+        );
+
+        await recordProvider.create(newRecord);
+        Navigator.pop(context);
+        showSnackBar(context, 'Record added successfully.', accentColor);
+      } catch (e) {
+        showSnackBar(context, 'Error: $e', secondaryColor);
+      }
+    } else {
+      _scrollToFirstError();
+    }
+  }
+
+  void _scrollToFirstError() {
+    for (final key in _fieldKeys) {
+      if (key.currentState?.hasError ?? false) {
+        Scrollable.ensureVisible(
+          key.currentContext!,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 500),
+        );
+        break;
+      }
     }
   }
 }

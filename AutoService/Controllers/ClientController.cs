@@ -149,8 +149,9 @@ namespace AutoService.Controllers
 
             foreach (VehicleDto vehicleDto in vehicles)
             {
-
+                var client = await _clientManager.GetClient(vehicleDto.ClientId);
                 VehicleViewModel vehicleViewModel = new VehicleViewModel(vehicleDto);
+                vehicleViewModel.ClientName = client.FirstName + " " + client.LastName;
                 vehicleViewModels.Add(vehicleViewModel);
 
             }

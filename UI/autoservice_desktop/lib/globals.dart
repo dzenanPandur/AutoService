@@ -21,7 +21,8 @@ void showSnackBar(BuildContext context, String message, Color color) {
 }
 
 Widget buildDropdown(
-    String label, List<String> options, TextEditingController controller) {
+    String label, List<String> options, TextEditingController controller,
+    {String? Function(String?)? validator}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5),
     child: SizedBox(
@@ -44,13 +45,19 @@ Widget buildDropdown(
             child: Text(value),
           );
         }).toList(),
+        validator: validator,
       ),
     ),
   );
 }
 
 Widget buildRow(String label, TextEditingController controller, bool editable,
-    TextInputType? inputType, int? characters) {
+    TextInputType? inputType, int? characters,
+    {String? Function(String?)? validator,
+    String? helperText,
+    String? errorText,
+    var key,
+    var onChanged}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
@@ -58,18 +65,22 @@ Widget buildRow(String label, TextEditingController controller, bool editable,
       children: [
         SizedBox(
           width: 230,
-          child: TextField(
+          child: TextFormField(
             controller: controller,
             readOnly: editable,
             keyboardType: inputType,
             maxLength: characters,
+            key: key,
             decoration: InputDecoration(
-              labelText: label,
-              floatingLabelStyle: TextStyle(color: secondaryColor),
-              filled: true,
-              fillColor: Colors.white,
-              border: const OutlineInputBorder(),
-            ),
+                labelText: label,
+                floatingLabelStyle: TextStyle(color: secondaryColor),
+                filled: true,
+                fillColor: Colors.white,
+                border: const OutlineInputBorder(),
+                helperText: helperText,
+                errorText: errorText),
+            validator: validator,
+            onChanged: onChanged,
           ),
         ),
       ],
@@ -77,7 +88,8 @@ Widget buildRow(String label, TextEditingController controller, bool editable,
   );
 }
 
-Widget buildPasswordRow(String label, TextEditingController controller) {
+Widget buildPasswordRow(String label, TextEditingController controller,
+    {String? Function(String?)? validator}) {
   bool isObscure = true;
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -86,7 +98,7 @@ Widget buildPasswordRow(String label, TextEditingController controller) {
       children: [
         SizedBox(
           width: 230,
-          child: TextField(
+          child: TextFormField(
             controller: controller,
             obscureText: isObscure,
             maxLength: 50,
@@ -97,6 +109,7 @@ Widget buildPasswordRow(String label, TextEditingController controller) {
               floatingLabelStyle: TextStyle(color: secondaryColor),
               border: const OutlineInputBorder(),
             ),
+            validator: validator,
           ),
         ),
       ],
@@ -131,12 +144,13 @@ Widget buildCheckboxRow(
 }
 
 Widget buildDatePicker(
-    String label, BuildContext context, TextEditingController controller) {
+    String label, BuildContext context, TextEditingController controller,
+    {String? Function(String?)? validator}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: SizedBox(
       width: 230,
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         readOnly: true,
         decoration: InputDecoration(
@@ -148,6 +162,8 @@ Widget buildDatePicker(
         ),
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
+            fieldHintText: "dd/mm/yyyy",
+            locale: const Locale("en", "GB"),
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(1900),
@@ -159,6 +175,7 @@ Widget buildDatePicker(
             controller.text = formattedDate;
           }
         },
+        validator: validator,
       ),
     ),
   );

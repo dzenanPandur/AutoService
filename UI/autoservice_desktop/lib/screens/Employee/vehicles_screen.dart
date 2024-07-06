@@ -13,6 +13,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../../enum.dart';
 import '../../globals.dart';
+import '../../models/Employee/requestModel.dart';
+import '../../providers/RequestProvider.dart';
 
 class VehiclesScreen extends StatefulWidget {
   final Function(VehicleModel) onVehicleSelected;
@@ -171,11 +173,6 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                               columns: [
                                 DataColumn(
                                     label: Text(
-                                  '#',
-                                  style: TextStyle(color: fontColor),
-                                )),
-                                DataColumn(
-                                    label: Text(
                                   'Status',
                                   style: TextStyle(color: fontColor),
                                 )),
@@ -238,15 +235,71 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                 onPressed: () async {
                   final pdf = pw.Document();
 
-                  List<VehicleModel> reportVehicles =
-                      filteredVehicles.isNotEmpty
-                          ? filteredVehicles
-                          : vehicles ?? [];
+                  List<RequestModel> allRequests =
+                      await RequestProvider().getAll();
+                  List<VehicleModel> allVehicles =
+                      await VehicleProvider().getAll();
+                  Map<int, VehicleModel> vehicleLookup = {
+                    for (var v in allVehicles) v.id: v
+                  };
+                  Map<String, Map<String, dynamic>>
+                      calculateTopServicedVehicles(
+                          List<RequestModel> requests) {
+                    Map<String, Map<String, dynamic>> vehicleStats = {};
+                    for (var request in requests) {
+                      if (request.status != 'Completed') continue;
+                      VehicleModel? vehicle = vehicleLookup[request.vehicleId];
+                      if (vehicle == null) continue;
+                      String vehicleKey = '${vehicle.make} ${vehicle.model}';
+                      if (!vehicleStats.containsKey(vehicleKey)) {
+                        vehicleStats[vehicleKey] = {
+                          'services': 0,
+                          'broughtIn': 0
+                        };
+                      }
+                      vehicleStats[vehicleKey]!['services'] +=
+                          request.serviceIdList.length;
+                      vehicleStats[vehicleKey]!['broughtIn'] += 1;
+                    }
+                    var sortedVehicles = vehicleStats.entries.toList()
+                      ..sort((a, b) =>
+                          b.value['services'].compareTo(a.value['services']));
+                    return Map.fromEntries(sortedVehicles.take(5));
+                  }
+
+                  Map<String, double> calculateTopAverageMaintenanceCost(
+                      List<RequestModel> requests) {
+                    Map<String, List<double>> vehicleCosts = {};
+                    for (var request in requests) {
+                      if (request.status != 'Completed') continue;
+                      VehicleModel? vehicle = vehicleLookup[request.vehicleId];
+                      if (vehicle == null) continue;
+                      String vehicleKey = '${vehicle.make} ${vehicle.model}';
+                      if (!vehicleCosts.containsKey(vehicleKey)) {
+                        vehicleCosts[vehicleKey] = [];
+                      }
+                      vehicleCosts[vehicleKey]!.add(request.totalCost ?? 0);
+                    }
+                    Map<String, double> averageCosts = {};
+                    vehicleCosts.forEach((key, value) {
+                      averageCosts[key] =
+                          value.reduce((a, b) => a + b) / value.length;
+                    });
+                    var sortedCosts = averageCosts.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value));
+                    return Map.fromEntries(sortedCosts.take(5));
+                  }
+
+                  var topServicedVehicles =
+                      calculateTopServicedVehicles(allRequests);
+                  var topAverageMaintenanceCost =
+                      calculateTopAverageMaintenanceCost(allRequests);
 
                   pdf.addPage(pw.Page(
                     pageFormat: PdfPageFormat.a4,
                     build: (pw.Context context) {
                       return pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Center(
                             child: pw.Text(
@@ -263,25 +316,46 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                             style: const pw.TextStyle(fontSize: 16),
                           ),
                           pw.SizedBox(height: 20),
+                          pw.Text(
+                            'Top 5 Most Serviced Vehicles:',
+                            style: pw.TextStyle(
+                                fontSize: 16, fontWeight: pw.FontWeight.bold),
+                          ),
+                          pw.SizedBox(height: 10),
                           pw.TableHelper.fromTextArray(
                             headers: [
-                              '#',
-                              'Status',
-                              'Client name',
-                              'Vehicle name',
+                              'Vehicle',
+                              'Services Done',
+                              'Times Brought In'
                             ],
-                            data: reportVehicles
-                                .asMap()
-                                .map((index, vehicle) => MapEntry(
-                                      index,
-                                      [
-                                        '${index + 1}',
-                                        vehicle.status,
-                                        vehicle.clientName,
-                                        '${vehicle.make} ${vehicle.model}',
-                                      ],
-                                    ))
-                                .values
+                            data: topServicedVehicles.entries
+                                .map((entry) => [
+                                      entry.key,
+                                      entry.value['services'].toString(),
+                                      entry.value['broughtIn'].toString(),
+                                    ])
+                                .toList(),
+                            border: pw.TableBorder.all(),
+                            cellAlignment: pw.Alignment.centerLeft,
+                            headerStyle:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            cellStyle: const pw.TextStyle(fontSize: 12),
+                            cellPadding: const pw.EdgeInsets.all(8),
+                          ),
+                          pw.SizedBox(height: 20),
+                          pw.Text(
+                            'Top 5 Average Maintenance Cost per Vehicle:',
+                            style: pw.TextStyle(
+                                fontSize: 16, fontWeight: pw.FontWeight.bold),
+                          ),
+                          pw.SizedBox(height: 10),
+                          pw.TableHelper.fromTextArray(
+                            headers: ['Vehicle', 'Average Cost'],
+                            data: topAverageMaintenanceCost.entries
+                                .map((entry) => [
+                                      entry.key,
+                                      '${entry.value.toStringAsFixed(2)} KM',
+                                    ])
                                 .toList(),
                             border: pw.TableBorder.all(),
                             cellAlignment: pw.Alignment.centerLeft,
@@ -377,12 +451,9 @@ class VehicleDataTableSource extends DataTableSource {
   @override
   DataRow getRow(int index) {
     final VehicleModel vehicle = _vehicles[index];
-    var rowNumber = _vehicles.indexOf(
-            _vehicles.firstWhere((element) => element.id == vehicle.id)) +
-        1;
+
     return DataRow(
       cells: [
-        DataCell(Text(rowNumber.toString())),
         DataCell(Text(vehicle.status)),
         DataCell(Text(vehicle.clientName)),
         DataCell(Text("${vehicle.make} ${vehicle.model}")),

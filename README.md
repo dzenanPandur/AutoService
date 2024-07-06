@@ -55,5 +55,4 @@ flutter run --dart-define stripePublishableKey=yourStripePublishableKey --dart-d
 
 ## Additional Information
 - RabbitMQ sends an email on status change. To test using your own email, update the client email on the mobile app.
-- Report generation is based on the data currently shown in the table, including filters.
 - Appointments can be canceled by the client while their vehicle has not been brought to service yet.

@@ -273,7 +273,17 @@ class MaintenanceRecordsDataTableSource extends DataTableSource {
                 ),
               ),
               actions: [
-                TextButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 50),
+                    backgroundColor: secondaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.white),
+                    ),
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

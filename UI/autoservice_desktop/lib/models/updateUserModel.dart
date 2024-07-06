@@ -9,6 +9,7 @@ class updateUserModel {
   String? city;
   int? postalCode;
   bool? active;
+  int? gender;
 
   updateUserModel(
       {required this.id,
@@ -20,7 +21,8 @@ class updateUserModel {
       this.address,
       this.city,
       this.postalCode,
-      this.active});
+      this.active,
+      this.gender});
 
   Map<String, dynamic> toJson() {
     return {
@@ -34,6 +36,7 @@ class updateUserModel {
       'city': city,
       'postalCode': postalCode,
       'active': active,
+      'gender': gender,
     };
   }
 
@@ -48,6 +51,7 @@ class updateUserModel {
         address: json['address'],
         city: json['city'],
         postalCode: json['postalCode'],
-        active: json['active']);
+        active: json['active'],
+        gender: json['gender']);
   }
 }

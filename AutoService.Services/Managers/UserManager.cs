@@ -139,7 +139,9 @@ namespace AutoService.Services.Managers
             _context.ChangeTracker.Clear();
 
             user.UserName = dto.UserName;
+            user.NormalizedUserName = dto.UserName.ToUpperInvariant();
             user.Email = dto.Email;
+            user.NormalizedEmail = dto.Email.ToUpperInvariant();
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
             user.PhoneNumber = dto.PhoneNumber;
@@ -148,6 +150,7 @@ namespace AutoService.Services.Managers
             user.PostalCode = dto.PostalCode;
             user.Active = dto.Active;
             user.Gender = dto.Gender;
+            user.ModifiedDate = DateTime.Now;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();

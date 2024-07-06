@@ -9,6 +9,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../globals.dart';
+import '../../models/Employee/requestModel.dart';
+import '../../providers/RequestProvider.dart';
 import 'vehicle_details_screen.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -187,55 +189,243 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 onPressed: () async {
                   final pdf = pw.Document();
 
-                  List<userModel> reportCustomers = filteredCustomers.isNotEmpty
-                      ? filteredCustomers
-                      : customers ?? [];
+                  List<RequestModel> requests =
+                      await RequestProvider().getAll();
+
+                  double calculateAverageAmountSpent(
+                      List<RequestModel> requests) {
+                    List<RequestModel> completedRequests =
+                        requests.where((r) => r.status == 'Completed').toList();
+
+                    double totalSpent = completedRequests.fold(
+                      0,
+                      (sum, item) => sum + (item.totalCost ?? 0),
+                    );
+
+                    int numberOfCustomers = completedRequests
+                        .map((r) => r.clientName)
+                        .toSet()
+                        .length;
+
+                    if (numberOfCustomers == 0) return 0;
+
+                    return totalSpent / numberOfCustomers;
+                  }
+
+                  Map<String, int> calculateTotalRequestsPerCustomer(
+                    List<RequestModel> requests,
+                  ) {
+                    Map<String, int> customerRequestCount = {};
+                    for (var request in requests) {
+                      if (request.status != 'Completed') continue;
+                      customerRequestCount[request.clientName] =
+                          (customerRequestCount[request.clientName] ?? 0) + 1;
+                    }
+                    var sortedEntries = customerRequestCount.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value));
+                    return Map.fromEntries(sortedEntries.take(5));
+                  }
+
+                  Map<String, Duration> calculateAverageFulfillmentTime(
+                    List<RequestModel> requests,
+                  ) {
+                    Map<String, Duration> customerFulfillmentTime = {};
+                    Map<String, int> customerRequestCount = {};
+                    for (var request in requests) {
+                      if (request.status != 'Completed') continue;
+                      Duration fulfillmentTime = request.dateCompleted
+                          .difference(request.dateRequested);
+                      customerFulfillmentTime[request.clientName] =
+                          (customerFulfillmentTime[request.clientName] ??
+                                  Duration.zero) +
+                              fulfillmentTime;
+                      customerRequestCount[request.clientName] =
+                          (customerRequestCount[request.clientName] ?? 0) + 1;
+                    }
+
+                    Map<String, Duration> customerAverageFulfillmentTime = {};
+                    customerFulfillmentTime.forEach((key, value) {
+                      customerAverageFulfillmentTime[key] =
+                          value ~/ customerRequestCount[key]!;
+                    });
+
+                    var sortedEntries = customerAverageFulfillmentTime.entries
+                        .toList()
+                      ..sort((a, b) => b.value.compareTo(a.value));
+
+                    return Map.fromEntries(sortedEntries.take(5));
+                  }
+
+                  double calculateCustomerRetentionRate(
+                    List<RequestModel> requests,
+                  ) {
+                    Set<String> uniqueCustomers =
+                        requests.map((r) => r.clientName).toSet();
+                    Set<String> returningCustomers = requests
+                        .where((r) =>
+                            requests
+                                .where((r2) => r2.clientName == r.clientName)
+                                .length >
+                            1)
+                        .map((r) => r.clientName)
+                        .toSet();
+                    return (returningCustomers.length /
+                            uniqueCustomers.length) *
+                        100;
+                  }
+
+                  Map<String, int> calculateNewVsReturningCustomers(
+                    List<RequestModel> requests,
+                  ) {
+                    Set<String> newCustomers = {};
+                    Set<String> returningCustomers = {};
+                    for (var request in requests) {
+                      if (newCustomers.contains(request.clientName) ||
+                          returningCustomers.contains(request.clientName)) {
+                        returningCustomers.add(request.clientName);
+                        newCustomers.remove(request.clientName);
+                      } else {
+                        newCustomers.add(request.clientName);
+                      }
+                    }
+                    return {
+                      "NewCustomers": newCustomers.length,
+                      "ReturningCustomers": returningCustomers.length,
+                    };
+                  }
+
+                  List<MapEntry<String, double>>
+                      calculateTopCustomersByAmountSpent(
+                    List<RequestModel> requests,
+                  ) {
+                    Map<String, double> customerTotalSpent = {};
+                    for (var request in requests) {
+                      if (request.status != 'Completed') continue;
+                      customerTotalSpent[request.clientName] =
+                          (customerTotalSpent[request.clientName] ?? 0) +
+                              (request.totalCost ?? 0);
+                    }
+                    var sortedEntries = customerTotalSpent.entries.toList()
+                      ..sort((a, b) => b.value.compareTo(a.value));
+                    return sortedEntries.take(5).toList();
+                  }
+
+                  double averageAmountSpent =
+                      calculateAverageAmountSpent(requests);
+                  Map<String, int> totalRequestsPerCustomer =
+                      calculateTotalRequestsPerCustomer(requests);
+                  Map<String, Duration> averageFulfillmentTime =
+                      calculateAverageFulfillmentTime(requests);
+                  double customerRetentionRate =
+                      calculateCustomerRetentionRate(requests);
+                  Map<String, int> newVsReturningCustomers =
+                      calculateNewVsReturningCustomers(requests);
+                  List<MapEntry<String, double>> topCustomersByAmountSpent =
+                      calculateTopCustomersByAmountSpent(requests);
 
                   pdf.addPage(pw.Page(
                     pageFormat: PdfPageFormat.a4,
-                    build: (pw.Context context) {
-                      return pw.Column(
-                        children: [
-                          pw.Center(
-                            child: pw.Text(
-                              'AutoService',
-                              style: pw.TextStyle(
-                                fontSize: 24,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
+                    build: (pw.Context context) => pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Center(
+                          child: pw.Text(
+                            'AutoService',
+                            style: pw.TextStyle(
+                              fontSize: 24,
+                              fontWeight: pw.FontWeight.bold,
                             ),
                           ),
-                          pw.SizedBox(height: 20),
-                          pw.Text(
-                            'Customers report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
-                            style: const pw.TextStyle(fontSize: 16),
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Text(
+                          'Customers report generated at: ${DateFormat('dd.MM.yyyy').format(DateTime.now())} at ${DateFormat('HH:mm').format(DateTime.now())}',
+                          style: const pw.TextStyle(fontSize: 16),
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Text(
+                          'Average Amount of Money Spent per Customer: ${averageAmountSpent.toStringAsFixed(2)} KM',
+                          style: const pw.TextStyle(fontSize: 14),
+                        ),
+                        pw.Text(
+                          'Customer Retention Rate: ${customerRetentionRate.toStringAsFixed(2)}%',
+                          style: const pw.TextStyle(fontSize: 14),
+                        ),
+                        pw.Text(
+                          'New vs. Returning Customers: New: ${newVsReturningCustomers["NewCustomers"]}, Returning: ${newVsReturningCustomers["ReturningCustomers"]}',
+                          style: const pw.TextStyle(fontSize: 14),
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Text(
+                          'Top 5 Customers by Average Fulfillment Time:',
+                          style: pw.TextStyle(
+                            fontSize: 16,
+                            fontWeight: pw.FontWeight.bold,
                           ),
-                          pw.SizedBox(height: 20),
-                          pw.TableHelper.fromTextArray(
-                            headers: [
-                              'Name',
-                              'Location',
-                              'Phone number',
-                            ],
-                            data: reportCustomers
-                                .map((customer) => [
-                                      '${customer.firstName} ${customer.lastName}',
-                                      '${customer.city}, ${customer.address}',
-                                      customer.phoneNumber,
-                                    ])
-                                .toList(),
-                            border: pw.TableBorder.all(),
-                            cellAlignment: pw.Alignment.centerLeft,
-                            headerStyle:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                            cellStyle: const pw.TextStyle(fontSize: 12),
-                            cellPadding: const pw.EdgeInsets.all(8),
+                        ),
+                        pw.TableHelper.fromTextArray(
+                          headers: [
+                            'Customer Name',
+                            'Average Fulfillment Time'
+                          ],
+                          data: averageFulfillmentTime.entries
+                              .map((entry) =>
+                                  [entry.key, '${entry.value.inDays} days'])
+                              .toList(),
+                          border: pw.TableBorder.all(),
+                          cellAlignment: pw.Alignment.centerLeft,
+                          headerStyle:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          cellStyle: const pw.TextStyle(fontSize: 12),
+                          cellPadding: const pw.EdgeInsets.all(8),
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Text(
+                          'Top 5 Customers by Total Completed Requests:',
+                          style: pw.TextStyle(
+                            fontSize: 16,
+                            fontWeight: pw.FontWeight.bold,
                           ),
-                        ],
-                      );
-                    },
+                        ),
+                        pw.TableHelper.fromTextArray(
+                          headers: ['Customer Name', 'Total Requests'],
+                          data: totalRequestsPerCustomer.entries
+                              .map((entry) =>
+                                  [entry.key, entry.value.toString()])
+                              .toList(),
+                          border: pw.TableBorder.all(),
+                          cellAlignment: pw.Alignment.centerLeft,
+                          headerStyle:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          cellStyle: const pw.TextStyle(fontSize: 12),
+                          cellPadding: const pw.EdgeInsets.all(8),
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Text(
+                          'Top 5 Customers by Amount Spent:',
+                          style: pw.TextStyle(
+                            fontSize: 16,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        pw.TableHelper.fromTextArray(
+                          headers: ['Customer Name', 'Amount Spent'],
+                          data: topCustomersByAmountSpent
+                              .map((entry) => [
+                                    entry.key,
+                                    '${entry.value.toStringAsFixed(2)} KM'
+                                  ])
+                              .toList(),
+                          border: pw.TableBorder.all(),
+                          cellAlignment: pw.Alignment.centerLeft,
+                          headerStyle:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          cellStyle: const pw.TextStyle(fontSize: 12),
+                          cellPadding: const pw.EdgeInsets.all(8),
+                        ),
+                      ],
+                    ),
                   ));
-
                   final bytes = await pdf.save();
 
                   final directory =
