@@ -398,7 +398,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
       filteredVehicles = _activeVehicles
           .where((vehicle) =>
               vehicle.clientName.toLowerCase().contains(clientNameSearchText) &&
-              '${vehicle.make}' '${vehicle.model}'
+              '${vehicle.make} ${vehicle.model}'
                   .toLowerCase()
                   .contains(vehicleNameSearchText) &&
               (selectedStatuses.isEmpty ||

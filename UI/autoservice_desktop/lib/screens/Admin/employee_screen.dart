@@ -680,13 +680,18 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     String locationSearchText = searchByLocationController.text.toLowerCase();
 
     if (employees != null) {
-      filteredEmployees = employees!
-          .where((employee) =>
-              '${employee.firstName} ${employee.lastName}'
-                  .toLowerCase()
-                  .contains(nameSearchText) &&
-              employee.city.toLowerCase().contains(locationSearchText))
-          .toList();
+      List<String> locationParts =
+          locationSearchText.split(',').map((part) => part.trim()).toList();
+
+      filteredEmployees = employees!.where((employee) {
+        bool nameMatches = '${employee.firstName} ${employee.lastName}'
+            .toLowerCase()
+            .contains(nameSearchText);
+        bool locationMatches = locationParts.every((part) =>
+            employee.city.toLowerCase().contains(part) ||
+            employee.address.toLowerCase().contains(part));
+        return nameMatches && locationMatches;
+      }).toList();
 
       String message;
       if (filteredEmployees.isNotEmpty) {

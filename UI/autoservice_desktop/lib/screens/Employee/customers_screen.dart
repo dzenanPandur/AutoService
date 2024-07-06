@@ -452,13 +452,18 @@ class _CustomersScreenState extends State<CustomersScreen> {
     String locationSearchText = searchByLocationController.text.toLowerCase();
 
     if (customers != null) {
-      filteredCustomers = customers!
-          .where((customer) =>
-              '${customer.firstName} ${customer.lastName}'
-                  .toLowerCase()
-                  .contains(nameSearchText) &&
-              customer.city.toLowerCase().contains(locationSearchText))
-          .toList();
+      List<String> locationParts =
+          locationSearchText.split(',').map((part) => part.trim()).toList();
+
+      filteredCustomers = customers!.where((customer) {
+        bool nameMatches = '${customer.firstName} ${customer.lastName}'
+            .toLowerCase()
+            .contains(nameSearchText);
+        bool locationMatches = locationParts.every((part) =>
+            customer.city.toLowerCase().contains(part) ||
+            customer.address.toLowerCase().contains(part));
+        return nameMatches && locationMatches;
+      }).toList();
 
       String message;
       if (filteredCustomers.isNotEmpty) {
